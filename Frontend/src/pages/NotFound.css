@@ -1,0 +1,50 @@
+.not-found {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.not-found-content {
+  text-align: center;
+  color: white;
+}
+
+.not-found-number {
+  font-size: 8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.not-found-content h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: white;
+}
+
+.not-found-content p {
+  margin: 0 0 2rem 0;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.not-found-content a {
+  text-decoration: none;
+}
+
+@media (max-width: 576px) {
+  .not-found-number {
+    font-size: 4rem;
+  }
+
+  .not-found-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .not-found-content p {
+    font-size: 0.875rem;
+  }
+}

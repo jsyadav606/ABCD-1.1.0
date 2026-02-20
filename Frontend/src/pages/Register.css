@@ -1,0 +1,37 @@
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.register-button {
+  margin-top: 0.5rem;
+}
+
+.register-footer {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.register-footer p {
+  margin: 0;
+  color: #666;
+}
+
+.login-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.login-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .register-form {
+    gap: 0.75rem;
+  }
+}
