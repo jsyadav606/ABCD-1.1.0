@@ -49,7 +49,11 @@ API.interceptors.response.use(
     const originalRequest = error.config
 
     // Handle 401 - Try to refresh token if not already refreshing
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // But skip refresh logic for login/register endpoints - let them fail normally
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                          originalRequest.url?.includes('/auth/register')
+    
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
