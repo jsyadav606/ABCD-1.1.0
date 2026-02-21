@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.js';
 import Input from '../../components/Input/Input.jsx';
 import Select from '../../components/Select/Select.jsx';
 import Textarea from '../../components/Textarea/Textarea.jsx';
@@ -16,7 +15,6 @@ import './AddUser.css';
 
 const AddUser = () => {
   const navigate = useNavigate();
-  const { user: loggedInUser } = useAuth();
 
   // Organization ID (Fixed for all users as per requirement)
   const ORGANIZATION_ID = '6991f27977da956717ec33f5';
@@ -75,9 +73,9 @@ const AddUser = () => {
         setErrorMessage('');
 
         // Fetch roles
-   
+
         const rolesData = await fetchRolesForDropdown();
-      
+
         setRoles(rolesData);
 
         // Fetch branches
@@ -220,7 +218,7 @@ const AddUser = () => {
       // console.log('🔑 OrganizationId:', submitData.organizationId);
 
       // Create user
-      const result = await createNewUser(submitData);
+      await createNewUser(submitData);
 
       setSuccessMessage('User created successfully! Redirecting...');
 
@@ -250,32 +248,29 @@ const AddUser = () => {
   return (
     <div className="add-user-page">
       <SetPageTitle title="Add New User" />
-
-      
-
       <div className="form-container">
         <div className="form-header">
           <h1>Add New User</h1>
           <p>Create a new user account in the system</p>
 
           {errorMessage && (
-        <div className="alert-error">
-          <strong>Error:</strong> {errorMessage}
-        </div>
-      )}
+            <div className="alert-error">
+              <strong>Error:</strong> {errorMessage}
+            </div>
+          )}
 
-      {successMessage && (
-        <div className="alert-success">
-          <strong>Success:</strong> {successMessage}
-        </div>
-      )}
+          {successMessage && (
+            <div className="alert-success">
+              <strong>Success:</strong> {successMessage}
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="user-form">
           {/* BASIC INFORMATION */}
           <div className="form-section">
             <h2 className="section-heading">Basic Information</h2>
-            
+
             <div className="form-row">
               <Input
                 name="userId"
@@ -326,7 +321,7 @@ const AddUser = () => {
           {/* CONTACT INFORMATION */}
           <div className="form-section">
             <h2 className="section-heading">Contact Information</h2>
-            
+
             <div className="form-row">
               <Input
                 name="email"
@@ -374,7 +369,7 @@ const AddUser = () => {
           {/* ORGANIZATION DETAILS */}
           <div className="form-section">
             <h2 className="section-heading">Organization Details</h2>
-            
+
             <div className="form-row">
               <Input
                 name="organization"
@@ -448,7 +443,7 @@ const AddUser = () => {
           {/* ACCESS & ROLE */}
           <div className="form-section">
             <h2 className="section-heading">Access & Role</h2>
-            
+
             <div className="form-row">
               <Select
                 name="role"

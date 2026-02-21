@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchUserById } from "../../services/userApi";
 import { PageLoader } from "../../components/Loader/Loader.jsx";
 import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
@@ -7,7 +7,6 @@ import "./UserDetails.css";
 
 const UserDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);

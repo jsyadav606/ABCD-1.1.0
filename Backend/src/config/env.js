@@ -59,7 +59,7 @@ export function validateEnv() {
  * Get parsed CORS origin
  */
 export function getParsedCorsOrigin() {
-  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
   if (corsOrigin === '*') {
     return ['*'];
   }

@@ -15,7 +15,6 @@ import {
   toggleCanLogin,
   changeUserPassword,
 } from "../../services/userApi.js";
-import { exportToCSV } from "../../utils/exportToCSV.js";
 import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
 
 const Users = () => {

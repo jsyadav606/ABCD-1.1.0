@@ -361,7 +361,7 @@ export const canAccessScope = (resourceBranchId, resourceEnterpriseId) => {
  * @param {boolean} result
  */
 export const logPermissionCheck = (permissionKey, result) => {
-  if (process.env.DEBUG_PERMISSIONS === "true") {
+  if (import.meta.env.VITE_DEBUG_PERMISSIONS === "true") {
     console.log(
       `[Permission Check] ${permissionKey}: ${result ? "✅ ALLOWED" : "❌ DENIED"}`
     );

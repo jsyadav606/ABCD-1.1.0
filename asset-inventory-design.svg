@@ -1,0 +1,92 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box { fill: #ffffff; stroke: #1e293b; stroke-width: 2; rx: 8; ry: 8; }
+    .title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #0f172a; }
+    .text { font-family: Arial, sans-serif; font-size: 12px; fill: #4b5563; }
+    .arrow { stroke: #0f172a; stroke-width: 2; marker-end: url(#arrowhead); }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7"
+            refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <!-- HEADER -->
+  <text x="600" y="40" text-anchor="middle"
+        style="font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; fill:#0f172a;">
+    Dynamic IT Asset Model - High Level Design
+  </text>
+
+  <!-- LEFT: ADMIN UI -->
+  <rect x="60" y="90" width="320" height="220" class="box" fill="#eff6ff"/>
+  <text x="80" y="115" class="title">Admin / Super Admin UI</text>
+  <text x="80" y="145" class="text">• Create Asset Category (Item Type)</text>
+  <text x="80" y="165" class="text">• Define dynamic fields</text>
+  <text x="80" y="185" class="text">  (text, number, date, dropdown...)</text>
+  <text x="80" y="205" class="text">• Mark required / optional</text>
+  <text x="80" y="225" class="text">• Save as reusable template</text>
+
+  <!-- CENTER TOP: TEMPLATES -->
+  <rect x="440" y="90" width="320" height="220" class="box"/>
+  <text x="460" y="115" class="title">1. Asset Category (Template)</text>
+  <text x="460" y="145" class="text">Table: asset_categories</text>
+  <text x="460" y="165" class="text">• id</text>
+  <text x="460" y="185" class="text">• name (Laptop, Server, Peripheral...)</text>
+  <text x="460" y="205" class="text">• description</text>
+  <text x="460" y="225" class="text">• isActive</text>
+
+  <rect x="800" y="90" width="320" height="220" class="box"/>
+  <text x="820" y="115" class="title">2. Field Definitions</text>
+  <text x="820" y="145" class="text">Table: asset_fields</text>
+  <text x="820" y="165" class="text">• id</text>
+  <text x="820" y="185" class="text">• categoryId (FK → asset_categories)</text>
+  <text x="820" y="205" class="text">• name (serialNumber, ramSize)</text>
+  <text x="820" y="225" class="text">• label (Serial No, RAM Size)</text>
+  <text x="820" y="245" class="text">• type (text, number, date, select)</text>
+  <text x="820" y="265" class="text">• isRequired, defaultValue, optionsJSON</text>
+
+  <!-- ARROWS BETWEEN ADMIN UI AND TEMPLATES -->
+  <line x1="380" y1="200" x2="440" y2="200" class="arrow"/>
+  <line x1="760" y1="200" x2="800" y2="200" class="arrow"/>
+
+  <!-- BOTTOM: ASSET INSTANCES -->
+  <rect x="200" y="360" width="360" height="220" class="box"/>
+  <text x="220" y="385" class="title">3. Asset Item</text>
+  <text x="220" y="415" class="text">Table: assets</text>
+  <text x="220" y="435" class="text">• id</text>
+  <text x="220" y="455" class="text">• categoryId (Laptop / Server / ...)</text>
+  <text x="220" y="475" class="text">• status (in-stock, issued, scrapped)</text>
+  <text x="220" y="495" class="text">• assignedToUserId (nullable)</text>
+  <text x="220" y="515" class="text">• locationId</text>
+  <text x="220" y="535" class="text">• purchaseDate, vendorId, etc.</text>
+
+  <rect x="640" y="360" width="360" height="220" class="box"/>
+  <text x="660" y="385" class="title">4. Dynamic Field Values</text>
+  <text x="660" y="415" class="text">Table: asset_field_values</text>
+  <text x="660" y="435" class="text">• id</text>
+  <text x="660" y="455" class="text">• assetId (FK → assets)</text>
+  <text x="660" y="475" class="text">• fieldId (FK → asset_fields)</text>
+  <text x="660" y="495" class="text">• valueText / valueNumber / valueDate</text>
+  <text x="660" y="515" class="text">• stored as string or typed columns</text>
+
+  <!-- ARROWS FOR INSTANCE CREATION -->
+  <line x1="600" y1="310" x2="380" y2="360" class="arrow"/>
+  <line x1="600" y1="310" x2="820" y2="360" class="arrow"/>
+
+  <text x="600" y="330" text-anchor="middle" class="text">
+    When user creates an asset, UI reads Template + Fields and renders dynamic form.
+  </text>
+
+  <!-- RIGHT: USER UI -->
+  <rect x="940" y="360" width="200" height="220" class="box" fill="#eff6ff"/>
+  <text x="960" y="385" class="title">Inventory User UI</text>
+  <text x="960" y="415" class="text">• Choose Category</text>
+  <text x="960" y="435" class="text">• Form auto-builds from</text>
+  <text x="960" y="455" class="text">  asset_fields</text>
+  <text x="960" y="475" class="text">• User fills values</text>
+  <text x="960" y="495" class="text">• Save → assets + asset_field_values</text>
+
+  <line x1="820" y1="470" x2="940" y2="470" class="arrow"/>
+</svg>

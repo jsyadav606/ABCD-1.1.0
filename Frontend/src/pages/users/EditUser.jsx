@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth.js";
 import Input from "../../components/Input/Input.jsx";
 import Select from "../../components/Select/Select.jsx";
 import Textarea from "../../components/Textarea/Textarea.jsx";
@@ -18,7 +17,6 @@ import "./AddUser.css"; // Reuse same CSS
 const EditUser = () => {
   const navigate = useNavigate();
   const { id: mongoId } = useParams();
-  const { user: loggedInUser } = useAuth();
 
   // Organization ID (Fixed for all users as per requirement)
   const ORGANIZATION_ID = "6991f27977da956717ec33f5";
@@ -260,8 +258,7 @@ const EditUser = () => {
       // console.log('📋 Update payload:', submitData);
 
       // Update user
-      const result = await updateUser(mongoId, submitData);
-      // console.log('✅ Update successful:', result);
+      await updateUser(mongoId, submitData);
 
       setSuccessMessage("User updated successfully! Redirecting...");
 

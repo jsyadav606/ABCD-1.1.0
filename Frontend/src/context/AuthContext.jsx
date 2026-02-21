@@ -3,7 +3,7 @@ import { authAPI, clearAuthHeaders } from '../services/api'
 import { clearAllAuthStorage } from '../utils/permissionHelper'
 import { v4 as uuidv4 } from 'uuid'
 
-export const AuthContext = createContext()
+const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
@@ -195,3 +195,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+
+AuthProvider.Context = AuthContext

@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { authAPI } from "../../services/api";
 import { Modal, Input, Button } from "../../components";
-import { hasPermission } from "../../utils/permissionHelper";
 import "./Sidebar.css";
 
 const Sidebar = ({ collapsed, onCloseSidebar }) => {
@@ -202,7 +201,8 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
       return;
     }
 
-    const PASSWORD_LENGTH = Number(import.meta.env.VITE_PASSWORD_LENGTH);
+    const PASSWORD_LENGTH =
+      Number(import.meta.env.VITE_PASSWORD_LENGTH) || 8;
 
     if (newPassword.length < PASSWORD_LENGTH) {
       setChangePwdModal((prev) => ({
