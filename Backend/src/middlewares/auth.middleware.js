@@ -40,8 +40,8 @@ export const verifyJWT = async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    // Fetch user details
-    const user = await User.findById(decoded.id);
+    // Fetch user details and populate role information
+    const user = await User.findById(decoded.id).populate('roleId');
 
     if (!user) {
       return res.status(401).json({
@@ -110,11 +110,14 @@ export const verifyJWT = async (req, res, next) => {
       });
     }
 
-    // Attach user to request
+    // Attach user to request. Expose role name via `role` for compatibility.
+    const userObj = user.toObject();
     req.user = {
       id: decoded.id,
       username: decoded.username,
-      ...user.toObject(),
+      ...userObj,
+      role: user.roleId?.name || null,
+      roleId: user.roleId?._id || null,
     };
 
     next();

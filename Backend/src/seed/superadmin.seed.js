@@ -53,7 +53,6 @@ async function seedSuperAdmin() {
       superUser = await User.create({
         userId: "superadmin",
         name: "Super Admin",
-        role: superRole ? superRole.name : "super_admin",
         roleId: superRole ? superRole._id : null,
         organizationId: org._id,
         organizationName: org.name,

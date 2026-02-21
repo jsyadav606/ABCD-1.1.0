@@ -22,18 +22,26 @@ export const authService = {
    */
   async login(loginId, password, deviceId, ipAddress = null, userAgent = null) {
     try {
+      const loginIdStr = String(loginId || "").trim();
+      if (!loginIdStr) {
+        throw new apiError(401, "Invalid login credentials");
+      }
+
       // Find UserLogin by username first (case-insensitive)
-      let userLogin = await UserLogin.findOne({ username: loginId.toLowerCase() }).select("+password");
-      
-      // If not found by username, try to find User by userId or email, then get their UserLogin
+      let userLogin = await UserLogin.findOne({ username: loginIdStr.toLowerCase() }).select("+password");
+
+      // If not found by username, try User by userId or email (case-insensitive)
       if (!userLogin) {
+        const escapeRegex = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const escaped = escapeRegex(loginIdStr);
         const user = await User.findOne({
           $or: [
-            { userId: loginId },
-            { email: loginId }
-          ]
+            { userId: { $regex: new RegExp(`^${escaped}$`, "i") } },
+            { email: { $regex: new RegExp(`^${escaped}$`, "i") } },
+            { personalEmail: { $regex: new RegExp(`^${escaped}$`, "i") } },
+          ],
         });
-        
+
         if (user) {
           userLogin = await UserLogin.findOne({ user: user._id }).select("+password");
         }
@@ -101,8 +109,8 @@ export const authService = {
         userAgent
       );
 
-      // Fetch user details for response (exclude sensitive fields)
-      const userResponse = await User.findById(userLogin.user).select("-password");
+      // Fetch user details for response (exclude sensitive fields) and populate role
+      const userResponse = await User.findById(userLogin.user).select("-password").populate('roleId');
 
       return {
         success: true,

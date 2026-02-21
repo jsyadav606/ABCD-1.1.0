@@ -1,21 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.js';
-import Form from '../../components/Form/Form.jsx';
-import Input from '../../components/Input/Input.jsx';
-import Select from '../../components/Select/Select.jsx';
-import Textarea from '../../components/Textarea/Textarea.jsx';
-import Checkbox from '../../components/Checkbox/Checkbox.jsx';
-import Button from '../../components/Button/Button.jsx';
-import { PageLoader } from '../../components/Loader/Loader.jsx';
-import { SetPageTitle } from '../../components/SetPageTitle/SetPageTitle.jsx';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth.js";
+import Input from "../../components/Input/Input.jsx";
+import Select from "../../components/Select/Select.jsx";
+import Textarea from "../../components/Textarea/Textarea.jsx";
+import Button from "../../components/Button/Button.jsx";
+import { PageLoader } from "../../components/Loader/Loader.jsx";
+import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
 import {
   fetchUserById,
   updateUser,
   fetchRolesForDropdown,
   fetchBranchesForDropdown,
-} from '../../services/userApi.js';
-import './AddUser.css'; // Reuse same CSS
+} from "../../services/userApi.js";
+import "./AddUser.css"; // Reuse same CSS
 
 const EditUser = () => {
   const navigate = useNavigate();
@@ -23,21 +21,25 @@ const EditUser = () => {
   const { user: loggedInUser } = useAuth();
 
   // Organization ID (Fixed for all users as per requirement)
-  const ORGANIZATION_ID = '6991f27977da956717ec33f5';
+  const ORGANIZATION_ID = "6991f27977da956717ec33f5";
 
   // Form State
   const [formData, setFormData] = useState({
-    userId: '',
-    name: '',
-    designation: '',
-    department: '',
-    email: '',
-    phone_no: '',
-    role: '',
-    roleId: '',
+    userId: "",
+    name: "",
+    designation: "",
+    department: "",
+    email: "",
+    phone_no: "",
+    gender: "",
+    dateOfBirth: "",
+    personalEmail: "",
+    dateOfJoining: "",
+    role: "",
+    roleId: "",
     branchId: [],
     canLogin: false,
-    remarks: '',
+    remarks: "",
     organizationId: ORGANIZATION_ID,
   });
 
@@ -49,51 +51,81 @@ const EditUser = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Auto-hide messages after 5 seconds
+  useEffect(() => {
+    if (!errorMessage) return;
+    const t = setTimeout(() => setErrorMessage(""), 5000);
+    return () => clearTimeout(t);
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (!successMessage) return;
+    const t = setTimeout(() => setSuccessMessage(""), 5000);
+    return () => clearTimeout(t);
+  }, [successMessage]);
 
   // Fetch user data and dropdowns on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        setErrorMessage('');
+        setErrorMessage("");
 
         // Fetch user data
-        console.log('📥 Fetching user data for ID:', mongoId);
+        // console.log('📥 Fetching user data for ID:', mongoId);
         const userData = await fetchUserById(mongoId);
-        console.log('✅ User data received:', userData);
+        // console.log('✅ User data received:', userData);
 
-        // Map user data to form
+        // Map user data to form (branchId may be array of objects or ids)
+        const branchIds = Array.isArray(userData.branchId)
+          ? userData.branchId.map((b) =>
+              typeof b === "object" && b?._id ? b._id : b,
+            )
+          : [];
         setFormData({
-          userId: userData.userId || '',
-          name: userData.name || '',
-          designation: userData.designation || '',
-          department: userData.department || '',
-          email: userData.email || '',
-          phone_no: userData.phone_no || '',
-          role: userData.role || '',
-          roleId: userData.roleId || '',
-          branchId: userData.branchId || [],
+          userId: userData.userId || "",
+          name: userData.name || "",
+          designation: userData.designation || "",
+          department: userData.department || "",
+          email: userData.email || "",
+          phone_no: userData.phone_no || "",
+          gender: userData.gender || "",
+          dateOfBirth: userData.dob
+            ? typeof userData.dob === "string"
+              ? userData.dob.slice(0, 10)
+              : new Date(userData.dob).toISOString().slice(0, 10)
+            : "",
+          personalEmail: userData.personalEmail || "",
+          dateOfJoining: userData.dateOfJoining
+            ? typeof userData.dateOfJoining === "string"
+              ? userData.dateOfJoining.slice(0, 10)
+              : new Date(userData.dateOfJoining).toISOString().slice(0, 10)
+            : "",
+          role: userData.role || "",
+          roleId: userData.roleId || "",
+          branchId: branchIds,
           canLogin: userData.canLogin || false,
-          remarks: userData.remarks || '',
+          remarks: userData.remarks || "",
           organizationId: userData.organizationId || ORGANIZATION_ID,
         });
 
         // Fetch roles
-        console.log('📥 Fetching roles...');
+        console.log("📥 Fetching roles...");
         const rolesData = await fetchRolesForDropdown();
-        console.log('✅ Roles received:', rolesData);
+        console.log("✅ Roles received:", rolesData);
         setRoles(rolesData);
 
         // Fetch branches
-        console.log('📥 Fetching branches for orgId:', ORGANIZATION_ID);
+        // console.log('📥 Fetching branches for orgId:', ORGANIZATION_ID);
         const branchesData = await fetchBranchesForDropdown(ORGANIZATION_ID);
-        console.log('✅ Branches received:', branchesData);
+        // console.log('✅ Branches received:', branchesData);
         setBranches(branchesData);
       } catch (error) {
-        console.error('❌ Failed to load data:', error);
-        setErrorMessage(error.message || 'Failed to load user data');
+        console.error("❌ Failed to load data:", error);
+        setErrorMessage(error.message || "Failed to load user data");
       } finally {
         setLoading(false);
       }
@@ -107,27 +139,31 @@ const EditUser = () => {
     const newErrors = {};
 
     if (!formData.userId.trim()) {
-      newErrors.userId = 'User ID is required';
+      newErrors.userId = "User ID is required";
     }
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     }
 
-    if (!formData.role) {
-      newErrors.role = 'Role is required';
+    if (!formData.roleId) {
+      newErrors.role = "Role is required";
     }
 
     if (formData.branchId.length === 0) {
-      newErrors.branchId = 'At least one branch must be selected';
+      newErrors.branchId = "At least one branch must be selected";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Gender is required";
     }
 
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = "Please enter a valid email address";
     }
 
     if (formData.phone_no && !/^\d{10}$/.test(formData.phone_no)) {
-      newErrors.phone_no = 'Phone number must be 10 digits';
+      newErrors.phone_no = "Phone number must be 10 digits";
     }
 
     setErrors(newErrors);
@@ -138,14 +174,17 @@ const EditUser = () => {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       setFormData((prev) => ({
         ...prev,
         [name]: checked,
       }));
-    } else if (name === 'branchId') {
+    } else if (name === "branchId") {
       // Handle multi-select
-      const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+      const selectedOptions = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value,
+      );
       setFormData((prev) => ({
         ...prev,
         [name]: selectedOptions,
@@ -161,7 +200,7 @@ const EditUser = () => {
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: '',
+        [name]: "",
       }));
     }
   };
@@ -174,13 +213,13 @@ const EditUser = () => {
     setFormData((prev) => ({
       ...prev,
       roleId: selectedRoleId,
-      role: selectedRole?.name || '',
+      role: selectedRole?.name || "",
     }));
 
     if (errors.role) {
       setErrors((prev) => ({
         ...prev,
-        role: '',
+        role: "",
       }));
     }
   };
@@ -190,49 +229,50 @@ const EditUser = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      setErrorMessage('Please fix all errors before submitting');
+      setErrorMessage("Please fix all errors before submitting");
       return;
     }
 
     try {
       setSubmitting(true);
-      setErrorMessage('');
-      setSuccessMessage('');
+      setErrorMessage("");
+      setSuccessMessage("");
 
-      // Prepare data for submission
-      // NOTE: canLogin and isActive cannot be updated via PUT endpoint
-      // They must be changed using dedicated buttons (Enable Login, Disable Login, etc.)
+      // Prepare data for submission (roleId only, no redundant role string)
       const submitData = {
         userId: formData.userId.trim(),
         name: formData.name.trim(),
-        designation: formData.designation.trim() || 'NA',
-        department: formData.department.trim() || 'NA',
+        designation: formData.designation.trim() || "NA",
+        department: formData.department.trim() || "NA",
         email: formData.email.trim() || null,
+        gender: formData.gender || null,
         phone_no: formData.phone_no ? parseInt(formData.phone_no) : null,
-        role: formData.role,
+        dob: formData.dateOfBirth || null,
+        personalEmail: formData.personalEmail?.trim() || null,
+        dateOfJoining: formData.dateOfJoining || null,
         roleId: formData.roleId || null,
         branchId: formData.branchId,
-        remarks: formData.remarks.trim() || '',
+        remarks: formData.remarks.trim() || "",
         organizationId: formData.organizationId,
       };
 
-      console.log('📤 Submitting user update for ID:', mongoId);
-      console.log('📋 Update payload:', submitData);
+      // console.log('📤 Submitting user update for ID:', mongoId);
+      // console.log('📋 Update payload:', submitData);
 
       // Update user
       const result = await updateUser(mongoId, submitData);
-      console.log('✅ Update successful:', result);
+      // console.log('✅ Update successful:', result);
 
-      setSuccessMessage('User updated successfully! Redirecting...');
+      setSuccessMessage("User updated successfully! Redirecting...");
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate('/users');
+        navigate("/users");
       }, 2000);
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error("Error updating user:", error);
       setErrorMessage(
-        error.message || 'Failed to update user. Please try again.'
+        error.message || "Failed to update user. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -241,7 +281,7 @@ const EditUser = () => {
 
   // Handle cancel
   const handleCancel = () => {
-    navigate('/users');
+    navigate("/users");
   };
 
   if (loading) {
@@ -249,221 +289,232 @@ const EditUser = () => {
   }
 
   return (
-    <div className="add-user-container">
+    <div className="add-user-page">
       <SetPageTitle title="Edit User" />
 
-      <div className="add-user-wrapper">
-        {/* Header */}
-        <div className="add-user-header">
-          <h1 className="add-user-title">Edit User</h1>
-          <p className="add-user-subtitle">
-            Update user information, role and branch assignments
-          </p>
+      <div className="form-container">
+        <div className="form-header">
+          <h1>Edit User</h1>
+          <p>Update user information, role and branch assignments</p>
+
+          {errorMessage && (
+            <div className="alert-error">
+              <strong>Error:</strong> {errorMessage}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="alert-success">
+              <strong>Success:</strong> {successMessage}
+            </div>
+          )}
         </div>
 
-        {/* Form Content */}
-        <div className="add-user-form-content">
-          {/* Success Message */}
-          {successMessage && (
-            <div className="success-message">{successMessage}</div>
-          )}
+        <form onSubmit={handleSubmit} className="user-form">
+          {/* BASIC INFORMATION */}
+          <div className="form-section">
+            <h2 className="section-heading">Basic Information</h2>
 
-          {/* Error Message */}
-          {errorMessage && (
-            <div className="error-message">{errorMessage}</div>
-          )}
-
-          <Form onSubmit={handleSubmit}>
-            {/* User Identity Section */}
-            <div className="form-section-title">Basic Information</div>
-
-            <div className="user-form-grid">
-              <div className="user-input-group">
-                <Input
-                  label="User ID"
-                  name="userId"
-                  type="text"
-                  value={formData.userId}
-                  onChange={handleInputChange}
-                  error={errors.userId}
-                  placeholder="Enter unique user ID"
-                  required
-                />
-              </div>
-
-              <div className="user-input-group">
-                <Input
-                  label="Full Name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  error={errors.name}
-                  placeholder="Enter full name"
-                  required
-                />
-              </div>
-
-              <div className="user-input-group">
-                <Input
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  error={errors.email}
-                  placeholder="Enter email address"
-                />
-              </div>
-
-              <div className="user-input-group">
-                <Input
-                  label="Phone Number"
-                  name="phone_no"
-                  type="tel"
-                  value={formData.phone_no}
-                  onChange={handleInputChange}
-                  error={errors.phone_no}
-                  placeholder="Enter 10-digit phone number"
-                  maxLength="10"
-                />
-              </div>
-
-              <div className="user-input-group">
-                <Input
-                  label="Designation"
-                  name="designation"
-                  type="text"
-                  value={formData.designation}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Manager, Executive"
-                />
-              </div>
-
-              <div className="user-input-group">
-                <Input
-                  label="Department"
-                  name="department"
-                  type="text"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Sales, Operations"
-                />
-              </div>
-            </div>
-
-            {/* Role and Branch Section */}
-            <div className="form-section-title">
-              Role & Branch Assignment
-            </div>
-
-            <div className="user-form-grid">
-              <div className="user-input-group">
-                <Select
-                  label="Role"
-                  name="role"
-                  value={formData.roleId}
-                  onChange={handleRoleChange}
-                  error={errors.role}
-                  placeholder="Select a role"
-                  required
-                  options={roles.map((role) => ({
-                    value: role._id,
-                    label: `${role.displayName} (${role.name})`,
-                  }))}
-                />
-              </div>
-
-              <div className="user-input-group multi-select-group">
-                <label htmlFor="branchId">
-                  Branches <span className="select-required">*</span>
-                </label>
-                <select
-                  id="branchId"
-                  name="branchId"
-                  multiple
-                  value={formData.branchId}
-                  onChange={handleInputChange}
-                  className={`select-field ${errors.branchId ? 'select-error' : ''}`}
-                >
-                  {branches.map((branch) => (
-                    <option key={branch._id} value={branch._id}>
-                      {branch.name} {branch.code ? `(${branch.code})` : ''}
-                    </option>
-                  ))}
-                </select>
-                {errors.branchId && (
-                  <span className="select-error-text">{errors.branchId}</span>
-                )}
-                <small style={{ color: '#666', marginTop: '0.25rem' }}>
-                  Hold Ctrl/Cmd to select multiple branches
-                </small>
-              </div>
-            </div>
-
-            {/* Access & Permissions Section */}
-            <div className="form-section-title">
-              Access & Permissions
-            </div>
-
-            <div className="checkbox-container">
-              <Checkbox
-                label="Enable Login (canLogin)"
-                name="canLogin"
-                checked={formData.canLogin}
+            <div className="form-row">
+              <Input
+                name="userId"
+                label="User ID"
+                type="text"
+                value={formData.userId}
                 onChange={handleInputChange}
+                error={errors.userId}
+                placeholder="Enter unique user ID"
+                required
+              />
+              <Input
+                name="name"
+                label="Full Name"
+                type="text"
+                value={formData.name}
+                onChange={handleInputChange}
+                error={errors.name}
+                placeholder="Enter full name"
+                required
+              />
+            </div>
+
+            <div className="form-row">
+              <Select
+                name="gender"
+                label="Gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                error={errors.gender}
+                options={[
+                  { value: "Male", label: "Male" },
+                  { value: "Female", label: "Female" },
+                  { value: "Other", label: "Other" },
+                ]}
+                required
+              />
+              <Input
+                name="dateOfBirth"
+                label="Date of Birth"
+                type="date"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* CONTACT INFORMATION */}
+          <div className="form-section">
+            <h2 className="section-heading">Contact Information</h2>
+
+            <div className="form-row">
+              <Input
+                name="email"
+                label="Office Email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                error={errors.email}
+                placeholder="Enter office email"
+              />
+              <Input
+                name="personalEmail"
+                label="Personal Email"
+                type="email"
+                value={formData.personalEmail}
+                onChange={handleInputChange}
+                placeholder="Enter personal email"
+              />
+            </div>
+
+            <div className="form-row">
+              <Input
+                name="phone_no"
+                label="Mobile Number"
+                type="tel"
+                value={formData.phone_no}
+                onChange={handleInputChange}
+                error={errors.phone_no}
+                placeholder="Enter 10-digit mobile number"
+                maxLength="10"
+              />
+            </div>
+          </div>
+
+          {/* ORGANIZATION DETAILS */}
+          <div className="form-section">
+            <h2 className="section-heading">Organization Details</h2>
+
+            <div className="form-row">
+              <Input
+                name="organization"
+                label="Organization"
+                type="text"
+                value="ABCD Corporation"
                 disabled
               />
-              <small style={{ color: '#999' }}>
-                ℹ️ Login status cannot be changed here. Use "Enable Login" / "Disable Login" buttons from the Users list.
-              </small>
+              <Select
+                name="branchId"
+                label="Branches"
+                value={
+                  formData.branchId && formData.branchId[0]
+                    ? formData.branchId[0]
+                    : ""
+                }
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      branchId: [e.target.value],
+                    }));
+                  }
+                }}
+                error={errors.branchId}
+                options={branches.map((b) => ({
+                  value: b._id,
+                  label: `${b.name}${b.code ? ` (${b.code})` : ""}`,
+                }))}
+                required
+              />
             </div>
 
-            {/* Remarks Section */}
-            <div className="form-section-title">Additional Information</div>
-
-            <div className="user-form-grid full-width">
-              <div className="user-input-group">
-                <Textarea
-                  label="Remarks"
-                  name="remarks"
-                  value={formData.remarks}
-                  onChange={handleInputChange}
-                  placeholder="Add any additional notes or remarks about this user..."
-                  rows={4}
-                />
-              </div>
+            <div className="form-row">
+              <Input
+                name="department"
+                label="Department"
+                type="text"
+                value={formData.department}
+                onChange={handleInputChange}
+                placeholder="e.g., Sales, Operations"
+              />
+              <Input
+                name="designation"
+                label="Designation"
+                type="text"
+                value={formData.designation}
+                onChange={handleInputChange}
+                placeholder="e.g., Manager, Executive"
+              />
             </div>
 
-            {/* Form Actions */}
-            <div className="form-actions">
-              <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                onClick={handleCancel}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <span className="form-loading">
-                    <span>Saving...</span>
-                  </span>
-                ) : (
-                  'Save Changes'
-                )}
-              </Button>
+            <div className="form-row">
+              <Input
+                name="dateOfJoining"
+                label="Date of Joining"
+                type="date"
+                value={formData.dateOfJoining}
+                onChange={handleInputChange}
+              />
             </div>
-          </Form>
-        </div>
+          </div>
+
+          {/* ACCESS & ROLE */}
+          <div className="form-section">
+            <h2 className="section-heading">Access & Role</h2>
+
+            <div className="form-row">
+              <Select
+                name="role"
+                label="Role"
+                value={formData.roleId}
+                onChange={handleRoleChange}
+                error={errors.role}
+                options={roles.map((r) => ({
+                  value: r._id,
+                  label: `${r.displayName} (${r.name})`,
+                }))}
+                required
+              />
+            </div>
+          </div>
+
+          {/* REMARKS */}
+          <div className="form-section">
+            <h2 className="section-heading">Additional Information</h2>
+            <Textarea
+              name="remarks"
+              label="Remarks"
+              value={formData.remarks}
+              onChange={handleInputChange}
+              placeholder="Add any additional notes or remarks about this user..."
+              rows={4}
+            />
+          </div>
+
+          {/* FORM ACTIONS */}
+          <div className="form-actions">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleCancel}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" disabled={submitting}>
+              {submitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

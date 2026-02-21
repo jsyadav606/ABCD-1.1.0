@@ -247,6 +247,23 @@ export const clearAuthData = () => {
 };
 
 /**
+ * Clear ALL auth-related data from storage (called on logout).
+ * Removes: accessToken, user, permissions, authData from localStorage,
+ * and deviceId from sessionStorage.
+ */
+export const clearAllAuthStorage = () => {
+  try {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("permissions");
+    localStorage.removeItem("authData");
+    sessionStorage.removeItem("deviceId");
+  } catch (error) {
+    console.error("Error clearing auth storage:", error);
+  }
+};
+
+/**
  * Check if user is authenticated
  * @returns {boolean}
  */

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useCallback, useEffect } from 'react'
-import { authAPI } from '../services/api'
+import { authAPI, clearAuthHeaders } from '../services/api'
+import { clearAllAuthStorage } from '../utils/permissionHelper'
 import { v4 as uuidv4 } from 'uuid'
 
 export const AuthContext = createContext()
@@ -10,30 +11,30 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [deviceId, setDeviceId] = useState(() => {
-    // Generate and store device ID for this device
     const stored = sessionStorage.getItem('deviceId')
     return stored || uuidv4()
   })
 
   // Store device ID in session storage
   useEffect(() => {
-    sessionStorage.setItem('deviceId', deviceId)
+    if (deviceId) {
+      sessionStorage.setItem('deviceId', deviceId)
+    }
   }, [deviceId])
 
-  // Check if user is already logged in
+  // Check if user is already logged in (on mount)
   useEffect(() => {
     const checkAuth = () => {
       const storedUser = localStorage.getItem('user')
       const token = localStorage.getItem('accessToken')
-      
+
       if (storedUser && token) {
         try {
           setUser(JSON.parse(storedUser))
           setIsAuthenticated(true)
         } catch (err) {
           console.error('Failed to parse stored user:', err)
-          localStorage.removeItem('user')
-          localStorage.removeItem('accessToken')
+          clearAllAuthStorage()
         }
       }
       setLoading(false)
@@ -50,8 +51,9 @@ export const AuthProvider = ({ children }) => {
       userId: fullUser.userId,
       name: fullUser.name,
       email: fullUser.email,
-      role: fullUser.role,
-      roleId: fullUser.roleId
+      // Role: prefer populated role name if available (fullUser.roleId.name), else keep roleId
+      role: fullUser.roleId?.name || null,
+      roleId: fullUser.roleId?._id || fullUser.roleId || null,
     }
   }
 
@@ -129,13 +131,16 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const logout = useCallback(async () => {
+    const currentDeviceId = deviceId
     try {
-      await authAPI.logout(deviceId)
+      // Call backend first (while we still have token + cookie) to invalidate refresh token
+      await authAPI.logout(currentDeviceId)
     } catch (err) {
-      console.error('Logout error:', err)
+      // Still clear local state even if API fails (e.g. network error, token expired)
+      console.warn('Logout API call failed, clearing local session:', err?.message)
     } finally {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('user')
+      clearAuthHeaders()
+      clearAllAuthStorage()
       setUser(null)
       setIsAuthenticated(false)
     }
@@ -145,10 +150,10 @@ export const AuthProvider = ({ children }) => {
     try {
       await authAPI.logoutAll()
     } catch (err) {
-      console.error('Logout all error:', err)
+      console.warn('Logout all API failed, clearing local session:', err?.message)
     } finally {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('user')
+      clearAuthHeaders()
+      clearAllAuthStorage()
       setUser(null)
       setIsAuthenticated(false)
     }

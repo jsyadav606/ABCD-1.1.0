@@ -24,7 +24,8 @@ export const createNewUser = async (userData) => {
     return response.data?.data || response.data
   } catch (error) {
     console.error('Failed to create user:', error)
-    throw new Error(error.response?.data?.message || 'Failed to create user')
+    const msg = error.response?.data?.message ?? error.message
+    throw new Error(typeof msg === 'string' ? msg : 'Failed to create user')
   }
 }
 

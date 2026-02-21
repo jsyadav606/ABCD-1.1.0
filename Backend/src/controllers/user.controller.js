@@ -77,15 +77,23 @@ export const createUser = asyncHandler(async (req, res) => {
     throw new apiError(400, "userId, name and organizationId are required");
   }
 
+  if (!payload.gender || !["Male", "Female", "Other"].includes(payload.gender)) {
+    throw new apiError(400, "gender is required and must be one of: Male, Female, Other");
+  }
+
   // Prevent client from forcing fields we manage server-side
   const toCreate = {
     userId: payload.userId,
     name: payload.name,
-    designation: payload.designation || payload.designation || "NA",
+    designation: payload.designation || "NA",
     department: payload.department || "NA",
+    gender: payload.gender,
+    dob: payload.dob ? new Date(payload.dob) : (payload.dateOfBirth ? new Date(payload.dateOfBirth) : null),
+    dateOfJoining: payload.dateOfJoining ? new Date(payload.dateOfJoining) : null,
     email: payload.email || null,
+    personalEmail: payload.personalEmail || null,
     phone_no: payload.phone_no || null,
-    role: payload.role || "user",
+    // Role is now stored as roleId reference. Try to resolve provided role name to an id.
     roleId: payload.roleId || null,
     permissions: payload.permissions || [],
     reportingTo: payload.reportingTo || null,
@@ -94,8 +102,21 @@ export const createUser = asyncHandler(async (req, res) => {
     canLogin: payload.canLogin === true,
     isActive: payload.isActive !== false,
     isBlocked: payload.isBlocked === true,
+    remarks: payload.remarks != null && payload.remarks !== '' ? String(payload.remarks).trim() : '',
     createdBy: payload.createdBy || null,
   };
+
+  // If a role name was provided instead of roleId, try to resolve it
+  if (!toCreate.roleId && payload.role) {
+    try {
+      const foundRole = await Role.findOne({ name: payload.role, isDeleted: false });
+      if (foundRole) {
+        toCreate.roleId = foundRole._id;
+      }
+    } catch (err) {
+      // ignore resolution errors and continue with null roleId
+    }
+  }
 
   const user = await User.create(toCreate);
 
@@ -114,7 +135,8 @@ export const createUser = asyncHandler(async (req, res) => {
 
 export const getUserById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const user = await User.findById(id).lean();
+  const userDoc = await User.findById(id).populate('roleId branchId').lean();
+  const user = userDoc ? { ...userDoc, role: userDoc.roleId?.name || null } : null;
   
   if (!user) {
     throw new apiError(404, "User not found");
@@ -129,7 +151,17 @@ export const listUsers = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
 
   const filter = {};
-  if (req.query.role) filter.role = req.query.role;
+  // Support filtering by role name or roleId
+  if (req.query.role) {
+    const roleQuery = req.query.role;
+    // If looks like an ObjectId, use directly
+    if (/^[0-9a-fA-F]{24}$/.test(roleQuery)) {
+      filter.roleId = roleQuery;
+    } else {
+      const found = await Role.findOne({ name: roleQuery, isDeleted: false }).select("_id");
+      if (found) filter.roleId = found._id;
+    }
+  }
   if (req.query.isActive !== undefined) filter.isActive = req.query.isActive === "true";
   if (req.query.canLogin !== undefined) filter.canLogin = req.query.canLogin === "true";
   if (req.query.organizationId) filter.organizationId = req.query.organizationId;
@@ -140,13 +172,20 @@ export const listUsers = asyncHandler(async (req, res) => {
       { name: new RegExp(q, "i") },
       { userId: new RegExp(q, "i") },
       { email: new RegExp(q, "i") },
+      { personalEmail: new RegExp(q, "i") },
     ];
   }
 
-  const [items, total] = await Promise.all([
-    User.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
+  const [itemsRaw, total] = await Promise.all([
+    User.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).populate('roleId branchId').lean(),
     User.countDocuments(filter),
   ]);
+
+  // Map role name for compatibility with frontend which expects `role` string
+  const items = itemsRaw.map((it) => ({
+    ...it,
+    role: it.roleId?.name || null,
+  }));
 
   return res.status(200).json(new apiResponse(200, { items, meta: { page, limit, total } }, "Users retrieved successfully"));
 });
@@ -187,6 +226,11 @@ export const updateUser = asyncHandler(async (req, res) => {
 export const toggleCanLogin = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { enable, loginId } = req.body; // enable:boolean, loginId optional (userId/email/username)
+
+  // User cannot change their own canLogin status
+  if (req.user?.id && String(req.user.id) === String(id)) {
+    throw new apiError(403, "You cannot change your own login status");
+  }
 
   // Validate input
   if (enable === undefined || enable === null) {
@@ -240,6 +284,11 @@ export const toggleIsActive = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { enable } = req.body; // boolean
 
+  // User cannot change their own isActive status
+  if (req.user?.id && String(req.user.id) === String(id)) {
+    throw new apiError(403, "You cannot change your own active status");
+  }
+
   const user = await User.findById(id);
   
   if (!user) {
@@ -275,9 +324,13 @@ export const changeUserRole = asyncHandler(async (req, res) => {
       throw new apiError(400, "Role not found");
     }
     user.roleId = roleId;
-    user.role = found.name || role || user.role;
   } else if (role) {
-    user.role = role;
+    // If role name provided, try to resolve to roleId
+    const found = await Role.findOne({ name: role, isDeleted: false });
+    if (!found) {
+      throw new apiError(400, "Role not found by name");
+    }
+    user.roleId = found._id;
   }
 
   await user.save();

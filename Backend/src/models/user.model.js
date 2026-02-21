@@ -23,6 +23,15 @@ const userSchema = new mongoose.Schema(
       default:"NA",
       trim: true,
     },
+     gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+      required: true
+    },
+     dob: {
+      type: Date,
+      default: null
+    },
 
     departmentId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -37,17 +46,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    personalEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      default: null
+    },
+
     phone_no: {
       type: Number,
       trim: true,
       length: 10,
-    },
-
-    role: {
-      type: String,
-      enum: ["enterprise_admin","super_admin", "admin", "user"],
-      required: true,
-      default:"user",
     },
 
     // NEW: Role-based permission system (Enterprise feature)
@@ -62,6 +71,12 @@ const userSchema = new mongoose.Schema(
       type:Boolean,
       default:false
     },
+
+     dateOfJoining: {
+      type: Date,
+      default: null
+    },
+
 
     permissions: [String],
 
@@ -112,7 +127,8 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ userId: 1, organizationId: 1 }, { unique: true });
 userSchema.index({ email: 1 });
 userSchema.index({ organizationId: 1 });
-userSchema.index({ role: 1 });
+// Use roleId index (role string removed in new schema)
+userSchema.index({ roleId: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ isBlocked: 1 });
 userSchema.index({ createdAt: -1 });

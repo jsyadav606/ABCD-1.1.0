@@ -11,7 +11,7 @@
   border-radius: 6px;
   padding: 12px 16px;
   color: #065f46;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   font-size: 14px;
 }
 
@@ -21,7 +21,7 @@
   border-radius: 6px;
   padding: 12px 16px;
   color: #7f1d1d;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   font-size: 14px;
 }
 
@@ -33,9 +33,20 @@
   overflow: hidden;
 }
 
+/* Layout: keep header (and outside alerts) fixed, make form body scrollable */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  /* max-height: calc(80vh); */
+}
+
 .form-header {
   padding: 24px;
   border-bottom: 1px solid #e5e7eb;
+  /* position: fixed;
+  top: var(--header-height); */
+  background-color: white;
+  z-index: 10;
 }
 
 .form-header h1 {
@@ -53,7 +64,9 @@
 
 /* User Form */
 .user-form {
-  padding: 24px;
+  padding: 24px 24px 0 24px; /* remove bottom padding so actions sit flush */
+  overflow: auto;
+  flex: 1 1 auto;
 }
 
 /* Form Section */
@@ -94,8 +107,13 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  padding-top: 24px;
+  padding: 12px 24px; /* slightly reduced padding */
   border-top: 1px solid #e5e7eb;
+  background: white;
+  /* Keep actions visible when form scrolls */
+  position: sticky;
+  bottom: 0;
+  box-shadow: 0 -6px 18px rgba(0,0,0,0.03); /* subtle separation instead of empty gap */
 }
 
 /* Responsive Design */

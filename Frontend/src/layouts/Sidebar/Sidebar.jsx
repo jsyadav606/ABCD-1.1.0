@@ -225,10 +225,8 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
     try {
       await authAPI.changePassword(oldPassword, newPassword, confirmPassword);
       handleCloseChangePwdModal();
-      // Backend clears refresh token - logout and redirect to login
       await logout();
-      navigate("/login");
-      if (onCloseSidebar) onCloseSidebar();
+      window.location.href = "/login";
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -360,24 +358,14 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
             </button>
             <button
               onClick={async () => {
-                // Close user panel first
                 setUserOpen(false);
-
-                // Perform logout via AuthContext (clears storage + state)
                 try {
                   await logout();
                 } catch (e) {
-                  // Optional: log error, but still navigate away
                   console.error("Logout failed:", e);
                 }
-
-                // Redirect to login page
-                navigate("/login");
-
-                // Close sidebar on mobile if callback provided
-                if (onCloseSidebar) {
-                  onCloseSidebar();
-                }
+                // Hard redirect ensures full cleanup (no stale React state)
+                window.location.href = "/login";
               }}
             >
               <span className="material-icons">logout</span> Logout

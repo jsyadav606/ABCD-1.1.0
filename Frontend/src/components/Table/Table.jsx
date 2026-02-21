@@ -11,6 +11,7 @@ const Table = ({
   showSearch = true,
   showPagination = true,
   onSelectionChange,
+  isRowSelectable,
   defaultSortKey = null,
   defaultSortDirection = "asc",
 }) => {
@@ -95,14 +96,18 @@ const Table = ({
   const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
   const endIndex = Math.min(totalItems, page * pageSize);
 
+  const canSelectRow = (row) => !isRowSelectable || isRowSelectable(row);
+
   const toggleRow = (row) => {
+    if (!canSelectRow(row)) return;
     setSelectedRows((prev) =>
       prev.includes(row._id) ? prev.filter((id) => id !== row._id) : [...prev, row._id],
     );
   };
 
   const toggleAll = (checked) => {
-    const pageIds = tableData.map((row) => row._id);
+    const selectableRows = tableData.filter(canSelectRow);
+    const pageIds = selectableRows.map((row) => row._id);
     setSelectedRows((prev) =>
       checked ? [...new Set([...prev, ...pageIds])] : prev.filter((id) => !pageIds.includes(id)),
     );
@@ -156,7 +161,8 @@ const Table = ({
                   type="checkbox"
                   onChange={(e) => toggleAll(e.target.checked)}
                   checked={
-                    tableData.length > 0 && tableData.every((row) => selectedRows.includes(row._id))
+                    tableData.filter(canSelectRow).length > 0 &&
+                    tableData.filter(canSelectRow).every((row) => selectedRows.includes(row._id))
                   }
                 />
               </th>
@@ -194,7 +200,12 @@ const Table = ({
                 className={selectedRows.includes(row._id) ? "table__row table__row--selected" : "table__row"}
               >
                 <td>
-                  <input type="checkbox" checked={selectedRows.includes(row._id)} onChange={() => toggleRow(row)} />
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.includes(row._id)}
+                    onChange={() => toggleRow(row)}
+                    disabled={!canSelectRow(row)}
+                  />
                 </td>
 
                 {columns.map((col, i) => (

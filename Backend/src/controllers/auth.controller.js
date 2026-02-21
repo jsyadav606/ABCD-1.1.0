@@ -1,6 +1,7 @@
 import authService from "../services/auth.service.js";
 import {
   getRefreshTokenCookieOptions,
+  getClearRefreshTokenCookieOptions,
 } from "../utils/tokenUtils.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -115,8 +116,11 @@ export const logoutController = asyncHandler(async (req, res) => {
   // Call service
   const result = await authService.logout(userId, deviceId);
 
-  // Clear refresh token cookie
-  res.clearCookie("refreshToken", { path: "/" });
+  // Clear refresh token cookie - res.cookie with empty value + maxAge:0 (more reliable than clearCookie)
+  const clearOpts = getClearRefreshTokenCookieOptions();
+  res.cookie("refreshToken", "", clearOpts);
+  // Also clear with SameSite=Lax (browsers may have stored with different SameSite)
+  res.cookie("refreshToken", "", { ...clearOpts, sameSite: "lax" });
 
   return res.status(200).json(new apiResponse(200, null, result.message));
 });
@@ -149,7 +153,9 @@ export const logoutAllDevicesController = asyncHandler(async (req, res) => {
   const result = await authService.logoutAllDevices(userId);
 
   // Clear refresh token cookie
-  res.clearCookie("refreshToken", { path: "/" });
+  const clearOpts = getClearRefreshTokenCookieOptions();
+  res.cookie("refreshToken", "", clearOpts);
+  res.cookie("refreshToken", "", { ...clearOpts, sameSite: "lax" });
 
   return res.status(200).json(new apiResponse(200, null, result.message));
 });
@@ -248,9 +254,9 @@ export const changePasswordController = asyncHandler(async (req, res) => {
   );
 
   // Clear refresh token cookie
-  res.clearCookie("refreshToken", {
-    path: "/",
-  });
+  const clearOpts = getClearRefreshTokenCookieOptions();
+  res.cookie("refreshToken", "", clearOpts);
+  res.cookie("refreshToken", "", { ...clearOpts, sameSite: "lax" });
 
   return res.status(200).json(new apiResponse(200, null, result.message));
 });

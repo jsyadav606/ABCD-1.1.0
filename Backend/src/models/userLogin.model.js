@@ -110,13 +110,17 @@ userLoginSchema.methods.generateRefreshToken = async function (deviceId, ipAddre
     }
   );
 
-  // Store token in refreshTokens array
+  const devId = deviceId || "unknown";
+
+  // refreshTokens array = only currently active tokens (one per device)
   if (!Array.isArray(this.refreshTokens)) {
     this.refreshTokens = [];
   }
+  // Remove any existing token for this device (old token when refreshing)
+  this.refreshTokens = this.refreshTokens.filter((rt) => rt.deviceId !== devId);
   this.refreshTokens.push({
     token,
-    deviceId: deviceId || "unknown",
+    deviceId: devId,
     createdAt: new Date(),
   });
 
@@ -200,8 +204,12 @@ userLoginSchema.methods.logoutDevice = async function (deviceId) {
         lastLogin.logoutAt = new Date();
       }
     }
-    // Clear the refresh token
+    // Clear the refresh token on device
     device.refreshToken = null;
+    // Remove this device's token from refreshTokens array (keep only active tokens)
+    if (Array.isArray(this.refreshTokens)) {
+      this.refreshTokens = this.refreshTokens.filter((rt) => rt.deviceId !== deviceId);
+    }
     // Increment device token version to invalidate existing access tokens for this device
     device.tokenVersion = (device.tokenVersion || 0) + 1;
     await this.save();
@@ -222,27 +230,34 @@ userLoginSchema.methods.logoutAllDevices = async function () {
         }
       }
       device.refreshToken = null;
-      // increment tokenVersion to invalidate access tokens for each device
       device.tokenVersion = (device.tokenVersion || 0) + 1;
     });
   }
+  // All devices logged out → refreshTokens should be empty
   this.refreshTokens = [];
   await this.save();
 };
 
-// Get all valid refresh tokens
+// Get all currently active refresh tokens (only logged-in devices)
 userLoginSchema.methods.getAllRefreshTokens = function () {
   return Array.isArray(this.refreshTokens) ? this.refreshTokens : [];
 };
 
-// Revoke specific refresh token
+// Revoke specific refresh token (also clear from device so refreshTokens stays in sync)
 userLoginSchema.methods.revokeRefreshToken = async function (token) {
-  if (Array.isArray(this.refreshTokens)) {
-    this.refreshTokens = this.refreshTokens.filter((rt) => rt.token !== token);
-    await this.save();
-    return true;
+  if (!Array.isArray(this.refreshTokens)) return false;
+  const hadToken = this.refreshTokens.some((rt) => rt.token === token);
+  this.refreshTokens = this.refreshTokens.filter((rt) => rt.token !== token);
+  // Clear this token from loggedInDevices so device is considered logged out
+  if (Array.isArray(this.loggedInDevices)) {
+    const device = this.loggedInDevices.find((d) => d.refreshToken === token);
+    if (device) {
+      device.refreshToken = null;
+      device.tokenVersion = (device.tokenVersion || 0) + 1;
+    }
   }
-  return false;
+  await this.save();
+  return hadToken;
 };  
 
 export const UserLogin = mongoose.model("UserLogin", userLoginSchema);

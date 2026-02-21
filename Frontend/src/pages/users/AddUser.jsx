@@ -54,6 +54,19 @@ const AddUser = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Auto-hide messages after 5 seconds
+  useEffect(() => {
+    if (!errorMessage) return;
+    const t = setTimeout(() => setErrorMessage(''), 5000);
+    return () => clearTimeout(t);
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (!successMessage) return;
+    const t = setTimeout(() => setSuccessMessage(''), 5000);
+    return () => clearTimeout(t);
+  }, [successMessage]);
+
   // Fetch roles and branches on component mount
   useEffect(() => {
     const loadDropdownData = async () => {
@@ -95,12 +108,16 @@ const AddUser = () => {
       newErrors.name = 'Name is required';
     }
 
-    if (!formData.role) {
+    if (!formData.roleId) {
       newErrors.role = 'Role is required';
     }
 
     if (formData.branchId.length === 0) {
       newErrors.branchId = 'At least one branch must be selected';
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = 'Gender is required';
     }
 
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -180,23 +197,27 @@ const AddUser = () => {
       setErrorMessage('');
       setSuccessMessage('');
 
-      // Prepare data for submission
+      // Prepare data for submission (gender is required by backend)
       const submitData = {
         userId: formData.userId.trim(),
         name: formData.name.trim(),
         designation: formData.designation.trim() || 'NA',
         department: formData.department.trim() || 'NA',
         email: formData.email.trim() || null,
+        gender: formData.gender,
         phone_no: formData.phone_no ? parseInt(formData.phone_no) : null,
-        role: formData.role,
+        personalEmail: formData.personalEmail?.trim() || null,
+        dateOfBirth: formData.dateOfBirth || null,
+        dateOfJoining: formData.dateOfJoining || null,
         roleId: formData.roleId || null,
         branchId: formData.branchId,
         canLogin: formData.canLogin,
+        remarks: formData.remarks?.trim() || '',
         organizationId: formData.organizationId,
       };
 
-      console.log('📤 Submitting user data:', submitData);
-      console.log('🔑 OrganizationId:', submitData.organizationId);
+      // console.log('📤 Submitting user data:', submitData);
+      // console.log('🔑 OrganizationId:', submitData.organizationId);
 
       // Create user
       const result = await createNewUser(submitData);
@@ -230,7 +251,14 @@ const AddUser = () => {
     <div className="add-user-page">
       <SetPageTitle title="Add New User" />
 
-      {errorMessage && (
+      
+
+      <div className="form-container">
+        <div className="form-header">
+          <h1>Add New User</h1>
+          <p>Create a new user account in the system</p>
+
+          {errorMessage && (
         <div className="alert-error">
           <strong>Error:</strong> {errorMessage}
         </div>
@@ -241,11 +269,6 @@ const AddUser = () => {
           <strong>Success:</strong> {successMessage}
         </div>
       )}
-
-      <div className="form-container">
-        <div className="form-header">
-          <h1>Add New User</h1>
-          <p>Create a new user account in the system</p>
         </div>
 
         <form onSubmit={handleSubmit} className="user-form">
@@ -282,11 +305,13 @@ const AddUser = () => {
                 label="Gender"
                 value={formData.gender}
                 onChange={handleInputChange}
+                error={errors.gender}
                 options={[
                   { value: 'Male', label: 'Male' },
                   { value: 'Female', label: 'Female' },
                   { value: 'Other', label: 'Other' },
                 ]}
+                required
               />
               <Input
                 name="dateOfBirth"

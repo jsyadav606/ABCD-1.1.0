@@ -60,6 +60,20 @@ export const getRefreshTokenCookieOptions = () => {
 };
 
 /**
+ * Get options for clearing refresh token cookie.
+ * Must match the options used when setting the cookie (path, httpOnly, secure, sameSite).
+ * Uses maxAge: 0 and expires to explicitly expire via res.cookie (more reliable than clearCookie).
+ */
+export const getClearRefreshTokenCookieOptions = () => ({
+  path: "/",
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 0,
+  expires: new Date(0),
+});
+
+/**
  * Get access token maxAge from env (in milliseconds)
  * @returns {number} - maxAge in milliseconds
  */
@@ -81,6 +95,7 @@ export default {
   convertExpiryToMs,
   getTokenCookieOptions,
   getRefreshTokenCookieOptions,
+  getClearRefreshTokenCookieOptions,
   getAccessTokenMaxAge,
   getRefreshTokenMaxAge,
 };

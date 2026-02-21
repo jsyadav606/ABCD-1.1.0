@@ -42,6 +42,14 @@ API.interceptors.request.use(
   }
 )
 
+/**
+ * Clear auth state from axios (e.g. on logout).
+ * Removes cached Authorization header.
+ */
+export const clearAuthHeaders = () => {
+  delete API.defaults.headers.common.Authorization
+}
+
 // Response interceptor - Handle token refresh and common errors
 API.interceptors.response.use(
   response => response,
@@ -87,8 +95,10 @@ API.interceptors.response.use(
         return API(originalRequest)
       } catch (err) {
         // Refresh failed - clear auth and redirect to login
+        clearAuthHeaders()
         localStorage.removeItem('accessToken')
         localStorage.removeItem('user')
+        sessionStorage.removeItem('deviceId')
         processQueue(err, null)
         window.location.href = '/login'
         return Promise.reject(err)
@@ -101,10 +111,12 @@ API.interceptors.response.use(
       error.message = message
     }
 
-    // Handle 403 - Forbidden (user not allowed to login)
+    // Handle 403 - Forbidden
     if (error.response?.status === 403) {
+      clearAuthHeaders()
       localStorage.removeItem('accessToken')
       localStorage.removeItem('user')
+      sessionStorage.removeItem('deviceId')
     }
 
     return Promise.reject(error)

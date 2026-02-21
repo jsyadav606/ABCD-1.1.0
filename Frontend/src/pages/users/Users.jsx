@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth.js";
 import Table from "../../components/Table/Table.jsx";
 import Button from "../../components/Button/Button.jsx";
 import Input from "../../components/Input/Input.jsx";
@@ -19,6 +20,7 @@ import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
 
 const Users = () => {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
 
   const [allUsers, setAllUsers] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -325,74 +327,71 @@ const Users = () => {
                 Edit
               </button>
 
-              {/* Conditional buttons based on status */}
-              {!row.isActive ? (
-                // Inactive user - Show: Edit, Active
+              {/* Hide Inactive/Active/Enable Login/Disable Login for current user */}
+              {String(row._id) !== String(currentUser?.id) && (
                 <>
-                  <button
-                    className="action-menu-item action-menu-item--success"
-                    onClick={() => {
-                      handleEnableRow(row._id);
-                      setOpenMenuId(null);
-                    }}
-                  >
-                    Active
-                  </button>
-                </>
-              ) : (
-                // Active user
-                <>
-                  {/* Show: Inactive button */}
-                  <button
-                    className="action-menu-item action-menu-item--danger"
-                    onClick={() => {
-                      handleDisableRow(row._id);
-                      setOpenMenuId(null);
-                    }}
-                  >
-                    Inactive
-                  </button>
-
-                  {/* Show: Enable/Disable Login button */}
-                  {row.canLogin ? (
-                    <button
-                      className="action-menu-item action-menu-item--warning"
-                      onClick={() => {
-                        handleToggleLogin(row._id, false);
-                        setOpenMenuId(null);
-                      }}
-                    >
-                      Disable Login
-                    </button>
-                  ) : (
+                  {!row.isActive ? (
                     <button
                       className="action-menu-item action-menu-item--success"
                       onClick={() => {
-                        handleToggleLogin(row._id, true);
+                        handleEnableRow(row._id);
                         setOpenMenuId(null);
                       }}
                     >
-                      Enable Login
+                      Active
                     </button>
-                  )}
-
-                  {/* Show: Change Password - Only if canLogin = true */}
-                  {row.canLogin && (
-                    <button
-                      className="action-menu-item action-menu-item--info"
-                      onClick={() => {
-                        handleOpenChangePasswordModal(
-                          row._id,
-                          row.userId,
-                          row.name,
-                        );
-                        setOpenMenuId(null);
-                      }}
-                    >
-                      Change Password
-                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="action-menu-item action-menu-item--danger"
+                        onClick={() => {
+                          handleDisableRow(row._id);
+                          setOpenMenuId(null);
+                        }}
+                      >
+                        Inactive
+                      </button>
+                      {row.canLogin ? (
+                        <button
+                          className="action-menu-item action-menu-item--warning"
+                          onClick={() => {
+                            handleToggleLogin(row._id, false);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                          Disable Login
+                        </button>
+                      ) : (
+                        <button
+                          className="action-menu-item action-menu-item--success"
+                          onClick={() => {
+                            handleToggleLogin(row._id, true);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                          Enable Login
+                        </button>
+                      )}
+                    </>
                   )}
                 </>
+              )}
+
+              {/* Change Password - show for all users with canLogin */}
+              {row.canLogin && (
+                <button
+                  className="action-menu-item action-menu-item--info"
+                  onClick={() => {
+                    handleOpenChangePasswordModal(
+                      row._id,
+                      row.userId,
+                      row.name,
+                    );
+                    setOpenMenuId(null);
+                  }}
+                >
+                  Change Password
+                </button>
               )}
             </div>
           )}
@@ -402,7 +401,14 @@ const Users = () => {
   ];
 
   const handleBulkDisable = async () => {
-    const usersToDisable = allUsers.filter((u) => selectedRows.includes(u._id));
+    // Exclude current user from bulk disable
+    const safeIds = selectedRows.filter((id) => String(id) !== String(currentUser?.id));
+    const usersToDisable = allUsers.filter((u) => safeIds.includes(u._id));
+
+    if (usersToDisable.length === 0) {
+      setError("You cannot disable yourself. Remove yourself from selection.");
+      return;
+    }
 
     const userListText = usersToDisable
       .map((u) => `${u.name} (${u.userId})`)
@@ -417,11 +423,11 @@ const Users = () => {
     try {
       setLoading(true);
       setError(null);
-      await Promise.all(selectedRows.map((id) => disableUser(id)));
+      await Promise.all(safeIds.map((id) => disableUser(id)));
 
       setAllUsers((prev) =>
         prev.map((u) =>
-          selectedRows.includes(u._id)
+          safeIds.includes(u._id)
             ? { ...u, isActive: false, status: "Inactive", canLogin: false }
             : u,
         ),
@@ -475,7 +481,7 @@ const Users = () => {
               <span className="material-icons">file_download</span> Export
             </Button> */}
 
-              {selectedRows.length > 0 && (
+              {selectedRows.length > 1 && (
                 <Button
                   onClick={handleBulkDisable}
                   className="btn-md delete-btn"
@@ -496,6 +502,7 @@ const Users = () => {
             showPagination={true}
             rowKey={(row) => row._id}
             onSelectionChange={(selected) => setSelectedRows(selected)}
+            isRowSelectable={(row) => String(row._id) !== String(currentUser?.id)}
           />
         </div>
 

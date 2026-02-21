@@ -42,7 +42,6 @@ async function testCanLoginFlow() {
     testUser = await User.create({
       userId: "test.employee",
       name: "John Doe",
-      role: "user",
       organizationId: org._id,
       canLogin: false,
       isActive: true,
@@ -113,7 +112,6 @@ async function testCanLoginFlow() {
     testUser3 = await User.create({
       userId: "test.employee3",
       name: "John Doe", // same name again
-      role: "user",
       organizationId: org._id,
       canLogin: false,
       isActive: true,
@@ -146,7 +144,6 @@ async function testCanLoginFlow() {
     testUser4 = await User.create({
       userId: "test.employee4",
       name: "John Doe", // same name - should get john.doe2
-      role: "user",
       organizationId: org._id,
       canLogin: false,
       isActive: true,
