@@ -110,13 +110,39 @@ export const authService = {
       );
 
       // Fetch user details for response (exclude sensitive fields) and populate role
-      const userResponse = await User.findById(userLogin.user).select("-password").populate('roleId');
+      const userResponse = await User.findById(userLogin.user)
+        .select("-password")
+        .populate("roleId");
+
+      let permissions = [];
+
+      if (userResponse && Array.isArray(userResponse.permissions)) {
+        permissions = [...userResponse.permissions];
+      }
+
+      if (userResponse?.roleId && Array.isArray(userResponse.roleId.permissionKeys)) {
+        permissions = [
+          ...permissions,
+          ...userResponse.roleId.permissionKeys,
+        ];
+      }
+
+      if (
+        userResponse?.roleId &&
+        userResponse.roleId.name === "super_admin" &&
+        !permissions.includes("*")
+      ) {
+        permissions.push("*");
+      }
+
+      permissions = Array.from(new Set(permissions));
 
       return {
         success: true,
         user: userResponse,
         accessToken,
         refreshToken,
+        permissions,
         forcePasswordChange: !!userLogin.forcePasswordChange,
         deviceId,
         message: "Login successful",

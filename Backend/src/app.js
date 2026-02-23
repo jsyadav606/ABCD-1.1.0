@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import roleRoutes from "./routes/role.routes.js";
+import branchRoutes from "./routes/branch.routes.js";
 import { apiError } from "./utils/apiError.js";
 
 // Load environment variables
@@ -49,6 +51,8 @@ app.get("/", (req, res) => {
 ================================ */
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/roles", roleRoutes);
+app.use("/api/v1/branches", branchRoutes);
 
 /* ===============================
    Global Error Handler

@@ -1,0 +1,141 @@
+.setup-page {
+  padding: 20px;
+}
+
+.setup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.setup-header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.setup-header p {
+  margin: 4px 0 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.setup-tabs {
+  display: inline-flex;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.setup-tabs button {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.setup-tabs button.active {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.setup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setup-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.setup-section-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.setup-table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.setup-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.setup-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.toggle-label {
+  color: #374151;
+}
+
+.setup-permissions-grid {
+  margin-top: 12px;
+}
+
+.setup-permissions-grid h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.setup-loading {
+  padding: 16px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.setup-error {
+  margin-bottom: 8px;
+}
+
+.setup-toast {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .setup-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+

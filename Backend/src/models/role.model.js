@@ -154,6 +154,11 @@ const roleSchema = new mongoose.Schema(
       },
     ],
 
+    permissionKeys: {
+      type: [String],
+      default: [],
+    },
+
     // Role Status
     isActive: {
       type: Boolean,

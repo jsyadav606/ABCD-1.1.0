@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { hasPermission } from "../../utils/permissionHelper";
 import { authAPI } from "../../services/api";
 import { Modal, Input, Button } from "../../components";
 import "./Sidebar.css";
@@ -10,7 +11,6 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [userOpen, setUserOpen] = useState(false);
-  const [userName, setUserName] = useState("User");
   const userRef = useRef(null);
   const assetsButtonRef = useRef(null);
   const [assetsDropdownOpen, setAssetsDropdownOpen] = useState(false);
@@ -25,15 +25,6 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
     error: "",
     isSubmitting: false,
   });
-
-  // Update userName when user data changes
-  useEffect(() => {
-    if (user && user.name) {
-      setUserName(user.name);
-    } else {
-      setUserName("User");
-    }
-  }, [user]);
 
   // Close when clicking outside (for user panel only)
   useEffect(() => {
@@ -291,34 +282,18 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
           </Link>
         </li>
 
-        <li>
-          <Link to="/setup" onClick={handleMenuItemClick}>
-            <span className="material-icons">settings</span>
-            <span className="menu-text">Setup</span>
-          </Link>
-        </li>
-
-        {/* RBAC Management - Admin Only */}
-        {/* {hasPermission("system:admin") && (
-          <>
-            <li>
-              <Link to="/rbac/permissions" onClick={handleMenuItemClick}>
-                <span className="material-icons">security</span>
-                <span className="menu-text">Permissions</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/rbac/roles" onClick={handleMenuItemClick}>
-                <span className="material-icons">admin_panel_settings</span>
-                <span className="menu-text">Roles</span>
-              </Link>
-            </li>
-          </>
-        )} */}
+        {hasPermission("user:update") && (
+          <li>
+            <Link to="/setup" onClick={handleMenuItemClick}>
+              <span className="material-icons">settings</span>
+              <span className="menu-text">Setup</span>
+            </Link>
+          </li>
+        )}
       </ul>
 
       {/* USER DETAILS (BOTTOM SECTION) */}
-      {userName && (
+      {user && (
         <div
           ref={userRef}
           className={`user-details ${userOpen ? "active" : ""}`}
@@ -329,7 +304,7 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
             title="User menu"
           >
             <span className="material-icons">account_circle</span>
-            <span className="menu-text">{userName}</span>
+            <span className="menu-text">{user?.name || "User"}</span>
           </button>
 
           <div className="user-panel" onClick={handleUserPanelClick}>

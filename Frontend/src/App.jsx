@@ -8,11 +8,11 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-// import Users from "./pages/Users/Users";
 import Users from "./pages/users/Users";
 import AddUser from "./pages/users/AddUser";
 import EditUser from "./pages/users/EditUser";
 import UserDetails from "./pages/users/UserDetails";
+import Setup from "./pages/Setup";
 
 function App() {
   return (
@@ -77,6 +77,17 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <UserDetails />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/setup"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Setup />
                 </MainLayout>
               </ProtectedRoute>
             }
