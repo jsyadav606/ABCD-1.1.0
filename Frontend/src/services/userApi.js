@@ -10,7 +10,11 @@ export const fetchAllUsers = async (limit = 100, page = 1) => {
       ...user,
       _id: user._id || user.id,
       status: user.isActive ? 'Active' : 'Inactive',
-      remarks: user.remarks || '--'
+      remarks: user.remarks || '--',
+      // Transform branchId array to branch string
+      branch: user.branchId && user.branchId.length > 0 
+        ? user.branchId.map(b => b.name || b).join(', ')
+        : '--'
     }))
   } catch (error) {
     console.error('Failed to fetch users:', error)

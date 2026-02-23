@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Input/Input.jsx';
 import Select from '../../components/Select/Select.jsx';
+import MultiSelectBranch from '../../components/MultiSelectBranch/MultiSelectBranch.jsx';
 import Textarea from '../../components/Textarea/Textarea.jsx';
 import Button from '../../components/Button/Button.jsx';
 import { PageLoader } from '../../components/Loader/Loader.jsx';
@@ -140,8 +141,12 @@ const AddUser = () => {
         [name]: checked,
       }));
     } else if (name === 'branchId') {
-      // Handle multi-select
-      const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+      // Handle multi-select (from MultiSelectBranch component)
+      // The component passes selectedOptions as an array directly
+      const selectedOptions = Array.isArray(e.target.selectedOptions) 
+        ? e.target.selectedOptions 
+        : Array.from(e.target.selectedOptions, (option) => option.value);
+      
       setFormData((prev) => ({
         ...prev,
         [name]: selectedOptions,
@@ -378,24 +383,18 @@ const AddUser = () => {
                 value="ABCD Corporation"
                 disabled
               />
-              <Select
+              <MultiSelectBranch
                 name="branchId"
                 label="Branches"
-                value={formData.branchId && formData.branchId[0] ? formData.branchId[0] : ''}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      branchId: [e.target.value],
-                    }));
-                  }
-                }}
-                error={errors.branchId}
+                value={formData.branchId}
+                onChange={handleInputChange}
                 options={branches.map((b) => ({
                   value: b._id,
                   label: `${b.name}${b.code ? ` (${b.code})` : ''}`,
                 }))}
+                error={errors.branchId}
                 required
+                placeholder="Select branches..."
               />
             </div>
 
