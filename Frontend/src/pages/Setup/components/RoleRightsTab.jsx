@@ -191,11 +191,11 @@ const RoleRightsTab = ({ toast, setToast }) => {
       header: "Rights Summary",
       key: "permissions",
       render: (row) => {
-        if (row.name === "super_admin") return "All Access (*)";
-        if (!Array.isArray(row.permissions) || row.permissions.length === 0) return "None";
-        return row.permissions
-          .map(p => `${p.resource}(${p.actions.length})`)
-          .join(", ");
+        if (row.name === "super_admin" || (row.permissionKeys && row.permissionKeys.includes("*"))) return "All Access (*)";
+        
+        // Show count of permissions
+        const count = row.permissionKeys?.length || 0;
+        return `${count} Permission${count !== 1 ? 's' : ''}`;
       },
     },
     {

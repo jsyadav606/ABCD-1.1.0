@@ -356,6 +356,37 @@ export const canAccessScope = (resourceBranchId, resourceEnterpriseId) => {
 };
 
 /**
+ * Check if user can access a specific module
+ * 
+ * @param {string} moduleKey - Module key (e.g., "users", "assets")
+ * @returns {boolean}
+ */
+export const canAccessModule = (moduleKey) => {
+  if (isSuperAdmin()) return true;
+  
+  // Check specifically for module access permission (e.g., "users:access")
+  return hasPermission(`${moduleKey}:access`);
+};
+
+/**
+ * Check if user can access a specific page/submenu
+ * 
+ * @param {string} moduleKey - Module key (e.g., "users", "assets")
+ * @param {string} pageKey - Page key (e.g., "users_list", "inventory")
+ * @returns {boolean}
+ */
+export const canAccessPage = (moduleKey, pageKey) => {
+  if (isSuperAdmin()) return true;
+  
+  // Check if module access is granted first
+  if (!canAccessModule(moduleKey)) return false;
+
+  // Check for page-level 'view' permission which usually governs access
+  // Adjust 'view' if your schema uses a different action for page access
+  return hasPermission(`${moduleKey}:${pageKey}:view`);
+};
+
+/**
  * Log permission check for debugging
  * @param {string} permissionKey
  * @param {boolean} result

@@ -1,41 +1,40 @@
 .setup-page {
-  padding: 20px;
+  padding: 1rem;
 }
 
 .setup-header {
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
 }
 
 .setup-header h1 {
   font-size: 1.5rem;
-  margin: 0;
+  margin-bottom: 0.25rem;
 }
 
 .setup-header p {
-  margin: 4px 0 0 0;
   color: #6b7280;
-  font-size: 0.9rem;
+  margin: 0;
 }
 
 .setup-tabs {
-  display: inline-flex;
-  border-radius: 9999px;
-  background: #e5e7eb;
-  padding: 4px;
-  margin-bottom: 20px;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1px;
 }
 
 .setup-tabs button {
+  padding: 0.5rem 1rem;
   border: none;
-  background: transparent;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  font-size: 0.9rem;
+  background: none;
   cursor: pointer;
-  color: #4b5563;
+  font-weight: 500;
+  color: #6b7280;
+  border-radius: 4px;
 }
 
 .setup-tabs button.active {
@@ -127,6 +126,197 @@
   margin-bottom: 12px;
 }
 
+/* Permission Tree Styles - Clean Hierarchical List */
+.permission-tree-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fff;
+  margin-top: 1rem;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.permission-tree-body {
+  padding: 0;
+}
+
+/* Level 1: Module (Root) */
+.module-group {
+  margin-bottom: 16px;
+}
+
+.module-header {
+  padding: 8px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.module-header:hover .module-title {
+  color: #1d4ed8;
+}
+
+.module-title {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.1rem;
+}
+
+/* Level 2: Submodule (Page) */
+.module-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 28px; /* Indent from Module */
+  margin-top: 4px;
+}
+
+.page-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.page-title {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
+}
+
+/* Level 3: Select All Row */
+.page-select-all-row {
+  padding-left: 32px; /* Indent from Submodule */
+  margin-bottom: 4px;
+}
+
+.page-select-all-row .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* Level 4: Actions List */
+.page-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 64px; /* Deep indent for actions */
+}
+
+.action-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 2px 0;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.action-checkbox-item:hover {
+  color: #111827;
+}
+
+.action-text {
+  font-size: 0.95rem;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #0f172a; /* Dark styling */
+  border-radius: 3px;
+  margin: 0;
+}
+
+/* Icons */
+.expand-icon {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  width: 16px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+}
+
+/* Utility */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Preview Mode Styles */
+.permission-preview-container {
+  margin-top: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  background-color: #f9fafb;
+}
+
+.sidebar-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #1e293b; /* Dark sidebar style */
+  padding: 16px;
+  border-radius: 6px;
+  color: #fff;
+  width: 250px;
+}
+
+.preview-module {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-module-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 8px;
+}
+
+.preview-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-page-item {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: default;
+  color: #e2e8f0;
+}
+
+.preview-page-item:hover {
+  background-color: #334155;
+}
+
 @media (max-width: 768px) {
   .setup-modal-grid {
     grid-template-columns: 1fr;
@@ -137,5 +327,15 @@
     align-items: flex-start;
     gap: 4px;
   }
+  
+  .page-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .page-actions {
+    width: 100%;
+    padding-left: 24px;
+  }
 }
-
