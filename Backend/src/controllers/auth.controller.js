@@ -1,4 +1,4 @@
-import authService from "../services/auth.service.js";
+import { authService } from "../services/auth.service.js";
 import {
   getRefreshTokenCookieOptions,
   getClearRefreshTokenCookieOptions,
@@ -78,17 +78,12 @@ export const loginController = asyncHandler(async (req, res) => {
   res.cookie("refreshToken", result.refreshToken, refreshTokenCookieOptions);
 
   return res.status(200).json(
-    new apiResponse(
-      200,
-      {
-        user: result.user,
-        accessToken: result.accessToken,
-        deviceId: result.deviceId,
-        permissions: result.permissions || [],
-        forcePasswordChange: result.forcePasswordChange || false,
-      },
-      result.message
-    )
+    new apiResponse(200, {
+      user: result.user,
+      accessToken: result.accessToken,
+      deviceId: result.deviceId,
+      forcePasswordChange: result.forcePasswordChange || false,
+    }, result.message)
   );
 });
 

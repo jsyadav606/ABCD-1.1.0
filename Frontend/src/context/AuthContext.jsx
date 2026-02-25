@@ -65,13 +65,8 @@ export const AuthProvider = ({ children }) => {
       // Send loginId (can be username, userId, or email) instead of email
       const response = await authAPI.login(loginId, password, deviceId)
       
-      const {
-        user: userData,
-        accessToken,
-        deviceId: returnedDeviceId,
-        forcePasswordChange,
-        permissions,
-      } = response.data.data
+      // Backend returns: { user, accessToken, deviceId, forcePasswordChange }
+      const { user: userData, accessToken, deviceId: returnedDeviceId, forcePasswordChange } = response.data.data
 
       if (!userData || !accessToken) {
         throw new Error('Invalid response from server')
@@ -82,12 +77,6 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('user', JSON.stringify(minimalUser))
-
-      if (Array.isArray(permissions)) {
-        localStorage.setItem('permissions', JSON.stringify(permissions))
-      } else {
-        localStorage.removeItem('permissions')
-      }
       
       // Update device ID if returned
       if (returnedDeviceId) {
