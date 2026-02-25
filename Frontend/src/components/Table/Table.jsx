@@ -16,33 +16,60 @@ const Table = ({
   defaultSortDirection = "asc",
 }) => {
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => {
+    // Initialize page from URL directly to prevent initial render at page 1
+    if (!showPagination) return 1;
+    const params = new URLSearchParams(window.location.search);
+    const urlPage = parseInt(params.get("page"), 10);
+    return (urlPage && !isNaN(urlPage) && urlPage > 0) ? urlPage : 1;
+  });
   const [selectedRows, setSelectedRows] = useState([]);
+
+  // URL state sync for page persistence - ONLY updates when URL changes externally (like popstate)
+  useEffect(() => {
+    if (!showPagination) return;
+    
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlPage = parseInt(params.get("page"), 10);
+      if (urlPage && !isNaN(urlPage) && urlPage > 0) {
+        setPage(urlPage);
+      } else {
+        setPage(1);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [showPagination]);
+
+  // Update URL when page changes
+  useEffect(() => {
+    if (!showPagination) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const currentPage = parseInt(params.get("page"), 10) || 1;
+
+    // Only update if changed
+    if (currentPage !== page) {
+      if (page === 1) {
+        params.delete("page");
+      } else {
+        params.set("page", page);
+      }
+      
+      const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+      // Use pushState so we can navigate back, or replaceState if we just want to update URL
+      // replaceState is better for pagination to not clutter history too much, but pushState allows back button to work for pages.
+      // Let's use replaceState as per original intent to just "persist" current view.
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [page, showPagination]);
 
   const [sortConfig, setSortConfig] = useState({
     key: defaultSortKey,
     direction: defaultSortKey ? defaultSortDirection : null,
   });
-
-  useEffect(() => {
-    onSelectionChange?.(selectedRows);
-  }, [selectedRows, onSelectionChange]);
-
-  const highlightText = (text, searchValue) => {
-    if (!searchValue) return text;
-    const regex = new RegExp(`(${searchValue})`, "gi");
-    return String(text)
-      .split(regex)
-      .map((part, index) =>
-        part.toLowerCase() === searchValue.toLowerCase() ? (
-          <span key={index} className="highlight">
-            {part}
-          </span>
-        ) : (
-          part
-        ),
-      );
-  };
 
   const handleSort = (key) => {
     setSortConfig((prev) => {
@@ -85,6 +112,42 @@ const Table = ({
 
     return tempData;
   }, [data, search, showSearch, sortConfig]);
+
+  // Validate page range when data changes
+  useEffect(() => {
+    // Skip this validation if no data, or if we are still initializing
+    if (!showPagination || data.length === 0) return;
+    
+    const processedLen = processedData.length;
+    const maxPage = Math.ceil(processedLen / pageSize) || 1;
+    
+    // Only adjust if strictly greater AND we aren't at initial load (prevent flash)
+    // Actually, we should allow being at page X if we expect data to be there.
+    // But if data changed (deleted), we should go back.
+    if (page > maxPage) {
+      setPage(maxPage);
+    }
+  }, [processedData.length, pageSize, page, showPagination, data.length]);
+
+  useEffect(() => {
+    onSelectionChange?.(selectedRows);
+  }, [selectedRows, onSelectionChange]);
+
+  const highlightText = (text, searchValue) => {
+    if (!searchValue) return text;
+    const regex = new RegExp(`(${searchValue})`, "gi");
+    return String(text)
+      .split(regex)
+      .map((part, index) =>
+        part.toLowerCase() === searchValue.toLowerCase() ? (
+          <span key={index} className="highlight">
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      );
+  };
 
   const totalPages = showPagination ? Math.ceil(processedData.length / pageSize) : 1;
 

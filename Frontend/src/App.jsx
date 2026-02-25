@@ -4,15 +4,15 @@ import MainLayout from "./layouts/MainLayout";
 import { ProtectedRoute } from "./components";
 
 // Pages
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Users from "./pages/users/Users";
-import AddUser from "./pages/users/AddUser";
-import EditUser from "./pages/users/EditUser";
-import UserDetails from "./pages/users/UserDetails";
-import Setup from "./pages/Setup";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import NotFound from "./pages/NotFound/NotFound";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
+import Users from "./pages/users/UsersList/Users";
+import AddUser from "./pages/users/AddUserPage/AddUser";
+import EditUser from "./pages/users/EditUserPage/EditUser";
+import UserDetails from "./pages/users/UserDetailsPage/UserDetails";
+import Setup from "./pages/Setup/Setup";
 
 function App() {
   return (

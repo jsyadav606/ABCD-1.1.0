@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Input from "../../components/Input/Input.jsx";
-import Select from "../../components/Select/Select.jsx";
-import MultiSelectBranch from "../../components/MultiSelectBranch/MultiSelectBranch.jsx";
-import Textarea from "../../components/Textarea/Textarea.jsx";
-import Button from "../../components/Button/Button.jsx";
-import { PageLoader } from "../../components/Loader/Loader.jsx";
-import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
+import Input from "../../../components/Input/Input.jsx";
+import Select from "../../../components/Select/Select.jsx";
+import MultiSelectBranch from "../../../components/MultiSelectBranch/MultiSelectBranch.jsx";
+import Textarea from "../../../components/Textarea/Textarea.jsx";
+import Button from "../../../components/Button/Button.jsx";
+import { PageLoader } from "../../../components/Loader/Loader.jsx";
+import { SetPageTitle } from "../../../components/SetPageTitle/SetPageTitle.jsx";
 import {
   fetchUserById,
   updateUser,
   fetchRolesForDropdown,
   fetchBranchesForDropdown,
-} from "../../services/userApi.js";
-import "./AddUser.css"; // Reuse same CSS
+} from "../../../services/userApi.js";
+import "../AddUserPage/AddUser.css"; // Reuse same CSS
 
 const EditUser = () => {
   const navigate = useNavigate();
@@ -269,7 +269,9 @@ const EditUser = () => {
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate("/users");
+        // Preserve query params (page) when redirecting back
+        const params = new URLSearchParams(window.location.search);
+        navigate(`/users${params.toString() ? `?${params.toString()}` : ''}`);
       }, 2000);
     } catch (error) {
       console.error("Error updating user:", error);
@@ -283,7 +285,8 @@ const EditUser = () => {
 
   // Handle cancel
   const handleCancel = () => {
-    navigate("/users");
+    const params = new URLSearchParams(window.location.search);
+    navigate(`/users${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
   if (loading) {

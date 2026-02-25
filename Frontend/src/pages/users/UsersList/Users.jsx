@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth.js";
-import Table from "../../components/Table/Table.jsx";
-import Button from "../../components/Button/Button.jsx";
-import Input from "../../components/Input/Input.jsx";
-import Modal from "../../components/Modal/Modal.jsx";
-import { hasPermission } from "../../utils/permissionHelper.js";
-import { PageLoader } from "../../components/Loader/Loader.jsx";
-import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
+import { useAuth } from "../../../hooks/useAuth.js";
+import Table from "../../../components/Table/Table.jsx";
+import Button from "../../../components/Button/Button.jsx";
+import Input from "../../../components/Input/Input.jsx";
+import Modal from "../../../components/Modal/Modal.jsx";
+import { hasPermission } from "../../../utils/permissionHelper.js";
+import { PageLoader } from "../../../components/Loader/Loader.jsx";
+import { ErrorNotification } from "../../../components/ErrorBoundary/ErrorNotification.jsx";
 import "./Users.css";
 import {
   fetchAllUsers,
@@ -15,8 +15,8 @@ import {
   enableUser,
   toggleCanLogin,
   changeUserPassword,
-} from "../../services/userApi.js";
-import { SetPageTitle } from "../../components/SetPageTitle/SetPageTitle.jsx";
+} from "../../../services/userApi.js";
+import { SetPageTitle } from "../../../components/SetPageTitle/SetPageTitle.jsx";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -323,7 +323,8 @@ const Users = () => {
                 <button
                   className="action-menu-item"
                   onClick={() => {
-                    navigate(`/users/edit/${row._id}`);
+                    const params = new URLSearchParams(window.location.search);
+                    navigate(`/users/edit/${row._id}${params.toString() ? `?${params.toString()}` : ''}`);
                     setOpenMenuId(null);
                   }}
                 >

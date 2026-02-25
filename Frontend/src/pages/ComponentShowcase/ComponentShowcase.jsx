@@ -15,7 +15,7 @@ import {
   Badge,
   Pagination,
   Breadcrumb
-} from '../components';
+} from '../../../components';
 import './ComponentShowcase.css';
 
 const ComponentShowcase = () => {

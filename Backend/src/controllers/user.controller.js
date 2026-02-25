@@ -52,6 +52,28 @@ const createUserLoginCredentials = async (userId, userName, providedLoginId = nu
   }
 };
 
+const hasBranchAccess = (reqUser, targetBranches) => {
+  const isSuper = reqUser?.role === "super_admin";
+  if (isSuper) return true;
+  const reqBranchIds = Array.isArray(reqUser?.branchId)
+    ? reqUser.branchId.map((b) =>
+        typeof b === "object" && b?._id ? String(b._id) : String(b),
+      )
+    : [];
+  if (reqBranchIds.length === 0) return false;
+  const targetIds = Array.isArray(targetBranches)
+    ? targetBranches.map((b) =>
+        typeof b === "object" && b?._id ? String(b._id) : String(b),
+      )
+    : [];
+  
+  // Strict Subset Logic: Target user must NOT have any branch that the request user doesn't have.
+  // And target must have at least one branch in common (implied if subset and not empty, but we should check intersection too if we want to be strict about "relevance").
+  // Actually, if targetIds is empty, every() returns true. Unassigned users are visible to everyone in this logic?
+  // Let's assume unassigned users are visible.
+  return targetIds.every((id) => reqBranchIds.includes(String(id)));
+};
+
 // Controller function names:
 // - createUser
 // - getUserById
@@ -142,6 +164,10 @@ export const getUserById = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
   
+  if (!hasBranchAccess(req.user, userDoc?.branchId)) {
+    throw new apiError(404, "User not found");
+  }
+  
   return res.status(200).json(new apiResponse(200, user, "User retrieved successfully"));
 });
 
@@ -171,8 +197,17 @@ export const listUsers = asyncHandler(async (req, res) => {
   const userBranchIds = Array.isArray(req.user?.branchId)
     ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
     : [];
-  if (!isSuper && userBranchIds.length > 0) {
-    filter.branchId = { $in: userBranchIds };
+  if (!isSuper) {
+    if (userBranchIds.length === 0) {
+      return res.status(200).json(new apiResponse(200, { items: [], meta: { page, limit, total: 0 } }, "Users retrieved successfully"));
+    }
+    // Strict subset logic: 
+    // 1. Must share at least one branch ($in)
+    // 2. Must NOT have any branch that is NOT in userBranchIds ($not $elemMatch $nin)
+    filter.branchId = { 
+      $in: userBranchIds,
+      $not: { $elemMatch: { $nin: userBranchIds } }
+    };
   }
 
   if (req.query.q) {
@@ -213,6 +248,14 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   console.log('📦 Payload after removing protected fields:', payload);
 
+  const existing = await User.findById(id).select('branchId').lean();
+  if (!existing) {
+    throw new apiError(404, "User not found");
+  }
+  if (!hasBranchAccess(req.user, existing.branchId)) {
+    throw new apiError(403, "Forbidden");
+  }
+
   const user = await User.findByIdAndUpdate(id, payload, { new: true }).populate('roleId branchId');
   
   if (!user) {
@@ -250,6 +293,10 @@ export const toggleCanLogin = asyncHandler(async (req, res) => {
   
   if (!user) {
     throw new apiError(404, "User not found");
+  }
+
+  if (!hasBranchAccess(req.user, user.branchId)) {
+    throw new apiError(403, "Forbidden");
   }
 
   // Check if user is active when trying to enable login
@@ -304,6 +351,10 @@ export const toggleIsActive = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
+  if (!hasBranchAccess(req.user, user.branchId)) {
+    throw new apiError(403, "Forbidden");
+  }
+
   if (enable) {
     user.isActive = true;
     // do not change canLogin
@@ -325,6 +376,10 @@ export const changeUserRole = asyncHandler(async (req, res) => {
   
   if (!user) {
     throw new apiError(404, "User not found");
+  }
+
+  if (!hasBranchAccess(req.user, user.branchId)) {
+    throw new apiError(403, "Forbidden");
   }
 
   if (roleId) {
@@ -465,6 +520,9 @@ export const getBranchesForDropdown = asyncHandler(async (req, res) => {
   const userBranchIds = Array.isArray(req.user?.branchId)
     ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
     : [];
+  if (!isSuper && userBranchIds.length === 0) {
+    return res.status(200).json(new apiResponse(200, [], "No branches found"));
+  }
   if (!isSuper && userBranchIds.length > 0) {
     filter._id = { $in: userBranchIds };
   }

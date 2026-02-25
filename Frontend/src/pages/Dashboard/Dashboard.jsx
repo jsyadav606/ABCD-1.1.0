@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Card } from "../components";
+import { Button, Card } from "../../components";
 import "./Dashboard.css";
 
 const Dashboard = () => {

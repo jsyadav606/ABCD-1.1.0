@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { Input, Button, Alert } from '../components'
-import AuthLayout from '../layouts/AuthLayout'
+import { useAuth } from '../../hooks/useAuth'
+import { Input, Button, Alert } from '../../components'
+import AuthLayout from '../../layouts/AuthLayout'
 import './Login.css'
 
 const Login = () => {
