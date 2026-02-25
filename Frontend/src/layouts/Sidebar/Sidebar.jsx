@@ -329,7 +329,7 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
                 setUserOpen(false);
               }}
             >
-              <span className="material-icons">lock</span> Change Password
+              <span className=" ">lock</span> Change Password
             </button>
             <button
               onClick={async () => {

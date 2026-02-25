@@ -166,6 +166,15 @@ export const listUsers = asyncHandler(async (req, res) => {
   if (req.query.canLogin !== undefined) filter.canLogin = req.query.canLogin === "true";
   if (req.query.organizationId) filter.organizationId = req.query.organizationId;
 
+  // Branch scope: non-super users only see users from their assigned branches
+  const isSuper = req.user?.role === "super_admin";
+  const userBranchIds = Array.isArray(req.user?.branchId)
+    ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
+    : [];
+  if (!isSuper && userBranchIds.length > 0) {
+    filter.branchId = { $in: userBranchIds };
+  }
+
   if (req.query.q) {
     const q = req.query.q.trim();
     filter.$or = [
@@ -449,6 +458,15 @@ export const getBranchesForDropdown = asyncHandler(async (req, res) => {
   let filter = { isActive: true };
   if (organizationId) {
     filter.organizationId = organizationId;
+  }
+  
+  // Restrict branches to user's assigned branches unless super admin
+  const isSuper = req.user?.role === "super_admin";
+  const userBranchIds = Array.isArray(req.user?.branchId)
+    ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
+    : [];
+  if (!isSuper && userBranchIds.length > 0) {
+    filter._id = { $in: userBranchIds };
   }
 
   const branches = await Branch.find(filter, "name code address").lean();

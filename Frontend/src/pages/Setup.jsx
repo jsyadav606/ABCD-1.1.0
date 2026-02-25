@@ -406,20 +406,19 @@ const Setup = () => {
     }
   };
 
-  const deleteBranch = async (branch) => {
-    if (!window.confirm("Are you sure you want to delete this branch?")) {
+  const disableBranch = async (branch) => {
+    if (!window.confirm("Are you sure you want to disable this branch?")) {
       return;
     }
-
     try {
-      await branchAPI.delete(branch._id || branch.id);
-      setToast({ type: "success", message: "Branch deleted successfully" });
+      await branchAPI.update(branch._id || branch.id, { isActive: false });
+      setToast({ type: "success", message: "Branch disabled successfully" });
       await loadBranches();
     } catch (error) {
       const message =
         error.response?.data?.message ||
         error.message ||
-        "Failed to delete branch";
+        "Failed to disable branch";
       setToast({ type: "danger", message });
     }
   };
@@ -470,6 +469,32 @@ const Setup = () => {
             >
               Edit
             </Button>
+            <Button
+              size="sm"
+              variant="info"
+              onClick={() => openEditRoleModal(row)}
+            >
+              Permissions
+            </Button>
+            {row.isActive && row.category !== "system" && (
+              <Button
+                size="sm"
+                variant="warning"
+                onClick={async () => {
+                  try {
+                    await roleAPI.update(row._id || row.id, { isActive: false });
+                    setToast({ type: "success", message: "Role disabled successfully" });
+                    await loadRoles();
+                  } catch (error) {
+                    const message =
+                      error.response?.data?.message || error.message || "Failed to disable role";
+                    setToast({ type: "danger", message });
+                  }
+                }}
+              >
+                Disable
+              </Button>
+            )}
             {row.category !== "system" && (
               <Button
                 size="sm"
@@ -514,13 +539,17 @@ const Setup = () => {
             >
               Edit
             </Button>
-            <Button
-              size="sm"
-              variant="danger"
-              onClick={() => deleteBranch(row)}
-            >
-              Delete
-            </Button>
+            {row.isActive ? (
+              <Button
+                size="sm"
+                variant="warning"
+                onClick={() => disableBranch(row)}
+              >
+                Disable
+              </Button>
+            ) : (
+              <span style={{ fontSize: "0.875rem", color: "#6c757d" }}>Disabled</span>
+            )}
           </div>
         ),
       },

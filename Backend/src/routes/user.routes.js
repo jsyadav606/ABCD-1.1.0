@@ -1,4 +1,5 @@
 import express from "express";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   createUser,
   getUserById,
@@ -16,6 +17,9 @@ import {
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
+
+// All user routes require authentication
+router.use(verifyJWT);
 
 // Get dropdown data for roles
 router.get("/dropdown/roles", getRolesForDropdown);
