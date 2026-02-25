@@ -5,6 +5,7 @@ import Table from "../../components/Table/Table.jsx";
 import Button from "../../components/Button/Button.jsx";
 import Input from "../../components/Input/Input.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
+import { hasPermission } from "../../utils/permissionHelper.js";
 import { PageLoader } from "../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
 import "./Users.css";
@@ -318,69 +319,82 @@ const Users = () => {
 
           {openMenuId === row._id && (
             <div className="action-dropdown-menu">
-              {/* Edit - Always show */}
-              <button
-                className="action-menu-item"
-                onClick={() => {
-                  navigate(`/users/edit/${row._id}`);
-                  setOpenMenuId(null);
-                }}
-              >
-                Edit
-              </button>
+              {hasPermission("users:edit") && (
+                <button
+                  className="action-menu-item"
+                  onClick={() => {
+                    navigate(`/users/edit/${row._id}`);
+                    setOpenMenuId(null);
+                  }}
+                >
+                  Edit
+                </button>
+              )}
 
-              {/* Hide Inactive/Active/Enable Login/Disable Login for current user */}
               {String(row._id) !== String(currentUser?.id) && (
                 <>
                   {!row.isActive ? (
-                    <button
-                      className="action-menu-item action-menu-item--success"
-                      onClick={() => {
-                        handleEnableRow(row._id);
-                        setOpenMenuId(null);
-                      }}
-                    >
-                      Active
-                    </button>
-                  ) : (
                     <>
-                      <button
-                        className="action-menu-item action-menu-item--danger"
-                        onClick={() => {
-                          handleDisableRow(row._id);
-                          setOpenMenuId(null);
-                        }}
-                      >
-                        Inactive
-                      </button>
-                      {row.canLogin ? (
-                        <button
-                          className="action-menu-item action-menu-item--warning"
-                          onClick={() => {
-                            handleToggleLogin(row._id, false);
-                            setOpenMenuId(null);
-                          }}
-                        >
-                          Disable Login
-                        </button>
-                      ) : (
+                      {hasPermission("users:inactive") && (
                         <button
                           className="action-menu-item action-menu-item--success"
                           onClick={() => {
-                            handleToggleLogin(row._id, true);
+                            handleEnableRow(row._id);
                             setOpenMenuId(null);
                           }}
                         >
-                          Enable Login
+                          Active
                         </button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {hasPermission("users:inactive") && (
+                        <button
+                          className="action-menu-item action-menu-item--danger"
+                          onClick={() => {
+                            handleDisableRow(row._id);
+                            setOpenMenuId(null);
+                          }}
+                        >
+                          Inactive
+                        </button>
+                      )}
+                      {row.canLogin ? (
+                        <>
+                          {hasPermission("users:disable_login") && (
+                            <button
+                              className="action-menu-item action-menu-item--warning"
+                              onClick={() => {
+                                handleToggleLogin(row._id, false);
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              Disable Login
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {hasPermission("users:disable_login") && (
+                            <button
+                              className="action-menu-item action-menu-item--success"
+                              onClick={() => {
+                                handleToggleLogin(row._id, true);
+                                setOpenMenuId(null);
+                              }}
+                            >
+                              Enable Login
+                            </button>
+                          )}
+                        </>
                       )}
                     </>
                   )}
                 </>
               )}
 
-              {/* Change Password - show for all users with canLogin */}
-              {row.canLogin && (
+              {row.canLogin && hasPermission("users:change_password") && (
                 <button
                   className="action-menu-item action-menu-item--info"
                   onClick={() => {
@@ -469,12 +483,14 @@ const Users = () => {
         <section className="users-actions">
           <div className="users-actions__wrapper">
             <div className="users-actions__bar">
-              <Button
-                onClick={() => navigate("/users/add")}
-                className="users-actions__btn users-actions__btn--add"
-              >
-                + Add New User
-              </Button>
+              {hasPermission("users:add_user") && (
+                <Button
+                  onClick={() => navigate("/users/add")}
+                  className="users-actions__btn users-actions__btn--add"
+                >
+                  + Add New User
+                </Button>
+              )}
 
               {/* <Button
               onClick={() => exportToCSV(allUsers, "users.csv")}
@@ -483,7 +499,7 @@ const Users = () => {
               <span className="material-icons">file_download</span> Export
             </Button> */}
 
-              {selectedRows.length > 1 && (
+              {selectedRows.length > 1 && hasPermission("users:disable_user") && (
                 <Button
                   onClick={handleBulkDisable}
                   className="btn-md delete-btn"

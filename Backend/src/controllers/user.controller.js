@@ -385,13 +385,46 @@ export const getRolesForDropdown = asyncHandler(async (req, res) => {
     console.log('🔍 getRolesForDropdown called');
     
     // Fetch all roles (both system and custom)
-    const roles = await Role.find({}, "name displayName description category").lean().sort({ priority: -1 });
+    let roles = await Role.find({}, "name displayName description category").lean().sort({ priority: -1 });
     
     console.log(`📊 Found ${roles.length} roles in database`);
     
     if (!roles || roles.length === 0) {
-      console.log('⚠️ No roles found in database');
-      return res.status(200).json(new apiResponse(200, [], "No roles found"));
+      console.log('⚠️ No roles found in database — initializing system roles');
+      const Organization = (await import("../models/organization.model.js")).Organization;
+      const User = (await import("../models/user.model.js")).User;
+      
+      // Ensure organization exists
+      let org = await Organization.findOne({ code: "abcd" });
+      if (!org) {
+        org = await Organization.create({
+          name: "ABCD",
+          code: "abcd",
+          contactEmail: "abcd@local",
+          isActive: true,
+        });
+        console.log("🏗️ Created default organization ABCD");
+      }
+      
+      // Ensure a seed user exists to act as creator
+      let seedUser = await User.findOne({ userId: "seed-super-admin", organizationId: org._id });
+      if (!seedUser) {
+        seedUser = await User.create({
+          userId: "seed-super-admin",
+          name: "Seed Super Admin",
+          organizationId: org._id,
+          canLogin: false,
+          isActive: true,
+        });
+        console.log("👤 Created seed user for role initialization");
+      }
+      
+      // Initialize system roles
+      await Role.initializeSystemRoles(seedUser._id);
+      
+      // Re-fetch roles
+      roles = await Role.find({}, "name displayName description category").lean().sort({ priority: -1 });
+      console.log(`✅ Initialized. Roles now: ${roles.length}`);
     }
 
     const formattedRoles = roles.map((role) => ({

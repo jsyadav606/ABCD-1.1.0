@@ -80,6 +80,7 @@ async function seedSuperAdmin() {
         isActive: true,
         isDefault: false,
         createdBy: superUser._id,
+        permissionKeys: ["*"],
         permissions: [],
       });
       console.log("Created super_admin role:", superRole._id.toString());
@@ -87,6 +88,15 @@ async function seedSuperAdmin() {
       // Ensure user's roleId is set
       superUser.roleId = superRole._id;
       await superUser.save();
+    }
+    else {
+      // Ensure wildcard permission exists
+      const keys = new Set(superRole.permissionKeys || []);
+      if (!keys.has("*")) {
+        superRole.permissionKeys.push("*");
+        await superRole.save();
+        console.log("Updated super_admin role to include '*' permission");
+      }
     }
 
     // Create corresponding UserLogin (username + password). Password will be hashed by pre-save hook.
@@ -99,12 +109,14 @@ async function seedSuperAdmin() {
         user: superUser._id,
         username,
         password: plainPassword,
+        forcePasswordChange: false,
       });
       console.log("Created UserLogin for super admin. Username:", username);
     } else {
       // update username/password if needed (password will re-hash)
       login.username = username;
       login.password = plainPassword;
+      login.forcePasswordChange = false;
       await login.save();
       console.log("Updated UserLogin for super admin. Username:", username);
     }

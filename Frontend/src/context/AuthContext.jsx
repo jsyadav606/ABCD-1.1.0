@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(loginId, password, deviceId)
       
       // Backend returns: { user, accessToken, deviceId, forcePasswordChange }
-      const { user: userData, accessToken, deviceId: returnedDeviceId, forcePasswordChange } = response.data.data
+      const { user: userData, accessToken, deviceId: returnedDeviceId, forcePasswordChange, permissions } = response.data.data
 
       if (!userData || !accessToken) {
         throw new Error('Invalid response from server')
@@ -77,6 +77,9 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('user', JSON.stringify(minimalUser))
+      if (Array.isArray(permissions)) {
+        localStorage.setItem('permissions', JSON.stringify(permissions))
+      }
       
       // Update device ID if returned
       if (returnedDeviceId) {
@@ -87,6 +90,21 @@ export const AuthProvider = ({ children }) => {
       // Keep full user object in memory for the app to use
       setUser(minimalUser)
       setIsAuthenticated(true)
+      
+      try {
+        const prof = await authAPI.getProfile()
+        const perms = prof.data?.data?.permissions
+        if (Array.isArray(perms)) {
+          localStorage.setItem('permissions', JSON.stringify(perms))
+        } else if (minimalUser?.role === 'super_admin') {
+          localStorage.setItem('permissions', JSON.stringify(['*']))
+        }
+      } catch (e) {
+        String(e)
+        if (minimalUser?.role === 'super_admin') {
+          localStorage.setItem('permissions', JSON.stringify(['*']))
+        }
+      }
       
       return { 
         success: true, 

@@ -1,21 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { roleAPI, branchAPI } from "../services/api";
 import { Table, Button, Input, Select, Modal, Card, Alert } from "../components";
-import { getPermissionDisplayName } from "../utils/permissionHelper";
 import "./Setup.css";
 
-const USER_PERMISSIONS = [
-  "user:create",
-  "user:read",
-  "user:update",
-  "user:disable",
-  "user:delete",
-  "user:change_password",
-];
+const RESOURCES = ["users", "roles", "branches", "dashboard", "reports"];
+const ACTIONS = ["create", "read", "update", "delete", "export", "approve"];
+const RESOURCE_ACTIONS = {
+  users: [
+    "add_user",
+    "disable_user",
+    "edit",
+    "inactive",
+    "disable_login",
+    "change_password",
+  ],
+};
+
+const toPermissionKeys = (permissions) => {
+  const keys = [];
+  permissions.forEach((p) => {
+    p.actions.forEach((a) => keys.push(`${p.resource}:${a}`));
+  });
+  return keys;
+};
+
+const fromPermissionKeys = (keys = []) => {
+  const map = {};
+  keys.forEach((k) => {
+    const [resource, action] = String(k).split(":");
+    if (!resource || !action) return;
+    if (!map[resource]) map[resource] = new Set();
+    map[resource].add(action);
+  });
+  return Object.entries(map).map(([resource, actionsSet]) => ({
+    resource,
+    actions: Array.from(actionsSet),
+  }));
+};
 
 const Setup = () => {
   const [activeTab, setActiveTab] = useState("roles");
 
+  // Roles State
   const [roles, setRoles] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
@@ -30,9 +56,10 @@ const Setup = () => {
     name: "",
     displayName: "",
     description: "",
+    priority: 100,
     isActive: true,
     isDefault: false,
-    permissionKeys: [],
+    permissions: [], // New structured permissions
   });
   const [roleFormError, setRoleFormError] = useState("");
   const [savingRole, setSavingRole] = useState(false);
@@ -101,9 +128,10 @@ const Setup = () => {
       name: "",
       displayName: "",
       description: "",
+      priority: 100,
       isActive: true,
       isDefault: false,
-      permissionKeys: [],
+      permissions: [],
     });
     setRoleFormError("");
     setRoleModalOpen(true);
@@ -115,11 +143,13 @@ const Setup = () => {
       name: role.name || "",
       displayName: role.displayName || "",
       description: role.description || "",
+      priority: role.priority || 100,
       isActive: role.isActive !== false,
       isDefault: role.isDefault === true,
-      permissionKeys: Array.isArray(role.permissionKeys)
-        ? role.permissionKeys
-        : [],
+      permissions:
+        (Array.isArray(role.permissions) && role.permissions.length > 0)
+          ? role.permissions
+          : fromPermissionKeys(role.permissionKeys || []),
     });
     setRoleFormError("");
     setRoleModalOpen(true);
@@ -130,16 +160,97 @@ const Setup = () => {
     setEditingRole(null);
   };
 
-  const handleRoleCheckboxChange = (permissionKey) => {
+  const handleActionToggle = (resource, action) => {
     setRoleForm((prev) => {
-      const exists = prev.permissionKeys.includes(permissionKey);
-      return {
-        ...prev,
-        permissionKeys: exists
-          ? prev.permissionKeys.filter((p) => p !== permissionKey)
-          : [...prev.permissionKeys, permissionKey],
-      };
+      const existingResource = prev.permissions.find((p) => p.resource === resource);
+      let newPermissions = [...prev.permissions];
+
+      if (existingResource) {
+        const hasAction = existingResource.actions.includes(action);
+        const newActions = hasAction
+          ? existingResource.actions.filter((a) => a !== action)
+          : [...existingResource.actions, action];
+
+        if (newActions.length === 0) {
+          newPermissions = newPermissions.filter((p) => p.resource !== resource);
+        } else {
+          newPermissions = newPermissions.map((p) =>
+            p.resource === resource ? { ...p, actions: newActions } : p
+          );
+        }
+      } else {
+        newPermissions.push({ resource, actions: [action] });
+      }
+
+      return { ...prev, permissions: newPermissions };
     });
+  };
+
+  const hasAction = (resource, action) => {
+    const perm = roleForm.permissions.find((p) => p.resource === resource);
+    return perm ? perm.actions.includes(action) : false;
+  };
+
+  const PermissionMatrix = () => (
+    <div className="permission-matrix-container">
+      <h3 className="matrix-title">Permission Matrix</h3>
+      <div className="matrix-scroll">
+        <table className="matrix-table">
+          <thead>
+            <tr>
+              <th>Resource</th>
+              {(RESOURCE_ACTIONS["users"] || ACTIONS).map((action) => (
+                <th key={action}>{action.charAt(0).toUpperCase() + action.slice(1)}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {RESOURCES.map((resource) => (
+              <tr key={resource}>
+                <td className="resource-name">{resource.charAt(0).toUpperCase() + resource.slice(1)}</td>
+                {(RESOURCE_ACTIONS[resource] || ACTIONS).map((action) => (
+                  <td key={action} className="action-cell">
+                    <input
+                      type="checkbox"
+                      checked={hasAction(resource, action)}
+                      onChange={() => handleActionToggle(resource, action)}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const RealTimePreview = () => {
+    const previewPermissions = useMemo(() => {
+      const keys = [];
+      roleForm.permissions.forEach(p => {
+        p.actions.forEach(a => keys.push(`${p.resource}:${a}`));
+      });
+      return keys;
+    }, [roleForm.permissions]);
+
+    const canSee = (res, act) => previewPermissions.includes(`${res}:${act}`);
+
+    return (
+      <Card className="preview-card">
+        <h3>Real-time Preview</h3>
+        <p className="preview-hint">Buttons visible for this role:</p>
+        <div className="preview-container">
+          {canSee('users', 'add_user') && <Button size="sm" variant="primary">Add User</Button>}
+          {canSee('users', 'disable_user') && <Button size="sm" variant="danger">Disable User</Button>}
+          {canSee('users', 'edit') && <Button size="sm" variant="secondary">Edit</Button>}
+          {canSee('users', 'inactive') && <Button size="sm" variant="warning">Inactive</Button>}
+          {canSee('users', 'disable_login') && <Button size="sm" variant="outline">Disable Login</Button>}
+          {canSee('users', 'change_password') && <Button size="sm" variant="success">Change Password</Button>}
+          {!previewPermissions.length && <span className="no-preview">No buttons visible</span>}
+        </div>
+      </Card>
+    );
   };
 
   const handleRoleInputChange = (e) => {
@@ -168,12 +279,14 @@ const Setup = () => {
       setRoleFormError("");
 
       const payload = {
-        name: roleForm.name.trim(),
+        name: roleForm.name.trim().toLowerCase(),
         displayName: roleForm.displayName.trim(),
-        description: roleForm.description?.trim() || "",
+        description: roleForm.description.trim(),
+        priority: parseInt(roleForm.priority) || 100,
         isActive: roleForm.isActive,
         isDefault: roleForm.isDefault,
-        permissionKeys: roleForm.permissionKeys,
+        permissions: roleForm.permissions,
+        permissionKeys: toPermissionKeys(roleForm.permissions),
       };
 
       if (editingRole) {
@@ -335,15 +448,15 @@ const Setup = () => {
         render: (row) => (row.isDefault ? "Yes" : "No"),
       },
       {
-        header: "User Management Rights",
-        key: "permissionKeys",
-        render: (row) =>
-          Array.isArray(row.permissionKeys) && row.permissionKeys.length > 0
-            ? row.permissionKeys
-                .filter((p) => p.startsWith("user:"))
-                .map((p) => getPermissionDisplayName(p))
-                .join(", ")
-            : "None",
+        header: "Rights Summary",
+        key: "permissions",
+        render: (row) => {
+          if (row.name === "super_admin") return "All Access (*)";
+          if (!Array.isArray(row.permissions) || row.permissions.length === 0) return "None";
+          return row.permissions
+            .map(p => `${p.resource}(${p.actions.length})`)
+            .join(", ");
+        },
       },
       {
         header: "Actions",
@@ -503,9 +616,16 @@ const Setup = () => {
           isOpen={roleModalOpen}
           title={editingRole ? "Edit Role" : "Add Role"}
           onClose={closeRoleModal}
-          onConfirm={saveRole}
-          confirmText={editingRole ? "Save Changes" : "Create Role"}
-          confirmDisabled={savingRole}
+          footer={
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+              <Button variant="secondary" onClick={closeRoleModal} disabled={savingRole}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={saveRole} disabled={savingRole}>
+                {editingRole ? "Save Changes" : "Create Role"}
+              </Button>
+            </div>
+          }
         >
           {roleFormError && (
             <div className="setup-error">
@@ -522,58 +642,57 @@ const Setup = () => {
               placeholder="e.g., User Administrator"
               required
             />
+            {!editingRole && (
+              <Input
+                name="name"
+                label="Role Internal Name"
+                value={roleForm.name}
+                onChange={handleRoleInputChange}
+                placeholder="e.g., user_admin (no spaces)"
+                required
+              />
+            )}
             <Input
-              name="name"
-              label="System Name"
-              value={roleForm.name}
+              name="priority"
+              label="Priority (1-1000)"
+              type="number"
+              value={roleForm.priority}
               onChange={handleRoleInputChange}
-              placeholder="e.g., user_admin"
-              required
+              placeholder="100"
+            />
+            <div className="setup-checkbox-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={roleForm.isActive}
+                  onChange={() => handleRoleToggleChange("isActive")}
+                />
+                Is Active
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={roleForm.isDefault}
+                  onChange={() => handleRoleToggleChange("isDefault")}
+                />
+                Is Default
+              </label>
+            </div>
+          </div>
+
+          <div className="setup-modal-full">
+            <Input
+              name="description"
+              label="Description"
+              value={roleForm.description}
+              onChange={handleRoleInputChange}
+              placeholder="Describe what this role can do"
             />
           </div>
 
-          <Input
-            name="description"
-            label="Description"
-            value={roleForm.description}
-            onChange={handleRoleInputChange}
-            placeholder="Short description of this role"
-          />
-
-          <div className="setup-toggle-row">
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={roleForm.isActive}
-                onChange={() => handleRoleToggleChange("isActive")}
-              />
-              <span className="toggle-label">Active</span>
-            </label>
-
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={roleForm.isDefault}
-                onChange={() => handleRoleToggleChange("isDefault")}
-              />
-              <span className="toggle-label">Default role for new users</span>
-            </label>
-          </div>
-
-          <div className="setup-permissions-grid">
-            <h3>User Management Rights</h3>
-            <div className="permissions-grid">
-              {USER_PERMISSIONS.map((perm) => (
-                <label key={perm} className="permission-item">
-                  <input
-                    type="checkbox"
-                    checked={roleForm.permissionKeys.includes(perm)}
-                    onChange={() => handleRoleCheckboxChange(perm)}
-                  />
-                  <span>{getPermissionDisplayName(perm)}</span>
-                </label>
-              ))}
-            </div>
+          <div className="rbac-management-section">
+            <PermissionMatrix />
+            <RealTimePreview />
           </div>
         </Modal>
       )}
@@ -583,9 +702,16 @@ const Setup = () => {
           isOpen={branchModalOpen}
           title={editingBranch ? "Edit Branch" : "Add Branch"}
           onClose={closeBranchModal}
-          onConfirm={saveBranch}
-          confirmText={editingBranch ? "Save Changes" : "Create Branch"}
-          confirmDisabled={savingBranch}
+          footer={
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+              <Button variant="secondary" onClick={closeBranchModal} disabled={savingBranch}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={saveBranch} disabled={savingBranch}>
+                {editingBranch ? "Save Changes" : "Create Branch"}
+              </Button>
+            </div>
+          }
         >
           {branchFormError && (
             <div className="setup-error">

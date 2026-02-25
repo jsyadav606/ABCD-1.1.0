@@ -142,6 +142,7 @@ export const authService = {
         user: userResponse,
         accessToken,
         refreshToken,
+        permissions,
         forcePasswordChange: !!userLogin.forcePasswordChange,
         deviceId,
         message: "Login successful",

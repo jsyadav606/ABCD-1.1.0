@@ -52,104 +52,20 @@ const roleSchema = new mongoose.Schema(
       note: "Higher priority overrides lower priority when conflicts occur. System roles: 1-10, Custom roles: 11-999",
     },
 
-    // Permissions - Detailed permission structure
+    // Permissions - Simplified for Master Prompt
     permissions: [
       {
         _id: false,
-        // Resource reference
-        resourceId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Resource",
-          required: true,
-          example: "User Management, Reports, etc.",
-        },
-
-        resourceName: {
+        resource: {
           type: String,
           required: true,
           lowercase: true,
           example: "users, reports, dashboard",
         },
-
-        // Actions/Operations
         actions: {
-          create: {
-            type: Boolean,
-            default: false,
-            note: "Can create new records",
-          },
-          read: {
-            type: Boolean,
-            default: false,
-            note: "Can view/read records",
-          },
-          update: {
-            type: Boolean,
-            default: false,
-            note: "Can edit/update records",
-          },
-          delete: {
-            type: Boolean,
-            default: false,
-            note: "Can permanently delete records",
-          },
-          export: {
-            type: Boolean,
-            default: false,
-            note: "Can export data",
-          },
-          approve: {
-            type: Boolean,
-            default: false,
-            note: "Can approve pending items",
-          },
-        },
-
-        // Scope/Field-level restrictions
-        scope: {
-          type: String,
-          enum: ["all", "own", "team", "department", "organization"],
-          default: "all",
-          note: "all=everything, own=own records, team=team records, department=dept records, organization=org records",
-        },
-
-        // Field-level access control
-        fieldRestrictions: {
-          type: Map,
-          of: Boolean,
-          default: new Map(),
-          note: "Restrict access to specific fields. true=can access, false=cannot access",
-        },
-
-        // Custom conditions for this permission
-        conditions: {
-          type: mongoose.Schema.Types.Mixed,
-          default: null,
-          note: "Custom logic conditions for granular permission control",
-        },
-
-        // Permission status
-        isActive: {
-          type: Boolean,
-          default: true,
-        },
-
-        // Metadata
-        grantedAt: {
-          type: Date,
-          default: Date.now,
-        },
-
-        grantedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          default: null,
-        },
-
-        note: {
-          type: String,
-          default: null,
-          note: "Admin notes about why this permission was granted/denied",
+          type: [String],
+          default: [],
+          example: ["create", "read", "update", "delete"],
         },
       },
     ],
@@ -232,20 +148,20 @@ roleSchema.index({ organizationId: 1, isActive: 1, isDeleted: 1 });
 
 /**
  * Check if role has specific permission on resource
- * @param {string} resourceName - Resource name
- * @param {string} action - Action to check (create, read, update, delete, export, approve)
+ * @param {string} resource - Resource name
+ * @param {string} action - Action to check (create, read, update, delete, export, etc.)
  * @returns {boolean}
  */
-roleSchema.methods.hasPermission = function (resourceName, action = "read") {
+roleSchema.methods.hasPermission = function (resource, action) {
   if (!this.isActive) return false;
 
   const permission = this.permissions.find(
-    (p) => p.resourceName === resourceName && p.isActive
+    (p) => p.resource === resource
   );
 
   if (!permission) return false;
 
-  return permission.actions[action] === true;
+  return permission.actions.includes(action) || permission.actions.includes("*");
 };
 
 /**
@@ -499,6 +415,9 @@ roleSchema.pre("save", async function () {
 
 // Validate created by user exists
 roleSchema.pre("save", async function () {
+  if (!this.isNew) {
+    return;
+  }
   if (this.createdBy) {
     const User = mongoose.model("User");
     const user = await User.findById(this.createdBy);

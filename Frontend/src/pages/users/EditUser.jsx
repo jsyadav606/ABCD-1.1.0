@@ -104,7 +104,10 @@ const EditUser = () => {
               : new Date(userData.dateOfJoining).toISOString().slice(0, 10)
             : "",
           role: userData.role || "",
-          roleId: userData.roleId || "",
+          roleId:
+            (typeof userData.roleId === "object" && userData.roleId?._id)
+              ? userData.roleId._id
+              : userData.roleId || "",
           branchId: branchIds,
           canLogin: userData.canLogin || false,
           remarks: userData.remarks || "",
@@ -112,9 +115,9 @@ const EditUser = () => {
         });
 
         // Fetch roles
-        console.log("📥 Fetching roles...");
+        // console.log("📥 Fetching roles...");
         const rolesData = await fetchRolesForDropdown();
-        console.log("✅ Roles received:", rolesData);
+        // console.log("✅ Roles received:", rolesData);
         setRoles(rolesData);
 
         // Fetch branches

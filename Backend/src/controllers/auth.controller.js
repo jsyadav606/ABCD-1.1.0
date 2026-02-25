@@ -82,6 +82,7 @@ export const loginController = asyncHandler(async (req, res) => {
       user: result.user,
       accessToken: result.accessToken,
       deviceId: result.deviceId,
+      permissions: result.permissions,
       forcePasswordChange: result.forcePasswordChange || false,
     }, result.message)
   );

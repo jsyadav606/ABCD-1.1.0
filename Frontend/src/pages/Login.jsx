@@ -61,12 +61,7 @@ const Login = () => {
     const result = await login(formData.loginId, formData.password)
 
     if (result.success) {
-      // Check if password change is required
-      if (result.forcePasswordChange) {
-        navigate('/change-password', { state: { forceChange: true } })
-      } else {
-        navigate('/dashboard')
-      }
+      navigate('/dashboard')
     }
 
     setLoading(false)

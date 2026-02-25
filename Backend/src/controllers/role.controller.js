@@ -1,4 +1,5 @@
 import { Role } from "../models/role.model.js";
+import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -136,6 +137,23 @@ export const updateRole = asyncHandler(async (req, res) => {
   if (req.user?.id) {
     role.updatedBy = req.user.id;
   }
+  
+  // Ensure createdBy points to a valid user to avoid pre-save hook failures on legacy data
+  try {
+    if (!role.createdBy) {
+      role.createdBy = req.user?.id || role.createdBy;
+    } else {
+      const creator = await User.findById(role.createdBy).select("_id");
+      if (!creator && req.user?.id) {
+        role.createdBy = req.user.id;
+      }
+    }
+  } catch (_) {
+    // Fallback: if lookup fails, at least set to current user if available
+    if (req.user?.id) {
+      role.createdBy = req.user.id;
+    }
+  }
 
   await role.save();
 
@@ -163,4 +181,3 @@ export const deleteRole = asyncHandler(async (req, res) => {
     .status(200)
     .json(new apiResponse(200, null, "Role deleted successfully"));
 });
-

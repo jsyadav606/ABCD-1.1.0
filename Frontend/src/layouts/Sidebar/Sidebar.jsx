@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { hasPermission } from "../../utils/permissionHelper";
+import { isSuperAdmin } from "../../utils/permissionHelper";
 import { authAPI } from "../../services/api";
 import { Modal, Input, Button } from "../../components";
 import "./Sidebar.css";
@@ -282,7 +282,7 @@ const Sidebar = ({ collapsed, onCloseSidebar }) => {
           </Link>
         </li>
 
-        {hasPermission("user:update") && (
+        {isSuperAdmin() && (
           <li>
             <Link to="/setup" onClick={handleMenuItemClick}>
               <span className="material-icons">settings</span>

@@ -88,8 +88,9 @@ const MultiSelectBranch = ({
                 {selectedLabels.map((label, idx) => (
                   <span key={idx} className="multi-select-chip">
                     {label}
-                    <button
-                      type="button"
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
                         const optionValue = options.find(
@@ -97,11 +98,22 @@ const MultiSelectBranch = ({
                         )?.value;
                         handleToggle(optionValue);
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const optionValue = options.find(
+                            (opt) => opt.label === label,
+                          )?.value;
+                          handleToggle(optionValue);
+                        }
+                      }}
                       className="multi-select-chip-remove"
                       title="Remove"
+                      aria-label={`Remove ${label}`}
                     >
-                      ✕
-                    </button>
+                      ×
+                    </span>
                   </span>
                 ))}
               </div>

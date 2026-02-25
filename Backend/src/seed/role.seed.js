@@ -47,6 +47,51 @@ async function seedRoles() {
     await Role.initializeSystemRoles(seedUser._id);
     console.log("System roles initialized/ensured.");
 
+    // 4) Ensure a granular "user_admin" role exists with specific permission keys
+    const existingUserAdmin = await Role.findOne({ name: "user_admin", isDeleted: false });
+    const userAdminPermissions = [
+      "users:add_user",
+      "users:disable_user",
+      "users:edit",
+      "users:inactive",
+      "users:disable_login",
+      "users:change_password",
+    ];
+
+    if (!existingUserAdmin) {
+      await Role.create({
+        name: "user_admin",
+        displayName: "User Admin",
+        description: "Can manage users and related actions",
+        category: "custom",
+        priority: 20,
+        isActive: true,
+        isDefault: false,
+        createdBy: seedUser._id,
+        permissionKeys: userAdminPermissions,
+        permissions: [
+          { resource: "users", actions: ["read", "update"] },
+        ],
+      });
+      console.log("Created custom role: user_admin");
+    } else {
+      // Update permissionKeys if missing any
+      const current = new Set(existingUserAdmin.permissionKeys || []);
+      let updated = false;
+      for (const k of userAdminPermissions) {
+        if (!current.has(k)) {
+          existingUserAdmin.permissionKeys.push(k);
+          updated = true;
+        }
+      }
+      if (updated) {
+        await existingUserAdmin.save();
+        console.log("Updated user_admin role permissionKeys");
+      } else {
+        console.log("user_admin role already up to date");
+      }
+    }
+
     // Done
     console.log("Role seed completed.");
     process.exit(0);
