@@ -5,7 +5,7 @@ import Table from "../../../components/Table/Table.jsx";
 import Button from "../../../components/Button/Button.jsx";
 import Input from "../../../components/Input/Input.jsx";
 import Modal from "../../../components/Modal/Modal.jsx";
-import { hasPermission } from "../../../utils/permissionHelper.js";
+import { hasPermission } from "../../../utils/permissionHelper";
 import { PageLoader } from "../../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../../components/ErrorBoundary/ErrorNotification.jsx";
 import "./Users.css";
@@ -91,6 +91,8 @@ const Users = () => {
     };
     loadUsers();
   }, []);
+
+  // Removed realtime subscription
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -303,7 +305,7 @@ const Users = () => {
         
         // Update local state
         const roleObj = roles.find(r => r._id === editRoleModal.newRoleId);
-        setAllUsers(prev => prev.map(u => u._id === editRoleModal.userId ? { ...u, roleId: roleObj, role: roleObj?.name } : u));
+        setAllUsers(prev => prev.map(u => u._id === editRoleModal.userId ? { ...u, roleId: roleObj, role: roleObj?.displayName || roleObj?.name } : u));
         
         setSuccessMessage("Role updated successfully");
         setEditRoleModal(prev => ({...prev, isOpen: false}));

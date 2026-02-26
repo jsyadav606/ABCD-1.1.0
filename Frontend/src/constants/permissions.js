@@ -66,23 +66,7 @@ export const PERMISSION_MODULES = [
       },
     ],
   },
-  {
-    key: "upgrades",
-    label: "Upgrade Module",
-    accessKey: "upgrades:access",
-    pages: [
-      {
-        key: "requests",
-        label: "Upgrade Requests",
-        actions: [
-          { key: "create", label: "Create Request" },
-          { key: "approve", label: "Approve Request" },
-          { key: "reject", label: "Reject Request" },
-          { key: "view", label: "View Requests" },
-        ],
-      },
-    ],
-  },
+  
 
   {
     key: "upgrades",

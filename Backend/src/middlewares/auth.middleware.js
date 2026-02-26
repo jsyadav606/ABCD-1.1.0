@@ -111,6 +111,7 @@ export const verifyJWT = async (req, res, next) => {
     }
 
     // Attach user to request. Expose role name via `role` for compatibility.
+    // Also attach rolePermissionKeys and user-level permissions for downstream authorization checks
     const userObj = user.toObject();
     req.user = {
       id: decoded.id,
@@ -118,6 +119,8 @@ export const verifyJWT = async (req, res, next) => {
       ...userObj,
       role: user.roleId?.name || null,
       roleId: user.roleId?._id || null,
+      rolePermissionKeys: Array.isArray(user.roleId?.permissionKeys) ? user.roleId.permissionKeys : [],
+      userPermissionKeys: Array.isArray(user.permissions) ? user.permissions : []
     };
 
     next();

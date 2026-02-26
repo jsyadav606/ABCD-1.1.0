@@ -22,6 +22,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/not-found" element={<NotFound />} />
 
           {/* Root redirect to dashboard */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -41,7 +42,7 @@ function App() {
           <Route
             path="/users"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="users:users_list:view">
                 <MainLayout>
                   <Users />
                 </MainLayout>
@@ -52,7 +53,7 @@ function App() {
           <Route
             path="/users/add"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="users:users_list:add">
                 <MainLayout>
                   <AddUser />
                 </MainLayout>
@@ -63,7 +64,7 @@ function App() {
           <Route
             path="/users/edit/:id"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="users:users_list:edit">
                 <MainLayout>
                   <EditUser />
                 </MainLayout>
@@ -74,7 +75,7 @@ function App() {
           <Route
             path="/user-detail/:id"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="users:users_list:view">
                 <MainLayout>
                   <UserDetails />
                 </MainLayout>
@@ -85,7 +86,7 @@ function App() {
           <Route
             path="/setup"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="setup:access">
                 <MainLayout>
                   <Setup />
                 </MainLayout>

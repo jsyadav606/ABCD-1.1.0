@@ -22,16 +22,47 @@ export const AuthProvider = ({ children }) => {
     }
   }, [deviceId])
 
-  // Check if user is already logged in (on mount)
+  // Check if user is already logged in (on mount) and refresh profile/permissions
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const storedUser = localStorage.getItem('user')
       const token = localStorage.getItem('accessToken')
 
       if (storedUser && token) {
         try {
-          setUser(JSON.parse(storedUser))
+          const parsed = JSON.parse(storedUser)
+          setUser(parsed)
           setIsAuthenticated(true)
+          // Refresh profile and permissions from server so role rights changes reflect on refresh
+          try {
+            const prof = await authAPI.getProfile()
+            const data = prof.data?.data
+            if (data?.user) {
+              localStorage.setItem('user', JSON.stringify({
+                id: data.user._id || data.user.id,
+                userId: data.user.userId,
+                name: data.user.name,
+                email: data.user.email,
+                role: data.user.role,
+                roleId: data.user.roleId
+              }))
+              setUser({
+                id: data.user._id || data.user.id,
+                userId: data.user.userId,
+                name: data.user.name,
+                email: data.user.email,
+                role: data.user.role,
+                roleId: data.user.roleId
+              })
+            }
+            if (Array.isArray(data?.permissions)) {
+              localStorage.setItem('permissions', JSON.stringify(data.permissions))
+            } else if ((data?.user?.role || parsed?.role) === 'super_admin') {
+              localStorage.setItem('permissions', JSON.stringify(['*']))
+            }
+          } catch (e) {
+            // Ignore profile errors; keep current session
+          }
         } catch (err) {
           console.error('Failed to parse stored user:', err)
           clearAllAuthStorage()

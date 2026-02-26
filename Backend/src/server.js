@@ -22,7 +22,6 @@ const envConfig = getEnvConfig();
 connectDB()
   .then(async () => {
     const PORT = envConfig.port;
-    
     app.listen(PORT, () => {
       console.log(`🚀 Server started successfully`);
       console.log(`

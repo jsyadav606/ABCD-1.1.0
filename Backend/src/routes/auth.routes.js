@@ -10,6 +10,7 @@ import {
   lockAccountController,
   unlockAccountController,
   validateTokenController,
+  profileController,
 } from "../controllers/auth.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -29,6 +30,9 @@ router.post("/refresh", refreshTokenController);
 router.post("/validate", validateTokenController);
 
 //! Protected routes (require authentication)
+// Purpose: Get current user's profile and permissions
+// GET /profile (Auth: Bearer token)
+router.get("/profile", verifyJWT, profileController);
 // Purpose: Logout current device (clear refresh token for device)
 // POST /logout { deviceId? } (Auth: Bearer token or refreshToken cookie)
 router.post("/logout", verifyJWT, logoutController);

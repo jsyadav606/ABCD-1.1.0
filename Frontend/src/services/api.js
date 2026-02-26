@@ -114,10 +114,10 @@ API.interceptors.response.use(
 
     // Handle 403 - Forbidden
     if (error.response?.status === 403) {
-      clearAuthHeaders()
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('user')
-      sessionStorage.removeItem('deviceId')
+      // Do NOT log out on 403. This just means the user lacks permission for a specific resource.
+      // The component (e.g., ProtectedRoute) will handle this by showing a 404/403 page.
+      console.warn("Access Denied (403) - You do not have permission for this action.");
+      return Promise.reject(error);
     }
 
     return Promise.reject(error)

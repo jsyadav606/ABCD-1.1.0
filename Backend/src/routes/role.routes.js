@@ -1,5 +1,6 @@
 import express from "express";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyPermission } from "../middlewares/permission.middleware.js";
 import {
   listRoles,
   getRoleById,
@@ -10,13 +11,13 @@ import {
 
 const router = express.Router();
 
-router.use(verifyJWT, verifyAdmin);
+router.use(verifyJWT);
 
-router.get("/", listRoles);
-router.get("/:id", getRoleById);
-router.post("/", createRole);
-router.put("/:id", updateRole);
-router.delete("/:id", deleteRole);
+router.get("/", verifyPermission("setup:roles:view"), listRoles);
+router.get("/:id", verifyPermission("setup:roles:view"), getRoleById);
+router.post("/", verifyPermission("setup:roles:manage"), createRole);
+router.put("/:id", verifyPermission("setup:roles:manage"), updateRole);
+router.delete("/:id", verifyPermission("setup:roles:manage"), deleteRole);
 
 export default router;
 

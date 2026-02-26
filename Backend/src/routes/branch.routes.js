@@ -1,5 +1,6 @@
 import express from "express";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyPermission } from "../middlewares/permission.middleware.js";
 import {
   listBranches,
   getBranchById,
@@ -10,13 +11,13 @@ import {
 
 const router = express.Router();
 
-router.use(verifyJWT, verifyAdmin);
+router.use(verifyJWT);
 
-router.get("/", listBranches);
-router.get("/:id", getBranchById);
-router.post("/", createBranch);
-router.put("/:id", updateBranch);
-router.delete("/:id", deleteBranch);
+router.get("/", verifyPermission("setup:branches:view"), listBranches);
+router.get("/:id", verifyPermission("setup:branches:view"), getBranchById);
+router.post("/", verifyPermission("setup:branches:manage"), createBranch);
+router.put("/:id", verifyPermission("setup:branches:manage"), updateBranch);
+router.delete("/:id", verifyPermission("setup:branches:manage"), deleteBranch);
 
 export default router;
 

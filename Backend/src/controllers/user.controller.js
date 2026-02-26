@@ -1,6 +1,6 @@
 import { User } from "../models/user.model.js";
 import { Role } from "../models/role.model.js";
-import { Branch } from "../models/branch.model.js";
+import { Branch } from "../models/branch.model.js"; 
 import { UserLogin } from "../models/userLogin.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
@@ -176,7 +176,7 @@ export const createUser = asyncHandler(async (req, res) => {
 export const getUserById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userDoc = await User.findById(id).populate('roleId branchId').lean();
-  const user = userDoc ? { ...userDoc, role: userDoc.roleId?.name || null } : null;
+  const user = userDoc ? { ...userDoc, role: userDoc.roleId?.displayName || userDoc.roleId?.name || null } : null;
   
   if (!user) {
     throw new apiError(404, "User not found");
@@ -353,7 +353,7 @@ export const listUsers = asyncHandler(async (req, res) => {
   // Map role name for compatibility with frontend which expects `role` string
   const items = itemsRaw.map((it) => ({
     ...it,
-    role: it.roleId?.name || null,
+    role: it.roleId?.displayName || it.roleId?.name || null,
   }));
 
   return res.status(200).json(new apiResponse(200, { items, meta: { page, limit, total } }, "Users retrieved successfully"));
@@ -582,7 +582,7 @@ export const getRolesForDropdown = asyncHandler(async (req, res) => {
     if (!roles || roles.length === 0) {
       console.log('⚠️ No roles found in database — initializing system roles');
       const Organization = (await import("../models/organization.model.js")).Organization;
-      const User = (await import("../models/user.model.js")).User;
+      const UserModel = (await import("../models/user.model.js")).User;
       
       // Ensure organization exists
       let org = await Organization.findOne({ code: "abcd" });
@@ -597,9 +597,9 @@ export const getRolesForDropdown = asyncHandler(async (req, res) => {
       }
       
       // Ensure a seed user exists to act as creator
-      let seedUser = await User.findOne({ userId: "seed-super-admin", organizationId: org._id });
+      let seedUser = await UserModel.findOne({ userId: "seed-super-admin", organizationId: org._id });
       if (!seedUser) {
-        seedUser = await User.create({
+        seedUser = await UserModel.create({
           userId: "seed-super-admin",
           name: "Seed Super Admin",
           organizationId: org._id,
@@ -735,19 +735,4 @@ export const changeUserPassword = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, { success: true, message: `Password changed for ${user.name}` }, "Password changed successfully"));
 });
 
-export default {
-  createUser,
-  getUserById,
-  listUsers,
-  updateUser,
-  toggleCanLogin,
-  toggleIsActive,
-  changeUserRole,
-  softDeleteUser,
-  restoreUser,
-  deleteUserPermanent,
-  getRolesForDropdown,
-  getBranchesForDropdown,
-  getUsersForDropdown,
-  changeUserPassword,
-};
+// Note: Named exports are used by routes; default export removed to avoid ESM interop issues.

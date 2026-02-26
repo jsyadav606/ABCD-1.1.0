@@ -8,6 +8,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { apiError } from "../utils/apiError.js";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
+import { User } from "../models/user.model.js";
 
 /**
  * Auth Controller - Handles HTTP requests for authentication
@@ -309,4 +310,52 @@ export const validateTokenController = asyncHandler(async (req, res) => {
   const result = await authService.validateAccessToken(token);
 
   return res.status(200).json(new apiResponse(200, result.data, "Token is valid"));
+});
+
+// =====================================================
+// PROFILE CONTROLLER
+// =====================================================
+export const profileController = asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    throw new apiError(401, "Unauthorized");
+  }
+
+  const userDoc = await User.findById(userId).select("-password").populate("roleId");
+  if (!userDoc) {
+    throw new apiError(404, "User not found");
+  }
+
+  const minimalUser = {
+    _id: userDoc._id,
+    userId: userDoc.userId,
+    name: userDoc.name,
+    email: userDoc.email,
+    role: userDoc.roleId?.name || null,
+    roleId: userDoc.roleId?._id || userDoc.roleId || null,
+    branchId: userDoc.branchId || [],
+    organizationId: userDoc.organizationId || null,
+  };
+
+  let permissions = [];
+  if (Array.isArray(userDoc.permissions)) {
+    permissions = [...userDoc.permissions];
+  }
+  if (userDoc.roleId && Array.isArray(userDoc.roleId.permissionKeys)) {
+    permissions = [...permissions, ...userDoc.roleId.permissionKeys];
+  }
+  if (minimalUser.role === "super_admin" && !permissions.includes("*")) {
+    permissions.push("*");
+  }
+  permissions = Array.from(new Set(permissions));
+
+  return res
+    .status(200)
+    .json(
+      new apiResponse(
+        200,
+        { user: minimalUser, permissions },
+        "Profile retrieved successfully"
+      )
+    );
 });
