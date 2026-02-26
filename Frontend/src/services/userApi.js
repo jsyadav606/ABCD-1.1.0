@@ -43,17 +43,29 @@ export const fetchRolesForDropdown = async () => {
   }
 }
 
-export const fetchBranchesForDropdown = async (organizationId = null) => {
+export const fetchBranchesForDropdown = async (organizationId) => {
   try {
-    let url = '/users/dropdown/branches'
-    if (organizationId) {
-      url += `?organizationId=${organizationId}`
-    }
+    const url = organizationId
+      ? `/users/dropdown/branches?organizationId=${organizationId}`
+      : '/users/dropdown/branches'
     const response = await API.get(url)
     return response.data?.data || []
   } catch (error) {
     console.error('Failed to fetch branches:', error)
     throw new Error(error.response?.data?.message || 'Failed to fetch branches')
+  }
+}
+
+export const fetchUsersForDropdown = async (organizationId) => {
+  try {
+    const url = organizationId
+      ? `/users/dropdown/users?organizationId=${organizationId}`
+      : '/users/dropdown/users'
+    const response = await API.get(url)
+    return response.data?.data || []
+  } catch (error) {
+    console.error('Failed to fetch users dropdown:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch users')
   }
 }
 
@@ -131,5 +143,17 @@ export const changeUserPassword = async (userId, newPassword) => {
   } catch (error) {
     console.error('Failed to change password:', error)
     throw new Error(error.response?.data?.message || 'Failed to change password')
+  }
+}
+
+export const changeUserRole = async (userId, roleId) => {
+  try {
+    const response = await API.post(`/users/${userId}/change-role`, {
+      roleId: roleId
+    })
+    return response.data?.data || response.data
+  } catch (error) {
+    console.error('Failed to change user role:', error)
+    throw new Error(error.response?.data?.message || 'Failed to change user role')
   }
 }

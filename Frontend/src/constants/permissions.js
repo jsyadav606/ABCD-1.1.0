@@ -20,7 +20,9 @@ export const PERMISSION_MODULES = [
           { key: "change_password", label: "Change Password" },
           { key: "disable_login", label: "Disable Login" },
           { key: "enable_login", label: "Enable Login" },
-          { key: "export", label: "Export Users" }, // New Permission
+          { key: "export", label: "Export Users" },
+          { key: "assign_reporting", label: "Assign Reporting Manager" }, // New
+          { key: "edit_role", label: "Edit User Role" }, // New
         ],
       },
       // Future pages like User Groups, etc.

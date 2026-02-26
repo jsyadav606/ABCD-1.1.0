@@ -15,7 +15,12 @@ import {
   enableUser,
   toggleCanLogin,
   changeUserPassword,
+  changeUserRole,
+  updateUser,
+  fetchRolesForDropdown,
+  fetchUsersForDropdown,
 } from "../../../services/userApi.js";
+import Select from "../../../components/Select/Select.jsx";
 import { SetPageTitle } from "../../../components/SetPageTitle/SetPageTitle.jsx";
 
 const Users = () => {
@@ -39,6 +44,32 @@ const Users = () => {
     passwordError: "",
     isSubmitting: false,
     showPassword: false,
+  });
+
+  // Dropdown data
+  const [roles, setRoles] = useState([]);
+  const [potentialManagers, setPotentialManagers] = useState([]);
+
+  // Edit Role Modal State
+  const [editRoleModal, setEditRoleModal] = useState({
+    isOpen: false,
+    userId: null,
+    userName: "",
+    currentRoleId: "",
+    newRoleId: "",
+    isSubmitting: false,
+    error: ""
+  });
+
+  // Assign Reporting Modal State
+  const [assignReportingModal, setAssignReportingModal] = useState({
+    isOpen: false,
+    userId: null,
+    userName: "",
+    currentManagerId: "",
+    newManagerId: "",
+    isSubmitting: false,
+    error: ""
   });
 
   const pageSize = Number(import.meta.env.VITE_PAGE_SIZE || import.meta.env.page_size) || 20;
@@ -241,6 +272,84 @@ const Users = () => {
     }
   };
 
+  // --- Edit Role Handlers ---
+  const handleOpenEditRole = async (row) => {
+    setEditRoleModal({
+      isOpen: true,
+      userId: row._id,
+      userName: row.name,
+      currentRoleId: row.roleId?._id || "",
+      newRoleId: row.roleId?._id || "",
+      isSubmitting: false,
+      error: ""
+    });
+    setOpenMenuId(null);
+    if (roles.length === 0) {
+        try {
+            const data = await fetchRolesForDropdown();
+            setRoles(data);
+        } catch(e) { console.error(e); }
+    }
+  };
+
+  const handleSubmitEditRole = async () => {
+    if (!editRoleModal.newRoleId) {
+        setEditRoleModal(prev => ({...prev, error: "Please select a role"}));
+        return;
+    }
+    try {
+        setEditRoleModal(prev => ({...prev, isSubmitting: true, error: ""}));
+        await changeUserRole(editRoleModal.userId, editRoleModal.newRoleId);
+        
+        // Update local state
+        const roleObj = roles.find(r => r._id === editRoleModal.newRoleId);
+        setAllUsers(prev => prev.map(u => u._id === editRoleModal.userId ? { ...u, roleId: roleObj, role: roleObj?.name } : u));
+        
+        setSuccessMessage("Role updated successfully");
+        setEditRoleModal(prev => ({...prev, isOpen: false}));
+        setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+        setEditRoleModal(prev => ({...prev, isSubmitting: false, error: err.message}));
+    }
+  };
+
+  // --- Assign Reporting Handlers ---
+  const handleOpenAssignReporting = async (row) => {
+      setAssignReportingModal({
+        isOpen: true,
+        userId: row._id,
+        userName: row.name,
+        currentManagerId: row.reportingTo || "",
+        newManagerId: row.reportingTo || "",
+        isSubmitting: false,
+        error: ""
+      });
+      setOpenMenuId(null);
+      if (potentialManagers.length === 0) {
+          try {
+              const data = await fetchUsersForDropdown(currentUser?.organizationId || '6991f27977da956717ec33f5'); 
+              setPotentialManagers(data);
+          } catch(e) { console.error(e); }
+      }
+  };
+
+  const handleSubmitAssignReporting = async () => {
+      try {
+        setAssignReportingModal(prev => ({...prev, isSubmitting: true, error: ""}));
+        // Send reportingTo (null if empty string)
+        await updateUser(assignReportingModal.userId, { reportingTo: assignReportingModal.newManagerId || null });
+        
+        // Update local state
+        setAllUsers(prev => prev.map(u => u._id === assignReportingModal.userId ? { ...u, reportingTo: assignReportingModal.newManagerId || null } : u));
+        
+        setSuccessMessage("Reporting manager updated successfully");
+        setAssignReportingModal(prev => ({...prev, isOpen: false}));
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } catch (err) {
+        setAssignReportingModal(prev => ({...prev, isSubmitting: false, error: err.message}));
+      }
+  };
+
   // Highlight text utility function
   const highlightText = (text, searchValue) => {
     if (!searchValue) return text;
@@ -319,6 +428,24 @@ const Users = () => {
 
           {openMenuId === row._id && (
             <div className="action-dropdown-menu">
+              {hasPermission("users:users_list:edit_role") && (
+                <button
+                  className="action-menu-item"
+                  onClick={() => handleOpenEditRole(row)}
+                >
+                  Edit Role
+                </button>
+              )}
+
+              {hasPermission("users:users_list:assign_reporting") && (
+                <button
+                  className="action-menu-item"
+                  onClick={() => handleOpenAssignReporting(row)}
+                >
+                  Reporting To
+                </button>
+              )}
+
               {hasPermission("users:edit") && (
                 <button
                   className="action-menu-item"
@@ -705,6 +832,70 @@ const Users = () => {
                 </Button>
               </div>
             </div>
+          </Modal>
+        )}
+
+        {/* Edit Role Modal */}
+        {editRoleModal.isOpen && (
+          <Modal
+            isOpen={editRoleModal.isOpen}
+            onClose={() => setEditRoleModal(prev => ({ ...prev, isOpen: false }))}
+            title="Edit User Role"
+          >
+             <div style={{ padding: "1rem", minWidth: "400px" }}>
+                <p style={{ marginBottom: "1rem" }}>User: <strong>{editRoleModal.userName}</strong></p>
+                <div style={{ marginBottom: "1.5rem" }}>
+                    <Select
+                        label="Select Role"
+                        name="newRoleId"
+                        value={editRoleModal.newRoleId}
+                        onChange={(e) => setEditRoleModal(prev => ({ ...prev, newRoleId: e.target.value, error: "" }))}
+                        options={roles.map(r => ({ value: r._id, label: r.displayName || r.name }))}
+                        error={editRoleModal.error}
+                    />
+                </div>
+                <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                    <Button variant="secondary" onClick={() => setEditRoleModal(prev => ({ ...prev, isOpen: false }))}>Cancel</Button>
+                    <Button onClick={handleSubmitEditRole} disabled={editRoleModal.isSubmitting}>
+                        {editRoleModal.isSubmitting ? "Saving..." : "Save Role"}
+                    </Button>
+                </div>
+             </div>
+          </Modal>
+        )}
+
+        {/* Assign Reporting Modal */}
+        {assignReportingModal.isOpen && (
+          <Modal
+            isOpen={assignReportingModal.isOpen}
+            onClose={() => setAssignReportingModal(prev => ({ ...prev, isOpen: false }))}
+            title="Assign Reporting Manager"
+          >
+             <div style={{ padding: "1rem", minWidth: "400px" }}>
+                <p style={{ marginBottom: "0.5rem" }}>User: <strong>{assignReportingModal.userName}</strong></p>
+                <p style={{ fontSize: "0.875rem", color: "#666", marginBottom: "1rem" }}>Assign a manager who this user reports to.</p>
+                <div style={{ marginBottom: "1.5rem" }}>
+                    <Select
+                        label="Select Manager"
+                        name="newManagerId"
+                        value={assignReportingModal.newManagerId}
+                        onChange={(e) => setAssignReportingModal(prev => ({ ...prev, newManagerId: e.target.value, error: "" }))}
+                        options={[
+                            { value: "", label: "No Manager (Remove Reporting)" },
+                            ...potentialManagers
+                                .filter(m => m._id !== assignReportingModal.userId)
+                                .map(m => ({ value: m._id, label: `${m.name} (${m.userId})` }))
+                        ]}
+                        error={assignReportingModal.error}
+                    />
+                </div>
+                <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                    <Button variant="secondary" onClick={() => setAssignReportingModal(prev => ({ ...prev, isOpen: false }))}>Cancel</Button>
+                    <Button onClick={handleSubmitAssignReporting} disabled={assignReportingModal.isSubmitting}>
+                        {assignReportingModal.isSubmitting ? "Saving..." : "Save"}
+                    </Button>
+                </div>
+             </div>
           </Modal>
         )}
       </div>

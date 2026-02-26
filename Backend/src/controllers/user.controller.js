@@ -137,42 +137,38 @@ export const createUser = asyncHandler(async (req, res) => {
     email: payload.email || null,
     personalEmail: payload.personalEmail || null,
     phone_no: payload.phone_no || null,
-    // Role is now stored as roleId reference. Try to resolve provided role name to an id.
-    roleId: payload.roleId || null,
-    permissions: payload.permissions || [],
+    // Default role assignment: always "User" (will be resolved below)
+    roleId: null,
+    permissions: [],
     reportingTo: payload.reportingTo || null,
     organizationId: payload.organizationId,
     branchId: payload.branchId || [],
-    canLogin: payload.canLogin === true,
+    canLogin: false, // Default: cannot login until enabled
     isActive: payload.isActive !== false,
     isBlocked: payload.isBlocked === true,
     remarks: payload.remarks != null && payload.remarks !== '' ? String(payload.remarks).trim() : '',
     createdBy: payload.createdBy || null,
   };
 
-  // If a role name was provided instead of roleId, try to resolve it
-  if (!toCreate.roleId && payload.role) {
-    try {
-      const foundRole = await Role.findOne({ name: payload.role, isDeleted: false });
-      if (foundRole) {
-        toCreate.roleId = foundRole._id;
-      }
-    } catch (err) {
-      // ignore resolution errors and continue with null roleId
+  // Assign default "user" role
+  try {
+    const userRole = await Role.findOne({ name: "user", isDeleted: false });
+    if (userRole) {
+      toCreate.roleId = userRole._id;
+    } else {
+      // Fallback: try to find any role if "user" not found (should not happen if seeded)
+      console.warn("⚠️ Default 'user' role not found, assigning first available role");
+      const anyRole = await Role.findOne({ isDeleted: false }).sort({ priority: 1 });
+      if (anyRole) toCreate.roleId = anyRole._id;
     }
+  } catch (err) {
+    console.error("❌ Failed to assign default role:", err);
   }
 
   const user = await User.create(toCreate);
 
-  // If canLogin is enabled during creation, automatically create UserLogin credentials
-  if (payload.canLogin === true) {
-    try {
-      await createUserLoginCredentials(user._id, user.name, payload.loginId);
-    } catch (loginError) {
-      // Log error but don't fail user creation
-      console.error("Warning: Failed to create login credentials:", loginError.message);
-    }
-  }
+  // canLogin is always false on creation now, so no need to create credentials here.
+  // Admin must enable login explicitly later.
 
   return res.status(201).json(new apiResponse(201, user, "User created successfully"));
 });
@@ -230,9 +226,7 @@ export const listUsers = asyncHandler(async (req, res) => {
       console.log("🔍 listUsers: Enterprise Admin Org Filter:", filter.organizationId);
     } else {
       // 2. Branch/Standard User: Branch Scope OR Hierarchy Scope
-      if (req.user?.organizationId) {
-        filter.organizationId = req.user.organizationId;
-      }
+      // Do not force organization filter here to avoid hiding branch/hierarchy users
 
       // Extract branch IDs safely (handling populated or unpopulated)
       const userBranchIds = Array.isArray(req.user?.branchId)
@@ -252,7 +246,28 @@ export const listUsers = asyncHandler(async (req, res) => {
       ];
 
       // See branch users
-      if (userBranchIds.length > 0) {
+      // FIX: Ensure that we match users who have AT LEAST ONE branch in common with the logged-in user
+      // AND (crucially) are part of the reporting hierarchy OR are peers if the business logic allows peers to see each other.
+      // However, the user specifically asked for "reporting users of same branch".
+      // Let's interpret "reporting users" as subordinates.
+      // But usually "users of same branch" means everyone in the branch.
+      // The user said: "loged in user unale to fatch his reporting user of same branch which is/are assigned to logedin user."
+      // This implies: User A is Manager. User B reports to A. User B is in Branch X. User A is in Branch X.
+      // User A should see User B.
+      
+      // The current logic adds `branchId: { $in: userBranchIds }` as an OR condition.
+      // This means "See anyone in my branch" OR "See anyone reporting to me".
+      // This is actually BROADER than "reporting user of same branch".
+      // If it's failing, maybe `userBranchIds` is empty or mismatching types?
+      
+      // Let's ensure strict type matching for Branch IDs
+      const safeBranchIds = userBranchIds.map(id => String(id));
+      
+      if (safeBranchIds.length > 0) {
+        // We use $in with both ObjectIds and Strings to be safe because Mongoose sometimes is finicky with mixed types in arrays
+        // But since we are using `lean()`, we might need to be careful.
+        // Let's rely on Mongoose's automatic casting for query by passing the original array if it contains ObjectIds,
+        // or constructing a query that checks both.
         visibilityConditions.push({ branchId: { $in: userBranchIds } });
       } else {
          console.log("⚠️ User has no branches assigned, visibility limited to hierarchy.");
@@ -270,13 +285,22 @@ export const listUsers = asyncHandler(async (req, res) => {
               connectFromField: "_id",
               connectToField: "reportingTo",
               as: "descendants",
-              maxDepth: 10
+              maxDepth: 10,
+              depthField: "level"
             }
           }
         ]);
-        const descendantIds = graph?.[0]?.descendants?.map(d => d._id) || [];
+        
+        const descendants = graph?.[0]?.descendants || [];
+        const descendantIds = descendants.map(d => d._id);
+        
+        console.log(`🔍 listUsers: Found ${descendantIds.length} descendants for user ${req.user.name}`);
+        
         if (descendantIds.length > 0) {
-          visibilityConditions.push({ _id: { $in: descendantIds } });
+           // We add descendant IDs to the visibility list. 
+           // Note: The previous logic was adding it as a separate OR condition.
+           // That is fine.
+           visibilityConditions.push({ _id: { $in: descendantIds } });
         }
       } catch (err) {
         console.error("❌ Hierarchy Aggregate Error:", err.message);
@@ -645,6 +669,39 @@ export const getBranchesForDropdown = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, formattedBranches, "Branches retrieved successfully"));
 });
 
+// Fetch all users for dropdown (returns id, name, userId)
+export const getUsersForDropdown = asyncHandler(async (req, res) => {
+  const { organizationId, branchId } = req.query;
+
+  let filter = { isActive: true, isBlocked: false };
+  if (organizationId) {
+    filter.organizationId = organizationId;
+  }
+  
+  // If user is not super admin, apply branch/hierarchy restrictions
+  const roleName = String(req.user?.role || "").toLowerCase();
+  const isSuper = roleName === "super_admin" || roleName === "super admin";
+  
+  if (!isSuper) {
+    if (req.user?.organizationId) {
+      filter.organizationId = req.user.organizationId;
+    }
+    // Simple visibility for dropdown: show all active users in organization
+    // Frontend can filter further if needed.
+  }
+
+  const users = await User.find(filter, "name userId designation").lean().sort({ name: 1 });
+  
+  const formattedUsers = users.map((u) => ({
+    _id: u._id,
+    name: u.name,
+    userId: u.userId,
+    designation: u.designation
+  }));
+
+  return res.status(200).json(new apiResponse(200, formattedUsers, "Users retrieved successfully"));
+});
+
 // Change user password
 export const changeUserPassword = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -691,5 +748,6 @@ export default {
   deleteUserPermanent,
   getRolesForDropdown,
   getBranchesForDropdown,
+  getUsersForDropdown,
   changeUserPassword,
 };

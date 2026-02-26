@@ -13,6 +13,7 @@ import {
   deleteUserPermanent,
   getRolesForDropdown,
   getBranchesForDropdown,
+  getUsersForDropdown,
   changeUserPassword,
 } from "../controllers/user.controller.js";
 
@@ -26,6 +27,9 @@ router.get("/dropdown/roles", getRolesForDropdown);
 
 // Get dropdown data for branches
 router.get("/dropdown/branches", getBranchesForDropdown);
+
+// Get dropdown data for users (managers)
+router.get("/dropdown/users", getUsersForDropdown);
 
 // Create a new user
 router.post("/", createUser);

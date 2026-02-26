@@ -9,7 +9,6 @@ import { PageLoader } from '../../../components/Loader/Loader.jsx';
 import { SetPageTitle } from '../../../components/SetPageTitle/SetPageTitle.jsx';
 import {
   createNewUser,
-  fetchRolesForDropdown,
   fetchBranchesForDropdown,
 } from '../../../services/userApi.js';
 import './AddUser.css';
@@ -34,16 +33,12 @@ const AddUser = () => {
     alternateMobile: '',
     employeeType: '',
     dateOfJoining: '',
-    role: '',
-    roleId: '',
     branchId: [],
-    canLogin: false,
     remarks: '',
     organizationId: ORGANIZATION_ID,
   });
 
   // Dropdown Data
-  const [roles, setRoles] = useState([]);
   const [branches, setBranches] = useState([]);
 
   // UI State
@@ -66,18 +61,12 @@ const AddUser = () => {
     return () => clearTimeout(t);
   }, [successMessage]);
 
-  // Fetch roles and branches on component mount
+  // Fetch branches on component mount
   useEffect(() => {
     const loadDropdownData = async () => {
       try {
         setLoading(true);
         setErrorMessage('');
-
-        // Fetch roles
-
-        const rolesData = await fetchRolesForDropdown();
-
-        setRoles(rolesData);
 
         // Fetch branches
         const branchesData = await fetchBranchesForDropdown(ORGANIZATION_ID);
@@ -85,7 +74,7 @@ const AddUser = () => {
       } catch (error) {
         console.error('❌ Failed to load dropdown data:', error);
         setErrorMessage(
-          error.message || 'Failed to load roles and branches'
+          error.message || 'Failed to load branches'
         );
       } finally {
         setLoading(false);
@@ -105,10 +94,6 @@ const AddUser = () => {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
-    }
-
-    if (!formData.roleId) {
-      newErrors.role = 'Role is required';
     }
 
     if (formData.branchId.length === 0) {
@@ -167,25 +152,6 @@ const AddUser = () => {
     }
   };
 
-  // Handle role change
-  const handleRoleChange = (e) => {
-    const selectedRoleId = e.target.value;
-    const selectedRole = roles.find((r) => r._id === selectedRoleId);
-
-    setFormData((prev) => ({
-      ...prev,
-      roleId: selectedRoleId,
-      role: selectedRole?.name || '',
-    }));
-
-    if (errors.role) {
-      setErrors((prev) => ({
-        ...prev,
-        role: '',
-      }));
-    }
-  };
-
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -212,15 +178,10 @@ const AddUser = () => {
         personalEmail: formData.personalEmail?.trim() || null,
         dateOfBirth: formData.dateOfBirth || null,
         dateOfJoining: formData.dateOfJoining || null,
-        roleId: formData.roleId || null,
         branchId: formData.branchId,
-        canLogin: formData.canLogin,
         remarks: formData.remarks?.trim() || '',
         organizationId: formData.organizationId,
       };
-
-      // console.log('📤 Submitting user data:', submitData);
-      // console.log('🔑 OrganizationId:', submitData.organizationId);
 
       // Create user
       await createNewUser(submitData);
@@ -438,42 +399,6 @@ const AddUser = () => {
                 type="date"
                 value={formData.dateOfJoining}
                 onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          {/* ACCESS & ROLE */}
-          <div className="form-section">
-            <h2 className="section-heading">Access & Role</h2>
-
-            <div className="form-row">
-              <Select
-                name="role"
-                label="Role"
-                value={formData.roleId}
-                onChange={handleRoleChange}
-                error={errors.role}
-                options={roles.map((r) => ({
-                  value: r._id,
-                  label: `${r.displayName} (${r.name})`,
-                }))}
-                required
-              />
-              <Select
-                name="canLogin"
-                label="Can Login"
-                value={formData.canLogin ? 'yes' : 'no'}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    canLogin: e.target.value === 'yes',
-                  }));
-                }}
-                options={[
-                  { value: 'yes', label: 'Yes' },
-                  { value: 'no', label: 'No' },
-                ]}
-                required
               />
             </div>
           </div>
