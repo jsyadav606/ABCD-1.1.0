@@ -3,7 +3,19 @@ import { authAPI, clearAuthHeaders } from '../services/api'
 import { clearAllAuthStorage } from '../utils/permissionHelper'
 import { v4 as uuidv4 } from 'uuid'
 
-const AuthContext = createContext()
+const AuthContext = createContext({
+  user: null,
+  loading: true,
+  error: '',
+  isAuthenticated: false,
+  deviceId: null,
+  login: async (_loginId, _password) => ({ success: false }),
+  register: async (_userData) => ({ success: false }),
+  logout: async () => {},
+  logoutAll: async () => {},
+  changePassword: async (_old, _next, _confirm) => ({ success: false }),
+  clearError: () => {}
+})
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
