@@ -314,7 +314,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
         </div>
       ) : (
         <div className="permission-tree-container">
-          <div className="permission-tree-body">
+          <div className="tree-root">
             {filteredModules.length === 0 && (
                 <div style={{ padding: "1rem", textAlign: "center", color: "#6b7280" }}>
                   No matching permissions found.
@@ -322,61 +322,53 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
             )}
 
             {filteredModules.map((module) => (
-              <div key={module.key} className="module-group">
+              <div key={module.key} className="tree-module">
+                {/* Module Header */}
                 <div 
                   className="module-header" 
                   onClick={(e) => {
-                    // Only expand if clicking outside the checkbox
                     if (e.target.type !== 'checkbox') {
                       toggleModuleExpand(module.key);
                     }
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className={`expand-icon ${expandedModules[module.key] ? 'expanded' : ''}`}>▶</span>
-                    {module.accessKey && (
-                      <input 
-                        type="checkbox"
-                        checked={isModuleFullySelected(assignedPermissions, module)}
-                        disabled={isSuperAdmin}
-                        onChange={(e) => handleModuleToggle(module, e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                        title="Enable/Disable entire module"
-                      />
-                    )}
-                    <span style={{marginRight: '4px'}}>📁</span>
-                    <span className="module-title">{module.label}</span>
-                  </div>
+                  <span className={`expand-icon ${expandedModules[module.key] ? 'expanded' : ''}`}>▶</span>
+                  {module.accessKey && (
+                    <input 
+                      type="checkbox"
+                      checked={isModuleFullySelected(assignedPermissions, module)}
+                      disabled={isSuperAdmin}
+                      onChange={(e) => handleModuleToggle(module, e.target.checked)}
+                      onClick={(e) => e.stopPropagation()}
+                      title="Enable/Disable entire module"
+                    />
+                  )}
+                  <span>{module.label}</span>
                 </div>
 
+                {/* Submodules (Pages) */}
                 {expandedModules[module.key] && (
-                  <div className="module-pages">
+                  <div className="module-children">
                     {module.pages.map((page) => {
                       const isModuleAccessGranted = isModuleFullySelected(assignedPermissions, module);
                       
-                      const isFullySelected = isPageFullyAssigned(
-                        assignedPermissions, 
-                        module.key, 
-                        page.key, 
-                        page.actions
-                      );
-
-                      // Check if the "view" action is assigned (this acts as the Submodule Checkbox)
+                      // Check if the "view" action is assigned
                       const isViewAssigned = hasPermission(assignedPermissions, module.key, page.key, "view");
 
-                      // Check if all actions *except* view are assigned (for "Select All")
-                      const otherActions = page.actions.filter(a => a.key !== "view");
-                      const isAllOthersSelected = otherActions.every(a => 
+                      // All Actions Logic for Select All
+                      // "Select All" should toggle all actions in this page
+                      const allPageActions = page.actions;
+                      const isAllActionsSelected = allPageActions.every(a => 
                         hasPermission(assignedPermissions, module.key, page.key, a.key)
                       );
 
                       const isDisabled = !isModuleAccessGranted || isSuperAdmin;
 
                       return (
-                        <div key={page.key} className="page-section">
-                          {/* Row 1: Submodule Checkbox (View Permission) */}
-                          <div className="page-header">
-                            <label className="checkbox-label page-checkbox" title="Enable Submodule Access">
+                        <div key={page.key} className="tree-submodule">
+                          {/* Submodule Header (acts as View toggle + Expand usually, but here just a list item) */}
+                          <div className="submodule-header">
+                            <label className="checkbox-label" title="Enable Submodule Access (View)">
                               <input
                                 type="checkbox"
                                 checked={isViewAssigned}
@@ -385,52 +377,43 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
                                   handleActionToggle(module.key, page.key, "view")
                                 }
                               />
-                              <span style={{marginRight: '4px'}}>📄</span>
-                              <span className="page-title">{page.label}</span>
+                              <span>{page.label}</span>
                             </label>
                           </div>
 
-                          {/* Row 2: Select All Actions Checkbox */}
-                          <div className="page-select-all-row" style={{ paddingLeft: '28px', marginBottom: '8px' }}>
-                             <label className="checkbox-label" title={`Select all ${page.label} actions`}>
-                                <input
-                                  type="checkbox"
-                                  checked={isAllOthersSelected}
-                                  disabled={isDisabled || !isViewAssigned}
-                                  onChange={(e) => {
-                                    // Toggle all OTHER actions
-                                    setAssignedPermissions(prev => {
-                                      let newKeys = [...prev];
-                                      otherActions.forEach(action => {
-                                        const fullKey = `${module.key}:${page.key}:${action.key}`;
-                                        if (e.target.checked) {
-                                          if (!newKeys.includes(fullKey)) newKeys.push(fullKey);
-                                        } else {
-                                          newKeys = newKeys.filter(k => k !== fullKey);
-                                        }
-                                      });
-                                      return newKeys;
-                                    });
-                                  }}
-                                />
-                                <span className="action-text" style={{fontWeight: 500}}>Select All {page.label} Actions</span>
-                             </label>
-                          </div>
-                          
-                          {/* Row 3+: Individual Actions List */}
-                          <div className="page-actions-list">
-                            {page.actions.filter(a => a.key !== "view").map((action) => (
-                              <label key={action.key} className="action-checkbox-item" title={action.label}>
-                                <input
-                                  type="checkbox"
-                                  checked={hasPermission(assignedPermissions, module.key, page.key, action.key)}
-                                  disabled={isDisabled || !isViewAssigned}
-                                  onChange={() => 
-                                    handleActionToggle(module.key, page.key, action.key)
-                                  }
-                                />
-                                <span className="action-text">{action.label}</span>
-                              </label>
+                          {/* Actions Children */}
+                          <div className="submodule-children">
+                            {/* Select All Item */}
+                            <div className="tree-action select-all">
+                               <label className="checkbox-label" title={`Select all ${page.label} actions`}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isAllActionsSelected}
+                                    disabled={isDisabled || !isViewAssigned}
+                                    onChange={(e) => {
+                                      const isChecked = e.target.checked;
+                                      handlePageToggle(module.key, page.key, allPageActions, isChecked);
+                                    }}
+                                  />
+                                  <span>Select All</span>
+                               </label>
+                            </div>
+
+                            {/* Individual Actions */}
+                            {page.actions.map((action) => (
+                              <div key={action.key} className="tree-action">
+                                <label className="checkbox-label" title={action.label}>
+                                  <input
+                                    type="checkbox"
+                                    checked={hasPermission(assignedPermissions, module.key, page.key, action.key)}
+                                    disabled={isDisabled || !isViewAssigned}
+                                    onChange={() => 
+                                      handleActionToggle(module.key, page.key, action.key)
+                                    }
+                                  />
+                                  <span>{action.label}</span>
+                                </label>
+                              </div>
                             ))}
                           </div>
                         </div>

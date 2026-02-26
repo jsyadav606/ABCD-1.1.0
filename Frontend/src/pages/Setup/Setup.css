@@ -126,7 +126,11 @@
   margin-bottom: 12px;
 }
 
-/* Permission Tree Styles - Clean Hierarchical List */
+/* 
+ * PERMISSION TREE STYLES (NEW)
+ * Hierarchical structure with connecting lines
+ */
+
 .permission-tree-container {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -137,100 +141,123 @@
   padding: 20px;
 }
 
-.permission-tree-body {
-  padding: 0;
-}
-
-/* Level 1: Module (Root) */
-.module-group {
-  margin-bottom: 16px;
-}
-
-.module-header {
-  padding: 8px 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  user-select: none;
-}
-
-.module-header:hover .module-title {
-  color: #1d4ed8;
-}
-
-.module-title {
-  font-weight: 700;
-  color: #111827;
-  font-size: 1.1rem;
-}
-
-/* Level 2: Submodule (Page) */
-.module-pages {
+.tree-root {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-left: 28px; /* Indent from Module */
-  margin-top: 4px;
+  gap: 1.5rem;
 }
 
-.page-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* 1. Module (Level 1) */
+.tree-module {
   position: relative;
 }
 
-.page-header {
+.module-header {
   display: flex;
   align-items: center;
-  padding: 4px 0;
-}
-
-.page-title {
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 4px;
   font-weight: 600;
-  color: #374151;
-  font-size: 1rem;
+  color: #111827;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* Level 3: Select All Row */
-.page-select-all-row {
-  padding-left: 32px; /* Indent from Submodule */
-  margin-bottom: 4px;
+.module-header:hover {
+  background-color: #e5e7eb;
 }
 
-.page-select-all-row .checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #4b5563;
-  font-weight: 500;
-}
-
-/* Level 4: Actions List */
-.page-actions-list {
+/* 2. Submodules Container (Level 2) */
+.module-children {
+  margin-left: 1.5rem; /* Indent for submodules */
+  padding-left: 1rem;
+  border-left: 1px solid #d1d5db; /* Vertical line connecting children */
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-left: 64px; /* Deep indent for actions */
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
-.action-checkbox-item {
+/* Submodule Item */
+.tree-submodule {
+  position: relative;
+}
+
+/* Horizontal line to submodule */
+.tree-submodule::before {
+  content: "";
+  position: absolute;
+  top: 14px; /* Align with text middle */
+  left: -1rem; /* Start from parent vertical line */
+  width: 1rem;
+  height: 1px;
+  background-color: #d1d5db;
+}
+
+/* Hide vertical line overlap for last child if needed (optional) */
+/* .tree-submodule:last-child::after {
+   content: "";
+   position: absolute;
+   top: 14px;
+   left: -1rem;
+   bottom: 0;
+   width: 1px;
+   background-color: #fff; 
+} */
+
+.submodule-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 2px 0;
-  color: #6b7280;
-  transition: color 0.2s;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+  color: #374151;
 }
 
-.action-checkbox-item:hover {
+/* 3. Actions Container (Level 3) */
+.submodule-children {
+  margin-left: 1.5rem; /* Indent actions further */
+  padding-left: 1rem;
+  border-left: 1px solid #d1d5db;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Action Item */
+.tree-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  color: #4b5563;
+}
+
+/* Horizontal line to action */
+.tree-action::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -1rem;
+  width: 1rem;
+  height: 1px;
+  background-color: #d1d5db;
+}
+
+.tree-action:hover {
   color: #111827;
 }
 
-.action-text {
-  font-size: 0.95rem;
+/* Select All Special Style */
+.tree-action.select-all {
+  font-weight: 500;
+  color: #2563eb;
+  margin-bottom: 0.25rem;
 }
 
 /* Checkbox Styling */
@@ -238,7 +265,7 @@ input[type="checkbox"] {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #0f172a; /* Dark styling */
+  accent-color: #0f172a;
   border-radius: 3px;
   margin: 0;
 }
@@ -256,14 +283,6 @@ input[type="checkbox"] {
   transform: rotate(90deg);
 }
 
-/* Utility */
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
 /* Preview Mode Styles */
 .permission-preview-container {
   margin-top: 1rem;
@@ -277,7 +296,7 @@ input[type="checkbox"] {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background-color: #1e293b; /* Dark sidebar style */
+  background-color: #1e293b;
   padding: 16px;
   border-radius: 6px;
   color: #fff;
@@ -326,16 +345,5 @@ input[type="checkbox"] {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
-  }
-  
-  .page-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .page-actions {
-    width: 100%;
-    padding-left: 24px;
   }
 }

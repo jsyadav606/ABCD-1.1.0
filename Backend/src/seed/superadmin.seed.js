@@ -1,6 +1,14 @@
 import dotenv from "dotenv";
 import path from "path";
 import mongoose from "mongoose";
+import dns from "dns";
+
+// Fix for ECONNREFUSED DNS issue by using Google DNS
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (error) {
+  console.warn("Could not set custom DNS servers:", error.message);
+}
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -41,18 +49,16 @@ async function seedSuperAdmin() {
 
     // Find role by name 'super_admin'. If missing, will create after user is created
     let superRole = await Role.findOne({ name: "super_admin", isDeleted: false });
-    if (superRole) {
-      console.log("Using existing super_admin role:", superRole._id.toString());
-    } else {
-      console.log("super_admin role not found; will create after user creation.");
-    }
-
+    
     // Create the first super admin user (if not exists)
     let superUser = await User.findOne({ userId: "superadmin", organizationId: org._id });
     if (!superUser) {
       superUser = await User.create({
         userId: "superadmin",
         name: "Super Admin",
+        email: "superadmin@abcd.com",
+        gender: "Male",
+        phone_no: 1234567890,
         roleId: superRole ? superRole._id : null,
         organizationId: org._id,
         organizationName: org.name,
@@ -80,7 +86,7 @@ async function seedSuperAdmin() {
         isActive: true,
         isDefault: false,
         createdBy: superUser._id,
-        permissionKeys: ["*"],
+        permissionKeys: ["*"], // Grant all permissions
         permissions: [],
       });
       console.log("Created super_admin role:", superRole._id.toString());
@@ -88,8 +94,7 @@ async function seedSuperAdmin() {
       // Ensure user's roleId is set
       superUser.roleId = superRole._id;
       await superUser.save();
-    }
-    else {
+    } else {
       // Ensure wildcard permission exists
       const keys = new Set(superRole.permissionKeys || []);
       if (!keys.has("*")) {
@@ -97,35 +102,41 @@ async function seedSuperAdmin() {
         await superRole.save();
         console.log("Updated super_admin role to include '*' permission");
       }
+      
+      // Ensure user is linked to role
+      if (!superUser.roleId || superUser.roleId.toString() !== superRole._id.toString()) {
+        superUser.roleId = superRole._id;
+        await superUser.save();
+        console.log("Linked super admin user to super_admin role");
+      }
     }
 
-    // Create corresponding UserLogin (username + password). Password will be hashed by pre-save hook.
-    let login = await UserLogin.findOne({ user: superUser._id });
-    const plainPassword = process.env.SUPERADMIN_PASSWORD || "123";
-    const username = process.env.SUPERADMIN_USERNAME || "superadmin";
-
-    if (!login) {
-      login = await UserLogin.create({
+    // Create UserLogin entry (Authentication)
+    let userLogin = await UserLogin.findOne({ user: superUser._id });
+    if (!userLogin) {
+      // Default password: 'password123' (will be hashed by pre-save hook)
+      userLogin = await UserLogin.create({
         user: superUser._id,
-        username,
-        password: plainPassword,
+        username: "superadmin",
+        password: "password123", 
         forcePasswordChange: false,
+        isLoggedIn: false,
+        lockLevel: 0,
+        failedLoginAttempts: 0
       });
-      console.log("Created UserLogin for super admin. Username:", username);
+      console.log("Created UserLogin credentials for superadmin");
     } else {
-      // update username/password if needed (password will re-hash)
-      login.username = username;
-      login.password = plainPassword;
-      login.forcePasswordChange = false;
-      await login.save();
-      console.log("Updated UserLogin for super admin. Username:", username);
+      // Optional: Reset password if needed (uncomment to reset)
+      // userLogin.password = "password123";
+      // await userLogin.save();
+      console.log("UserLogin credentials already exist");
     }
 
-    console.log("Superadmin seed completed.");
-    console.log("Login details - username:", username, ", password:", plainPassword);
+    console.log("Super Admin Seed Completed Successfully!");
     process.exit(0);
-  } catch (err) {
-    console.error("Superadmin seed failed:", err);
+
+  } catch (error) {
+    console.error("Seed Error:", error);
     process.exit(1);
   }
 }

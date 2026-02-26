@@ -7,6 +7,24 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 
 // =====================================================
+// HELPER FUNCTION: Check hierarchical access (reporting chain)
+// =====================================================
+const isInReportingChain = async (targetUserId, managerUserId, maxDepth = 20) => {
+  if (!targetUserId || !managerUserId) return false;
+  let currentId = targetUserId;
+  let depth = 0;
+  // Traverse reportingTo upwards until null or maxDepth
+  while (currentId && depth < maxDepth) {
+    const doc = await User.findById(currentId).select("reportingTo").lean();
+    if (!doc || !doc.reportingTo) break;
+    if (String(doc.reportingTo) === String(managerUserId)) return true;
+    currentId = doc.reportingTo;
+    depth += 1;
+  }
+  return false;
+};
+
+// =====================================================
 // HELPER FUNCTION: Create UserLogin with username generation
 // =====================================================
 const createUserLoginCredentials = async (userId, userName, providedLoginId = null) => {
@@ -52,26 +70,30 @@ const createUserLoginCredentials = async (userId, userName, providedLoginId = nu
   }
 };
 
-const hasBranchAccess = (reqUser, targetBranches) => {
-  const isSuper = reqUser?.role === "super_admin";
+const hasUserAccess = async (reqUser, targetUser) => {
+  const roleName = (reqUser?.role || "").replace(/ /g, "_");
+  const isSuper = roleName === "super_admin";
   if (isSuper) return true;
+  if (!targetUser) return false;
+
+  // Self access
+  if (String(targetUser._id) === String(reqUser._id)) return true;
+
+  // Hierarchy access (any level of reporting)
+  if (await isInReportingChain(targetUser._id, reqUser._id)) return true;
+
+  // Branch overlap access (any intersection)
   const reqBranchIds = Array.isArray(reqUser?.branchId)
-    ? reqUser.branchId.map((b) =>
-        typeof b === "object" && b?._id ? String(b._id) : String(b),
-      )
+    ? reqUser.branchId.map((b) => (typeof b === "object" && b?._id ? String(b._id) : String(b)))
     : [];
-  if (reqBranchIds.length === 0) return false;
-  const targetIds = Array.isArray(targetBranches)
-    ? targetBranches.map((b) =>
-        typeof b === "object" && b?._id ? String(b._id) : String(b),
-      )
+  const targetIds = Array.isArray(targetUser?.branchId)
+    ? targetUser.branchId.map((b) => (typeof b === "object" && b?._id ? String(b._id) : String(b)))
     : [];
-  
-  // Strict Subset Logic: Target user must NOT have any branch that the request user doesn't have.
-  // And target must have at least one branch in common (implied if subset and not empty, but we should check intersection too if we want to be strict about "relevance").
-  // Actually, if targetIds is empty, every() returns true. Unassigned users are visible to everyone in this logic?
-  // Let's assume unassigned users are visible.
-  return targetIds.every((id) => reqBranchIds.includes(String(id)));
+  if (reqBranchIds.length > 0 && targetIds.some((id) => reqBranchIds.includes(String(id)))) {
+    return true;
+  }
+
+  return false;
 };
 
 // Controller function names:
@@ -164,7 +186,8 @@ export const getUserById = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
   
-  if (!hasBranchAccess(req.user, userDoc?.branchId)) {
+  const targetUserForAccess = await User.findById(id).select("branchId reportingTo").lean();
+  if (!(await hasUserAccess(req.user, { ...targetUserForAccess, _id: id }))) {
     throw new apiError(404, "User not found");
   }
   
@@ -175,6 +198,9 @@ export const listUsers = asyncHandler(async (req, res) => {
   const page = Math.max(parseInt(req.query.page || 1, 10), 1);
   const limit = Math.max(parseInt(req.query.limit || 25, 10), 1);
   const skip = (page - 1) * limit;
+
+  console.log("🔍 listUsers: Request User Role:", req.user?.role);
+  console.log("🔍 listUsers: Request User Org:", req.user?.organizationId);
 
   const filter = {};
   // Support filtering by role name or roleId
@@ -192,32 +218,107 @@ export const listUsers = asyncHandler(async (req, res) => {
   if (req.query.canLogin !== undefined) filter.canLogin = req.query.canLogin === "true";
   if (req.query.organizationId) filter.organizationId = req.query.organizationId;
 
-  // Branch scope: non-super users only see users from their assigned branches
-  const isSuper = req.user?.role === "super_admin";
-  const userBranchIds = Array.isArray(req.user?.branchId)
-    ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
-    : [];
+  // Branch scope: non-super users only see users from their assigned branches and hierarchy
+  const roleName = String(req.user?.role || "").toLowerCase();
+  const isSuper = roleName === "super_admin" || roleName === "super admin";
+  const isEnterprise = roleName === "enterprise_admin" || roleName === "enterprise admin";
+  
   if (!isSuper) {
-    if (userBranchIds.length === 0) {
-      return res.status(200).json(new apiResponse(200, { items: [], meta: { page, limit, total: 0 } }, "Users retrieved successfully"));
+    // 1. Enterprise Admin: All users in their Organization
+    if (isEnterprise && req.user?.organizationId) {
+      filter.organizationId = req.user.organizationId;
+      console.log("🔍 listUsers: Enterprise Admin Org Filter:", filter.organizationId);
+    } else {
+      // 2. Branch/Standard User: Branch Scope OR Hierarchy Scope
+      if (req.user?.organizationId) {
+        filter.organizationId = req.user.organizationId;
+      }
+
+      // Extract branch IDs safely (handling populated or unpopulated)
+      const userBranchIds = Array.isArray(req.user?.branchId)
+        ? req.user.branchId.map((b) => (b && b._id ? b._id : b))
+        : [];
+      
+      console.log(`🔍 listUsers: User ${req.user.name} (${req.user._id}) has branches:`, userBranchIds);
+
+      // Visibility Conditions:
+      // 1. Always see self
+      // 2. See direct reports
+      // 3. See branch users (if any branch assigned)
+      // 4. See recursive reports
+      const visibilityConditions = [
+        { _id: req.user._id }, // Always see self
+        { reportingTo: req.user._id } // See direct reports
+      ];
+
+      // See branch users
+      if (userBranchIds.length > 0) {
+        visibilityConditions.push({ branchId: { $in: userBranchIds } });
+      } else {
+         console.log("⚠️ User has no branches assigned, visibility limited to hierarchy.");
+      }
+
+      // If we want recursive hierarchy in the filter without aggregate:
+      // For now, let's use the aggregate descendant IDs we already have logic for
+      try {
+        const graph = await User.aggregate([
+          { $match: { _id: req.user._id } }, // Ensure we match by ObjectId
+          {
+            $graphLookup: {
+              from: "users",
+              startWith: "$_id",
+              connectFromField: "_id",
+              connectToField: "reportingTo",
+              as: "descendants",
+              maxDepth: 10
+            }
+          }
+        ]);
+        const descendantIds = graph?.[0]?.descendants?.map(d => d._id) || [];
+        if (descendantIds.length > 0) {
+          visibilityConditions.push({ _id: { $in: descendantIds } });
+        }
+      } catch (err) {
+        console.error("❌ Hierarchy Aggregate Error:", err.message);
+      }
+
+      // Combine into main OR filter
+      if (filter.$or) {
+        // If existing OR (e.g. from search), wrap it
+        filter.$and = [
+          { $or: filter.$or },
+          { $or: visibilityConditions }
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = visibilityConditions;
+      }
     }
-    // Strict subset logic: 
-    // 1. Must share at least one branch ($in)
-    // 2. Must NOT have any branch that is NOT in userBranchIds ($not $elemMatch $nin)
-    filter.branchId = { 
-      $in: userBranchIds,
-      $not: { $elemMatch: { $nin: userBranchIds } }
-    };
   }
 
+  // Handle Search Query (merged with existing filter)
   if (req.query.q) {
     const q = req.query.q.trim();
-    filter.$or = [
-      { name: new RegExp(q, "i") },
-      { userId: new RegExp(q, "i") },
-      { email: new RegExp(q, "i") },
-      { personalEmail: new RegExp(q, "i") },
-    ];
+    const searchCondition = {
+      $or: [
+        { name: new RegExp(q, "i") },
+        { userId: new RegExp(q, "i") },
+        { email: new RegExp(q, "i") },
+        { personalEmail: new RegExp(q, "i") },
+      ]
+    };
+    
+    if (filter.$or) {
+      filter.$and = [
+        { $or: filter.$or },
+        searchCondition
+      ];
+      delete filter.$or;
+    } else if (filter.$and) {
+      filter.$and.push(searchCondition);
+    } else {
+      filter.$or = searchCondition.$or;
+    }
   }
 
   const [itemsRaw, total] = await Promise.all([
@@ -252,7 +353,8 @@ export const updateUser = asyncHandler(async (req, res) => {
   if (!existing) {
     throw new apiError(404, "User not found");
   }
-  if (!hasBranchAccess(req.user, existing.branchId)) {
+  const targetUserForAccess = await User.findById(id).select("branchId reportingTo").lean();
+  if (!(await hasUserAccess(req.user, { ...targetUserForAccess, _id: id }))) {
     throw new apiError(403, "Forbidden");
   }
 
@@ -295,7 +397,7 @@ export const toggleCanLogin = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
-  if (!hasBranchAccess(req.user, user.branchId)) {
+  if (!(await hasUserAccess(req.user, user))) {
     throw new apiError(403, "Forbidden");
   }
 
@@ -351,7 +453,7 @@ export const toggleIsActive = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
-  if (!hasBranchAccess(req.user, user.branchId)) {
+  if (!(await hasUserAccess(req.user, user))) {
     throw new apiError(403, "Forbidden");
   }
 
@@ -378,7 +480,7 @@ export const changeUserRole = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
-  if (!hasBranchAccess(req.user, user.branchId)) {
+  if (!(await hasUserAccess(req.user, user))) {
     throw new apiError(403, "Forbidden");
   }
 

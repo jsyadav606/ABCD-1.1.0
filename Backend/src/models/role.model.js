@@ -8,7 +8,6 @@ const roleSchema = new mongoose.Schema(
       required: true,
       trim: true,
       lowercase: true,
-      unique: true,
       minlength: 3,
       maxlength: 50,
       example: "super_admin",
@@ -133,7 +132,7 @@ const roleSchema = new mongoose.Schema(
 // =====================================================
 // INDEXES
 // =====================================================
-roleSchema.index({ organizationId: 1, name: 1 });
+roleSchema.index({ organizationId: 1, name: 1, isDeleted: 1 }, { unique: true });
 roleSchema.index({ organizationId: 1, isActive: 1 });
 roleSchema.index({ category: 1 });
 roleSchema.index({ priority: -1 });
@@ -143,100 +142,64 @@ roleSchema.index({ createdAt: -1 });
 roleSchema.index({ organizationId: 1, isActive: 1, isDeleted: 1 });
 
 // =====================================================
-// METHODS
+// HOOKS
 // =====================================================
 
-/**
- * Check if role has specific permission on resource
- * @param {string} resource - Resource name
- * @param {string} action - Action to check (create, read, update, delete, export, etc.)
- * @returns {boolean}
- */
-roleSchema.methods.hasPermission = function (resource, action) {
-  if (!this.isActive) return false;
-
-  const permission = this.permissions.find(
-    (p) => p.resource === resource
-  );
-
-  if (!permission) return false;
-
-  return permission.actions.includes(action) || permission.actions.includes("*");
-};
-
-/**
- * Check if role has multiple permissions
- * @param {array} requirements - [{resourceName: "users", action: "read"}, ...]
- * @returns {boolean} - True if has ALL permissions
- */
-roleSchema.methods.hasAllPermissions = function (requirements = []) {
-  return requirements.every((req) =>
-    this.hasPermission(req.resourceName, req.action)
-  );
-};
-
-/**
- * Check if role has any of the permissions
- * @param {array} requirements - [{resourceName: "users", action: "read"}, ...]
- * @returns {boolean} - True if has ANY permission
- */
-roleSchema.methods.hasAnyPermission = function (requirements = []) {
-  return requirements.some((req) =>
-    this.hasPermission(req.resourceName, req.action)
-  );
-};
-
-/**
- * Get all permissions for a resource
- * @param {string} resourceName - Resource name
- * @returns {object} - Permission object
- */
-roleSchema.methods.getResourcePermissions = function (resourceName) {
-  return this.permissions.find(
-    (p) => p.resourceName === resourceName && p.isActive
-  ) || null;
-};
-
-/**
- * Add permission to role
- * @param {object} permissionData - Permission data
- * @returns {Promise}
- */
-roleSchema.methods.addPermission = async function (permissionData) {
-  // Check if permission already exists
-  const existingPermission = this.permissions.find(
-    (p) => p.resourceName === permissionData.resourceName
-  );
-
-  if (existingPermission) {
-    // Update existing permission
-    Object.assign(existingPermission, permissionData);
-  } else {
-    // Add new permission
-    this.permissions.push(permissionData);
+roleSchema.pre("validate", function () {
+  if (typeof this.name === "string") {
+    this.name = this.name.trim().toLowerCase();
   }
+  if (typeof this.displayName === "string") {
+    this.displayName = this.displayName.trim();
+  }
+  if (!this.category) {
+    this.category = this.organizationId ? "custom" : "system";
+  }
+});
 
-  return await this.save();
+roleSchema.pre("save", function () {
+  if (Array.isArray(this.permissionKeys)) {
+    let keys = this.permissionKeys
+      .filter((k) => typeof k === "string")
+      .map((k) => k.trim());
+    const hasWildcard = keys.includes("*");
+    if (hasWildcard) {
+      keys = ["*"];
+    } else {
+      keys = Array.from(new Set(keys.map((k) => k.toLowerCase()))).sort();
+    }
+    this.permissionKeys = keys;
+  } else {
+    this.permissionKeys = [];
+  }
+});
+
+// =====================================================
+// METHODS (permissionKeys based)
+// =====================================================
+
+roleSchema.methods.hasKey = function (key) {
+  if (!this.isActive) return false;
+  if (!Array.isArray(this.permissionKeys)) return false;
+  return this.permissionKeys.includes("*") || this.permissionKeys.includes(key);
 };
 
-/**
- * Remove permission from role
- * @param {string} resourceName - Resource name
- * @returns {Promise}
- */
-roleSchema.methods.removePermission = async function (resourceName) {
-  this.permissions = this.permissions.filter(
-    (p) => p.resourceName !== resourceName
-  );
-  return await this.save();
+roleSchema.methods.hasAnyKeys = function (keys = []) {
+  if (!Array.isArray(keys) || keys.length === 0) return false;
+  if (!Array.isArray(this.permissionKeys)) return false;
+  if (this.permissionKeys.includes("*")) return true;
+  return keys.some((k) => this.permissionKeys.includes(String(k)));
 };
 
-/**
- * Get all active permissions
- * @returns {array}
- */
-roleSchema.methods.getActivePermissions = function () {
-  return this.permissions.filter((p) => p.isActive);
+roleSchema.methods.hasAllKeys = function (keys = []) {
+  if (!Array.isArray(keys) || keys.length === 0) return false;
+  if (!Array.isArray(this.permissionKeys)) return false;
+  if (this.permissionKeys.includes("*")) return true;
+  return keys.every((k) => this.permissionKeys.includes(String(k)));
+};
+
+roleSchema.methods.getPermissionKeys = function () {
+  return Array.isArray(this.permissionKeys) ? this.permissionKeys : [];
 };
 
 /**
@@ -336,7 +299,8 @@ roleSchema.statics.initializeSystemRoles = async function (createdBy) {
       isActive: true,
       isDefault: false,
       createdBy,
-      permissions: [], // Admin will have all permissions
+      permissions: [],
+      permissionKeys: ["*"],
     },
     {
       name: "enterprise_admin",
@@ -348,6 +312,7 @@ roleSchema.statics.initializeSystemRoles = async function (createdBy) {
       isDefault: false,
       createdBy,
       permissions: [],
+      permissionKeys: [],
     },
     {
       name: "admin",
@@ -359,6 +324,7 @@ roleSchema.statics.initializeSystemRoles = async function (createdBy) {
       isDefault: false,
       createdBy,
       permissions: [],
+      permissionKeys: [],
     },
     {
       name: "user",
@@ -370,6 +336,7 @@ roleSchema.statics.initializeSystemRoles = async function (createdBy) {
       isDefault: true,
       createdBy,
       permissions: [],
+      permissionKeys: [],
     },
   ];
 

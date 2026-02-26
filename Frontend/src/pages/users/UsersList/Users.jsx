@@ -41,7 +41,7 @@ const Users = () => {
     showPassword: false,
   });
 
-  const pageSize = 20;
+  const pageSize = Number(import.meta.env.VITE_PAGE_SIZE || import.meta.env.page_size) || 20;
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -49,7 +49,7 @@ const Users = () => {
         setLoading(true);
         setError(null);
         // Fetch all users by paging until complete
-        const data = await fetchAllUsers(100);
+        const data = await fetchAllUsers(Number(import.meta.env.VITE_API_TABLE_SIZE) || 100000);
         setAllUsers(data);
       } catch (error) {
         console.error("Failed to fetch users", error);
@@ -484,7 +484,7 @@ const Users = () => {
         <section className="users-actions">
           <div className="users-actions__wrapper">
             <div className="users-actions__bar">
-              {hasPermission("users:add_user") && (
+              {hasPermission("users:users_list:add") && (
                 <Button
                   onClick={() => navigate("/users/add")}
                   className="users-actions__btn users-actions__btn--add"
@@ -493,14 +493,19 @@ const Users = () => {
                 </Button>
               )}
 
-              {/* <Button
-              onClick={() => exportToCSV(allUsers, "users.csv")}
-              className="users-actions__btn users-actions__btn--export"
-            >
-              <span className="material-icons">file_download</span> Export
-            </Button> */}
+              {/* Export Button - Protected by new permission */}
+              {hasPermission("users:users_list:export") && (
+                <Button
+                  onClick={() => alert("Export functionality would be triggered here")}
+                  className="users-actions__btn users-actions__btn--export"
+                  style={{ marginLeft: "10px", backgroundColor: "#10b981" }}
+                >
+                  <span className="material-icons" style={{fontSize: "1.2rem", marginRight: "5px", verticalAlign: "middle"}}>download</span> 
+                  Export Users
+                </Button>
+              )}
 
-              {selectedRows.length > 1 && hasPermission("users:disable_user") && (
+              {selectedRows.length > 1 && hasPermission("users:users_list:disable") && (
                 <Button
                   onClick={handleBulkDisable}
                   className="btn-md delete-btn"

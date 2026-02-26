@@ -40,8 +40,8 @@ export const verifyJWT = async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    // Fetch user details and populate role information
-    const user = await User.findById(decoded.id).populate('roleId');
+    // Fetch user details and populate role and branch information
+    const user = await User.findById(decoded.id).populate('roleId').populate('branchId');
 
     if (!user) {
       return res.status(401).json({
