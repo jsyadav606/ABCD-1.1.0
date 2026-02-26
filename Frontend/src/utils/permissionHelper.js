@@ -317,8 +317,8 @@ export const getUserAccessibleEnterprises = () => {
 /**
  * Check if user can access a specific scope
  * 
- * @param {string|ObjectId} resourceBranchId - Branch ID of resource
- * @param {string|ObjectId} resourceEnterpriseId - Enterprise ID of resource
+ * @param {string} resourceBranchId - Branch ID of resource (stringified)
+ * @param {string} resourceEnterpriseId - Enterprise ID of resource (stringified)
  * @returns {boolean}
  */
 export const canAccessScope = (resourceBranchId, resourceEnterpriseId) => {

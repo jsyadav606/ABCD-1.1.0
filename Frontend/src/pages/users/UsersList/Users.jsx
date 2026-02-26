@@ -653,7 +653,6 @@ const Users = () => {
             pageSize={pageSize}
             showSearch={true}
             showPagination={true}
-            rowKey={(row) => row._id}
             onSelectionChange={(selected) => setSelectedRows(selected)}
             isRowSelectable={(row) => String(row._id) !== String(currentUser?.id)}
           />
@@ -683,6 +682,8 @@ const Users = () => {
           <Modal
             isOpen={changePasswordModal.isOpen}
             onClose={handleCloseChangePasswordModal}
+            title="Change Password"
+            footer={<></>}
           >
             <div style={{ padding: "2rem", minWidth: "400px" }}>
               <h2 style={{ marginBottom: "0.5rem", marginTop: 0 }}>
@@ -843,6 +844,7 @@ const Users = () => {
             isOpen={editRoleModal.isOpen}
             onClose={() => setEditRoleModal(prev => ({ ...prev, isOpen: false }))}
             title="Edit User Role"
+            footer={<></>}
           >
              <div style={{ padding: "1rem", minWidth: "400px" }}>
                 <p style={{ marginBottom: "1rem" }}>User: <strong>{editRoleModal.userName}</strong></p>
@@ -852,6 +854,7 @@ const Users = () => {
                         name="newRoleId"
                         value={editRoleModal.newRoleId}
                         onChange={(e) => setEditRoleModal(prev => ({ ...prev, newRoleId: e.target.value, error: "" }))}
+                        onBlur={() => {}}
                         options={roles.map(r => ({ value: r._id, label: r.displayName || r.name }))}
                         error={editRoleModal.error}
                     />
@@ -872,6 +875,7 @@ const Users = () => {
             isOpen={assignReportingModal.isOpen}
             onClose={() => setAssignReportingModal(prev => ({ ...prev, isOpen: false }))}
             title="Assign Reporting Manager"
+            footer={<></>}
           >
              <div style={{ padding: "1rem", minWidth: "400px" }}>
                 <p style={{ marginBottom: "0.5rem" }}>User: <strong>{assignReportingModal.userName}</strong></p>
@@ -882,6 +886,7 @@ const Users = () => {
                         name="newManagerId"
                         value={assignReportingModal.newManagerId}
                         onChange={(e) => setAssignReportingModal(prev => ({ ...prev, newManagerId: e.target.value, error: "" }))}
+                        onBlur={() => {}}
                         options={[
                             { value: "", label: "No Manager (Remove Reporting)" },
                             ...potentialManagers

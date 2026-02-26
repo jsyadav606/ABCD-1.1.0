@@ -47,7 +47,13 @@ const Setup = () => {
             <p>Access not granted.</p>
           </div>
         </div>
-        <Alert type="danger" message="You do not have permission to access Setup." />
+        <Alert
+          type="danger"
+          title="Access Denied"
+          onClose={() => {}}
+        >
+          You do not have permission to access Setup.
+        </Alert>
       </div>
     );
   }
@@ -67,8 +73,11 @@ const Setup = () => {
         <div className="setup-toast">
           <Alert
             type={toast.type === "danger" ? "danger" : "success"}
-            message={toast.message}
-          />
+            title={toast.type === "danger" ? "Error" : "Success"}
+            onClose={() => setToast({ type: "", message: "" })}
+          >
+            {toast.message}
+          </Alert>
         </div>
       )}
 
