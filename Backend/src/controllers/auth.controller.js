@@ -166,7 +166,7 @@ export const logoutAllDevicesController = asyncHandler(async (req, res) => {
 // =====================================================
 export const refreshTokenController = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
-  const { deviceId = uuidv4() } = req.body;
+  const { deviceId } = req.body || {};
 
   if (!refreshToken) {
     throw new apiError(401, "Refresh token is required");

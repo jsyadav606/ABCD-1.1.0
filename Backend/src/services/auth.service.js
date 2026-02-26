@@ -245,18 +245,37 @@ export const authService = {
         throw new apiError(404, "User not found");
       }
 
-      // Verify token belongs to the device
+      // Resolve deviceId if not provided by client
+      let effectiveDeviceId = deviceId;
+      if (!effectiveDeviceId || effectiveDeviceId === "unknown") {
+        // Try to derive deviceId from stored refreshTokens
+        if (Array.isArray(userLogin.refreshTokens)) {
+          const rt = userLogin.refreshTokens.find((rt) => rt.token === refreshToken);
+          if (rt?.deviceId) {
+            effectiveDeviceId = rt.deviceId;
+          }
+        }
+        // Fallback: try from loggedInDevices
+        if (!effectiveDeviceId && Array.isArray(userLogin.loggedInDevices)) {
+          const dev = userLogin.loggedInDevices.find((d) => d.refreshToken === refreshToken);
+          if (dev?.deviceId) {
+            effectiveDeviceId = dev.deviceId;
+          }
+        }
+      }
+
+      // Verify token belongs to the resolved device
       const isValidToken = userLogin.verifyRefreshTokenForDevice(
         refreshToken,
-        deviceId
+        effectiveDeviceId
       );
       if (!isValidToken) {
         throw new apiError(401, "Invalid refresh token for this device");
       }
 
       // Generate new tokens
-      const newAccessToken = userLogin.generateAccessToken(deviceId);
-      const newRefreshToken = await userLogin.generateRefreshToken(deviceId);
+      const newAccessToken = userLogin.generateAccessToken(effectiveDeviceId);
+      const newRefreshToken = await userLogin.generateRefreshToken(effectiveDeviceId);
 
       return {
         success: true,

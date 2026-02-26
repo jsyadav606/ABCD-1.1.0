@@ -446,7 +446,7 @@ const Users = () => {
                 </button>
               )}
 
-              {hasPermission("users:edit") && (
+              {hasPermission("users:users_list:edit") && (
                 <button
                   className="action-menu-item"
                   onClick={() => {
@@ -463,7 +463,7 @@ const Users = () => {
                 <>
                   {!row.isActive ? (
                     <>
-                      {hasPermission("users:inactive") && (
+                      {hasPermission("users:users_list:enable") && (
                         <button
                           className="action-menu-item action-menu-item--success"
                           onClick={() => {
@@ -477,7 +477,7 @@ const Users = () => {
                     </>
                   ) : (
                     <>
-                      {hasPermission("users:inactive") && (
+                      {hasPermission("users:users_list:disable") && (
                         <button
                           className="action-menu-item action-menu-item--danger"
                           onClick={() => {
@@ -490,7 +490,7 @@ const Users = () => {
                       )}
                       {row.canLogin ? (
                         <>
-                          {hasPermission("users:disable_login") && (
+                          {hasPermission("users:users_list:disable_login") && (
                             <button
                               className="action-menu-item action-menu-item--warning"
                               onClick={() => {
@@ -504,7 +504,7 @@ const Users = () => {
                         </>
                       ) : (
                         <>
-                          {hasPermission("users:disable_login") && (
+                          {hasPermission("users:users_list:enable_login") && (
                             <button
                               className="action-menu-item action-menu-item--success"
                               onClick={() => {
@@ -522,7 +522,7 @@ const Users = () => {
                 </>
               )}
 
-              {row.canLogin && hasPermission("users:change_password") && (
+              {row.canLogin && hasPermission("users:users_list:change_password") && (
                 <button
                   className="action-menu-item action-menu-item--info"
                   onClick={() => {

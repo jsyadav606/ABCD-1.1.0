@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Alert } from "../../components";
 import RoleRightsTab from "./components/RoleRightsTab";
 import BranchesTab from "./components/BranchesTab";
 import OrganizationTab from "./components/OrganizationTab";
+import { isSuperAdmin, canAccessPage } from "../../utils/permissionHelper";
 import "./Setup.css";
 
 const Setup = () => {
@@ -14,6 +15,42 @@ const Setup = () => {
     const timeout = setTimeout(() => setToast({ type: "", message: "" }), 4000);
     return () => clearTimeout(timeout);
   }, [toast]);
+
+  const allTabs = useMemo(
+    () => [
+      { key: "organization", label: "Organization" },
+      { key: "roles", label: "Roles & Rights" },
+      { key: "branches", label: "Branches" },
+    ],
+    []
+  );
+
+  const allowedTabs = useMemo(() => {
+    return allTabs.filter(
+      (t) => isSuperAdmin() || canAccessPage("setup", t.key)
+    );
+  }, [allTabs]);
+
+  useEffect(() => {
+    if (allowedTabs.length === 0) return;
+    if (!allowedTabs.some((t) => t.key === activeTab)) {
+      setActiveTab(allowedTabs[0].key);
+    }
+  }, [allowedTabs, activeTab]);
+
+  if (allowedTabs.length === 0) {
+    return (
+      <div className="setup-page">
+        <div className="setup-header">
+          <div>
+            <h1>Setup</h1>
+            <p>Access not granted.</p>
+          </div>
+        </div>
+        <Alert type="danger" message="You do not have permission to access Setup." />
+      </div>
+    );
+  }
 
   return (
     <div className="setup-page">
@@ -36,35 +73,26 @@ const Setup = () => {
       )}
 
       <div className="setup-tabs">
-        <button
-          className={activeTab === "organization" ? "active" : ""}
-          onClick={() => setActiveTab("organization")}
-        >
-          Organization
-        </button>
-        <button
-          className={activeTab === "roles" ? "active" : ""}
-          onClick={() => setActiveTab("roles")}
-        >
-          Roles & Rights
-        </button>
-        <button
-          className={activeTab === "branches" ? "active" : ""}
-          onClick={() => setActiveTab("branches")}
-        >
-          Branches
-        </button>
+        {allowedTabs.map((t) => (
+          <button
+            key={t.key}
+            className={activeTab === t.key ? "active" : ""}
+            onClick={() => setActiveTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {activeTab === "organization" && (
+      {activeTab === "organization" && allowedTabs.some(t => t.key === "organization") && (
         <OrganizationTab toast={toast} setToast={setToast} />
       )}
-
-      {activeTab === "roles" && (
+   
+      {activeTab === "roles" && allowedTabs.some(t => t.key === "roles") && (
         <RoleRightsTab toast={toast} setToast={setToast} />
       )}
 
-      {activeTab === "branches" && (
+      {activeTab === "branches" && allowedTabs.some(t => t.key === "branches") && (
         <BranchesTab toast={toast} setToast={setToast} />
       )}
     </div>

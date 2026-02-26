@@ -83,6 +83,24 @@ export const PERMISSION_MODULES = [
       },
     ],
   },
+
+  {
+    key: "upgrades",
+    label: "Upgrade Module",
+    accessKey: "upgrades:access",
+    pages: [
+      {
+        key: "requests",
+        label: "Upgrade Requests",
+        actions: [
+          { key: "create", label: "Create Request" },
+          { key: "approve", label: "Approve Request" },
+          { key: "reject", label: "Reject Request" },
+          { key: "view", label: "View Requests" },
+        ],
+      },
+    ],
+  },
   {
     key: "reports",
     label: "Reports",
@@ -96,6 +114,25 @@ export const PERMISSION_MODULES = [
           { key: "export", label: "Export Logs" },
         ],
       },
+    ],
+  },
+  {
+    key: "setup",
+    label: "Setup",
+    accessKey: "setup:access",
+    pages: [
+      { key: "organization", label: "Organization", actions: [
+        { key: "view", label: "View" },
+        { key: "manage", label: "Manage" },
+      ]},
+      { key: "roles", label: "Roles & Rights", actions: [
+        { key: "view", label: "View" },
+        { key: "manage", label: "Manage" },
+      ]},
+      { key: "branches", label: "Branches", actions: [
+        { key: "view", label: "View" },
+        { key: "manage", label: "Manage" },
+      ]},
     ],
   },
 ];

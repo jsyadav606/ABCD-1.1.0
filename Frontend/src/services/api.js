@@ -77,9 +77,10 @@ API.interceptors.response.use(
       isRefreshing = true
 
       try {
+        const deviceId = sessionStorage.getItem('deviceId') || undefined
         const response = await axios.post(
           `${API_BASE_URL}/auth/refresh`,
-          {},
+          { deviceId },
           {
             withCredentials: true // Send refreshToken cookie
           }

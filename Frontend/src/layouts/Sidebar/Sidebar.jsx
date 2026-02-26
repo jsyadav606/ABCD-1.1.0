@@ -222,6 +222,16 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
             </li>
           )}
 
+          {/* Upgrade Request Module */}
+          {(isSuperAdmin() || canAccessModule("issueTo")) && (
+            <li>
+              <Link to="/requests" onClick={handleMenuItemClick}>
+                <span className="material-icons">assignment</span>
+                <span className="menu-text">Issue To</span>
+              </Link>
+            </li>
+          )}
+
           {/* Reports Module */}
           {(isSuperAdmin() || canAccessModule("reports")) && (
             <li>
@@ -232,8 +242,8 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
             </li>
           )}
 
-          {/* Setup Module - Super Admin Only */}
-          {isSuperAdmin() && (
+          {/* Setup Module */}
+          {(isSuperAdmin() || canAccessModule("setup")) &&(
             <li>
               <Link to="/setup" onClick={handleMenuItemClick}>
                 <span className="material-icons">settings</span>
