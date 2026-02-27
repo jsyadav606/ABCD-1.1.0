@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { UserLogin } from "../models/userLogin.model.js";
 import { User } from "../models/user.model.js";
+import { Organization } from "../models/organization.model.js";
 import { apiError } from "../utils/apiError.js";
 
 /**
@@ -84,7 +85,7 @@ export const authService = {
       }
 
       // Fetch user details and enforce login flags
-      const user = await User.findById(userLogin.user);
+      const user = await User.findById(userLogin.user).populate("roleId");
       if (!user) {
         throw new apiError(500, "Associated user not found");
       }
@@ -92,6 +93,20 @@ export const authService = {
       // Only allow login when canLogin and isActive are true
       if (!user.canLogin || !user.isActive) {
         throw new apiError(403, "User is not allowed to login");
+      }
+
+      const orgId = user.organizationId;
+      if (orgId) {
+        const org = await Organization.findById(orgId).select("enabledFeatures settings").lean();
+        const enabled = Array.isArray(org?.enabledFeatures) ? org.enabledFeatures : [];
+        const authSettings = org?.settings?.auth;
+        if (enabled.includes("AUTH") && authSettings?.roleLoginEnabled) {
+          const allowedRoles = Array.isArray(authSettings.allowedLoginRoles) ? authSettings.allowedLoginRoles : [];
+          const roleName = String(user.roleId?.name || "").trim();
+          if (allowedRoles.length > 0 && roleName && !allowedRoles.includes(roleName)) {
+            throw new apiError(403, "Login is disabled for this role");
+          }
+        }
       }
 
       // Reset failed attempts on successful login
@@ -418,6 +433,32 @@ export const authService = {
       const isPasswordValid = await userLogin.comparePassword(String(oldPassword));
       if (!isPasswordValid) {
         throw new apiError(401, "Current password is incorrect");
+      }
+
+      const user = await User.findById(userId).select("organizationId").lean();
+      if (user?.organizationId) {
+        const org = await Organization.findById(user.organizationId).select("enabledFeatures settings").lean();
+        const enabled = Array.isArray(org?.enabledFeatures) ? org.enabledFeatures : [];
+        const policy = org?.settings?.passwordPolicy;
+        if (enabled.includes("PASSWORD_POLICY") && policy?.enabled) {
+          const pwd = String(newPassword || "");
+          const minLength = Number(policy.minLength);
+          if (Number.isFinite(minLength) && pwd.length < minLength) {
+            throw new apiError(400, `Password must be at least ${minLength} characters long`);
+          }
+          if (policy.requireUppercase && !/[A-Z]/.test(pwd)) {
+            throw new apiError(400, "Password must contain at least one uppercase letter");
+          }
+          if (policy.requireLowercase && !/[a-z]/.test(pwd)) {
+            throw new apiError(400, "Password must contain at least one lowercase letter");
+          }
+          if (policy.requireNumber && !/[0-9]/.test(pwd)) {
+            throw new apiError(400, "Password must contain at least one number");
+          }
+          if (policy.requireSpecial && !/[^A-Za-z0-9]/.test(pwd)) {
+            throw new apiError(400, "Password must contain at least one special character");
+          }
+        }
       }
 
       // Update password

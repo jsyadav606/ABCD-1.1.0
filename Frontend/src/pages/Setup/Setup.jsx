@@ -31,11 +31,10 @@ const Setup = () => {
     );
   }, [allTabs]);
 
-  useEffect(() => {
-    if (allowedTabs.length === 0) return;
-    if (!allowedTabs.some((t) => t.key === activeTab)) {
-      setActiveTab(allowedTabs[0].key);
-    }
+  const effectiveActiveTab = useMemo(() => {
+    if (allowedTabs.length === 0) return "";
+    if (allowedTabs.some((t) => t.key === activeTab)) return activeTab;
+    return allowedTabs[0].key;
   }, [allowedTabs, activeTab]);
 
   if (allowedTabs.length === 0) {
@@ -85,7 +84,7 @@ const Setup = () => {
         {allowedTabs.map((t) => (
           <button
             key={t.key}
-            className={activeTab === t.key ? "active" : ""}
+            className={effectiveActiveTab === t.key ? "active" : ""}
             onClick={() => setActiveTab(t.key)}
           >
             {t.label}
@@ -93,15 +92,15 @@ const Setup = () => {
         ))}
       </div>
 
-      {activeTab === "organization" && allowedTabs.some(t => t.key === "organization") && (
-        <OrganizationTab toast={toast} setToast={setToast} />
+      {effectiveActiveTab === "organization" && allowedTabs.some(t => t.key === "organization") && (
+        <OrganizationTab setToast={setToast} />
       )}
    
-      {activeTab === "roles" && allowedTabs.some(t => t.key === "roles") && (
+      {effectiveActiveTab === "roles" && allowedTabs.some(t => t.key === "roles") && (
         <RoleRightsTab toast={toast} setToast={setToast} />
       )}
 
-      {activeTab === "branches" && allowedTabs.some(t => t.key === "branches") && (
+      {effectiveActiveTab === "branches" && allowedTabs.some(t => t.key === "branches") && (
         <BranchesTab toast={toast} setToast={setToast} />
       )}
     </div>

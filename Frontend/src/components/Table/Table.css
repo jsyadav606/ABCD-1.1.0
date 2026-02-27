@@ -57,6 +57,20 @@
 	background: #dbeafe;
 }
 
+/* Inactive Row Style */
+.table__row--inactive {
+    background-color: #b6b8b9;
+    color: #9ca3af;
+}
+
+.table__row--inactive td {
+    border-color: #e5e7eb;
+}
+
+.table__row--inactive:hover {
+    background-color: #f3f4f6;
+}
+
 .action-buttons {
 	display: flex;
 	justify-content: center;

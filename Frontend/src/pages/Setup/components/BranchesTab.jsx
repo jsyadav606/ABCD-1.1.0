@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
 import { branchAPI } from "../../../services/api.js";
-import { Table, Button, Input, Modal, Card, Alert } from "../../../components";
+import { Table, Button, Input, Modal, Card, Alert, Select } from "../../../components";
 
-const BranchesTab = ({ toast, setToast }) => {
+const TYPES = [
+  { value: "MAIN", label: "Main" },
+  { value: "SUB", label: "Sub" },
+  { value: "SATELLITE", label: "Satellite" },
+];
+
+const STATUSES = [
+  { value: "ACTIVE", label: "Active" },
+  { value: "INACTIVE", label: "Inactive" },
+  { value: "SUSPENDED", label: "Suspended" },
+];
+
+const BranchesTab = ({ setToast }) => {
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
   const [branchesError, setBranchesError] = useState("");
@@ -10,10 +22,14 @@ const BranchesTab = ({ toast, setToast }) => {
   const [branchModalOpen, setBranchModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState(null);
   const [branchForm, setBranchForm] = useState({
-    name: "",
-    code: "",
-    address: "",
-    isActive: true,
+    branchName: "",
+    branchCode: "",
+    type: "SUB",
+    status: "ACTIVE",
+    contactInfo: { email: "", phone: "" },
+    address: { line1: "", line2: "", city: "", state: "", pincode: "", country: "India" },
+    geoLocation: { latitude: "", longitude: "" },
+    settings: { allowAssetTransfer: true, allowUserTransfer: true },
   });
   const [branchFormError, setBranchFormError] = useState("");
   const [savingBranch, setSavingBranch] = useState(false);
@@ -24,12 +40,10 @@ const BranchesTab = ({ toast, setToast }) => {
       setBranchesError("");
       const response = await branchAPI.getAll();
       const data = response.data?.data || response.data || [];
-      setBranches(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : [];
+      setBranches(list);
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to load branches";
+      const message = error.response?.data?.message || error.message || "Failed to load branches";
       setBranchesError(message);
     } finally {
       setBranchesLoading(false);
@@ -43,10 +57,14 @@ const BranchesTab = ({ toast, setToast }) => {
   const openCreateBranchModal = () => {
     setEditingBranch(null);
     setBranchForm({
-      name: "",
-      code: "",
-      address: "",
-      isActive: true,
+      branchName: "",
+      branchCode: "",
+      type: "SUB",
+      status: "ACTIVE",
+      contactInfo: { email: "", phone: "" },
+      address: { line1: "", line2: "", city: "", state: "", pincode: "", country: "India" },
+      geoLocation: { latitude: "", longitude: "" },
+      settings: { allowAssetTransfer: true, allowUserTransfer: true },
     });
     setBranchFormError("");
     setBranchModalOpen(true);
@@ -55,10 +73,30 @@ const BranchesTab = ({ toast, setToast }) => {
   const openEditBranchModal = (branch) => {
     setEditingBranch(branch);
     setBranchForm({
-      name: branch.name || "",
-      code: branch.code || "",
-      address: branch.address || "",
-      isActive: branch.isActive !== false,
+      branchName: branch.branchName || "",
+      branchCode: branch.branchCode || "",
+      type: branch.type || "SUB",
+      status: branch.status || "ACTIVE",
+      contactInfo: {
+        email: branch.contactInfo?.email || "",
+        phone: branch.contactInfo?.phone || "",
+      },
+      address: {
+        line1: branch.address?.line1 || "",
+        line2: branch.address?.line2 || "",
+        city: branch.address?.city || "",
+        state: branch.address?.state || "",
+        pincode: branch.address?.pincode || "",
+        country: branch.address?.country || "India",
+      },
+      geoLocation: {
+        latitude: branch.geoLocation?.latitude ?? "",
+        longitude: branch.geoLocation?.longitude ?? "",
+      },
+      settings: {
+        allowAssetTransfer: branch.settings?.allowAssetTransfer !== false,
+        allowUserTransfer: branch.settings?.allowUserTransfer !== false,
+      },
     });
     setBranchFormError("");
     setBranchModalOpen(true);
@@ -71,22 +109,40 @@ const BranchesTab = ({ toast, setToast }) => {
 
   const handleBranchInputChange = (e) => {
     const { name, value } = e.target;
-    setBranchForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setBranchForm((prev) => {
+      const next = structuredClone(prev);
+      const parts = name.split(".");
+      let cur = next;
+      for (let i = 0; i < parts.length - 1; i += 1) {
+        cur[parts[i]] = cur[parts[i]] ?? {};
+        cur = cur[parts[i]];
+      }
+      cur[parts[parts.length - 1]] = value;
+      return next;
+    });
   };
 
   const handleBranchToggleChange = (name) => {
-    setBranchForm((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
+    const parts = name.split(".");
+    setBranchForm((prev) => {
+      const next = structuredClone(prev);
+      let cur = next;
+      for (let i = 0; i < parts.length - 1; i += 1) {
+        cur[parts[i]] = cur[parts[i]] ?? {};
+        cur = cur[parts[i]];
+      }
+      cur[parts[parts.length - 1]] = !cur[parts[parts.length - 1]];
+      return next;
+    });
   };
 
   const saveBranch = async () => {
-    if (!branchForm.name.trim()) {
+    if (!branchForm.branchName.trim()) {
       setBranchFormError("Branch name is required");
+      return;
+    }
+    if (!branchForm.branchCode.trim()) {
+      setBranchFormError("Branch code is required");
       return;
     }
 
@@ -94,23 +150,27 @@ const BranchesTab = ({ toast, setToast }) => {
       setSavingBranch(true);
       setBranchFormError("");
 
-      const payload = { ...branchForm };
+      const payload = {
+        ...branchForm,
+        branchCode: branchForm.branchCode.trim().toUpperCase(),
+        geoLocation: {
+          latitude: branchForm.geoLocation.latitude === "" ? undefined : Number(branchForm.geoLocation.latitude),
+          longitude: branchForm.geoLocation.longitude === "" ? undefined : Number(branchForm.geoLocation.longitude),
+        },
+      };
 
       if (editingBranch) {
         await branchAPI.update(editingBranch._id || editingBranch.id, payload);
-        setToast({ type: "success", message: "Branch updated successfully" });
+        setToast({ type: "success", message: "Branch updated" });
       } else {
         await branchAPI.create(payload);
-        setToast({ type: "success", message: "Branch created successfully" });
+        setToast({ type: "success", message: "Branch created" });
       }
 
       closeBranchModal();
       await loadBranches();
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to save branch";
+      const message = error.response?.data?.message || error.message || "Failed to save branch";
       setBranchFormError(message);
     } finally {
       setSavingBranch(false);
@@ -118,40 +178,25 @@ const BranchesTab = ({ toast, setToast }) => {
   };
 
   const disableBranch = async (branch) => {
-    if (!window.confirm("Are you sure you want to disable this branch?")) {
+    if (!window.confirm("Are you sure you want to inactivate this branch?")) {
       return;
     }
     try {
-      await branchAPI.update(branch._id || branch.id, { isActive: false });
-      setToast({ type: "success", message: "Branch disabled successfully" });
+      await branchAPI.update(branch._id || branch.id, { status: "INACTIVE" });
+      setToast({ type: "success", message: "Branch inactivated" });
       await loadBranches();
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to disable branch";
+      const message = error.response?.data?.message || error.message || "Failed to update branch";
       setToast({ type: "danger", message });
     }
   };
 
   const branchColumns = [
-    {
-      header: "Name",
-      key: "name",
-    },
-    {
-      header: "Code",
-      key: "code",
-    },
-    {
-      header: "Address",
-      key: "address",
-    },
-    {
-      header: "Status",
-      key: "isActive",
-      render: (row) => (row.isActive ? "Active" : "Inactive"),
-    },
+    { header: "Branch Name", key: "branchName" },
+    { header: "Code", key: "branchCode" },
+    { header: "Type", key: "type" },
+    { header: "Status", key: "status" },
+    { header: "City", key: "address", render: (row) => row.address?.city || "-" },
     {
       header: "Actions",
       key: "actions",
@@ -164,13 +209,13 @@ const BranchesTab = ({ toast, setToast }) => {
           >
             Edit
           </Button>
-          {row.isActive ? (
+          {row.status === "ACTIVE" ? (
             <Button
               size="sm"
               variant="warning"
               onClick={() => disableBranch(row)}
             >
-              Disable
+              Inactivate
             </Button>
           ) : (
             <span style={{ fontSize: "0.875rem", color: "#6c757d" }}>Disabled</span>
@@ -191,7 +236,9 @@ const BranchesTab = ({ toast, setToast }) => {
 
       {branchesError && (
         <div className="setup-error">
-          <Alert type="danger" message={branchesError} />
+          <Alert type="danger" title="Error" onClose={() => setBranchesError("")}>
+            {branchesError}
+          </Alert>
         </div>
       )}
 
@@ -221,43 +268,146 @@ const BranchesTab = ({ toast, setToast }) => {
         >
           {branchFormError && (
             <div className="setup-error">
-              <Alert type="danger" message={branchFormError} />
+              <Alert type="danger" title="Error" onClose={() => setBranchFormError("")}>
+                {branchFormError}
+              </Alert>
             </div>
           )}
 
           <div className="setup-modal-grid">
             <Input
-              name="name"
+              name="branchName"
               label="Branch Name"
-              value={branchForm.name}
+              value={branchForm.branchName}
               onChange={handleBranchInputChange}
               required
             />
             <Input
-              name="code"
-              label="Code"
-              value={branchForm.code}
-              onChange={handleBranchInputChange}
+              name="branchCode"
+              label="Branch Code"
+              value={branchForm.branchCode}
+              onChange={(e) =>
+                handleBranchInputChange({
+                  target: { name: "branchCode", value: e.target.value.toUpperCase() },
+                })
+              }
               placeholder="e.g., DEL-HQ"
             />
           </div>
 
+          <div className="setup-modal-grid">
+            <Select
+              name="type"
+              label="Type"
+              value={branchForm.type}
+              onChange={(e) =>
+                handleBranchInputChange({ target: { name: "type", value: e.target.value } })
+              }
+              options={TYPES}
+              required
+            />
+            <Select
+              name="status"
+              label="Status"
+              value={branchForm.status}
+              onChange={(e) =>
+                handleBranchInputChange({ target: { name: "status", value: e.target.value } })
+              }
+              options={STATUSES}
+              required
+            />
+          </div>
+
+          <div className="setup-modal-grid">
+            <Input
+              name="contactInfo.email"
+              label="Contact Email"
+              value={branchForm.contactInfo.email}
+              onChange={handleBranchInputChange}
+            />
+            <Input
+              name="contactInfo.phone"
+              label="Contact Phone"
+              value={branchForm.contactInfo.phone}
+              onChange={handleBranchInputChange}
+            />
+          </div>
+
           <Input
-            name="address"
-            label="Address"
-            value={branchForm.address}
+            name="address.line1"
+            label="Address Line 1"
+            value={branchForm.address.line1}
             onChange={handleBranchInputChange}
-            placeholder="Branch address"
+            placeholder="House/Street"
           />
+          <Input
+            name="address.line2"
+            label="Address Line 2"
+            value={branchForm.address.line2}
+            onChange={handleBranchInputChange}
+            placeholder="Area/Landmark"
+          />
+
+          <div className="setup-modal-grid">
+            <Input
+              name="address.city"
+              label="City"
+              value={branchForm.address.city}
+              onChange={handleBranchInputChange}
+            />
+            <Input
+              name="address.state"
+              label="State"
+              value={branchForm.address.state}
+              onChange={handleBranchInputChange}
+            />
+            <Input
+              name="address.pincode"
+              label="PIN Code"
+              value={branchForm.address.pincode}
+              onChange={handleBranchInputChange}
+            />
+            <Input
+              name="address.country"
+              label="Country"
+              value={branchForm.address.country}
+              onChange={handleBranchInputChange}
+            />
+          </div>
+
+          <div className="setup-modal-grid">
+            <Input
+              name="geoLocation.latitude"
+              type="number"
+              label="Latitude"
+              value={branchForm.geoLocation.latitude}
+              onChange={handleBranchInputChange}
+            />
+            <Input
+              name="geoLocation.longitude"
+              type="number"
+              label="Longitude"
+              value={branchForm.geoLocation.longitude}
+              onChange={handleBranchInputChange}
+            />
+          </div>
 
           <div className="setup-toggle-row">
             <label className="toggle">
               <input
                 type="checkbox"
-                checked={branchForm.isActive}
-                onChange={() => handleBranchToggleChange("isActive")}
+                checked={branchForm.settings.allowAssetTransfer}
+                onChange={() => handleBranchToggleChange("settings.allowAssetTransfer")}
               />
-              <span className="toggle-label">Active</span>
+              <span className="toggle-label">Allow Asset Transfer</span>
+            </label>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={branchForm.settings.allowUserTransfer}
+                onChange={() => handleBranchToggleChange("settings.allowUserTransfer")}
+              />
+              <span className="toggle-label">Allow User Transfer</span>
             </label>
           </div>
         </Modal>

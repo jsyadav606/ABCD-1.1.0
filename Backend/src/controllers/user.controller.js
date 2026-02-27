@@ -2,6 +2,7 @@ import { User } from "../models/user.model.js";
 import { Role } from "../models/role.model.js";
 import { Branch } from "../models/branch.model.js"; 
 import { UserLogin } from "../models/userLogin.model.js";
+import { Organization } from "../models/organization.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -636,7 +637,7 @@ export const getRolesForDropdown = asyncHandler(async (req, res) => {
 export const getBranchesForDropdown = asyncHandler(async (req, res) => {
   const { organizationId } = req.query;
 
-  let filter = { isActive: true };
+  let filter = { status: "ACTIVE" };
   if (organizationId) {
     filter.organizationId = organizationId;
   }
@@ -653,7 +654,7 @@ export const getBranchesForDropdown = asyncHandler(async (req, res) => {
     filter._id = { $in: userBranchIds };
   }
 
-  const branches = await Branch.find(filter, "name code address").lean();
+  const branches = await Branch.find(filter, "branchName branchCode address").lean();
   
   if (!branches || branches.length === 0) {
     return res.status(200).json(new apiResponse(200, [], "No branches found"));
@@ -661,9 +662,9 @@ export const getBranchesForDropdown = asyncHandler(async (req, res) => {
 
   const formattedBranches = branches.map((branch) => ({
     _id: branch._id,
-    name: branch.name,
-    code: branch.code,
-    address: branch.address,
+    name: branch.branchName,
+    code: branch.branchCode,
+    address: branch.address?.line1 || "",
   }));
 
   return res.status(200).json(new apiResponse(200, formattedBranches, "Branches retrieved successfully"));
@@ -709,14 +710,48 @@ export const changeUserPassword = asyncHandler(async (req, res) => {
 
   console.log('🔐 changeUserPassword called for userId:', id);
 
-  if (!newPassword || newPassword.trim().length < 6) {
-    throw new apiError(400, "Password must be at least 6 characters long");
+  if (!newPassword || !String(newPassword).trim()) {
+    throw new apiError(400, "newPassword is required");
   }
 
   // Find user
   const user = await User.findById(id);
   if (!user) {
     throw new apiError(404, "User not found");
+  }
+
+  const orgId = user.organizationId;
+  if (orgId) {
+    const org = await Organization.findById(orgId).select("enabledFeatures settings").lean();
+    const enabled = Array.isArray(org?.enabledFeatures) ? org.enabledFeatures : [];
+    const policy = org?.settings?.passwordPolicy;
+    if (enabled.includes("PASSWORD_POLICY") && policy?.enabled) {
+      const pwd = String(newPassword || "").trim();
+      const minLength = Number(policy.minLength);
+      if (Number.isFinite(minLength) && pwd.length < minLength) {
+        throw new apiError(400, `Password must be at least ${minLength} characters long`);
+      }
+      if (policy.requireUppercase && !/[A-Z]/.test(pwd)) {
+        throw new apiError(400, "Password must contain at least one uppercase letter");
+      }
+      if (policy.requireLowercase && !/[a-z]/.test(pwd)) {
+        throw new apiError(400, "Password must contain at least one lowercase letter");
+      }
+      if (policy.requireNumber && !/[0-9]/.test(pwd)) {
+        throw new apiError(400, "Password must contain at least one number");
+      }
+      if (policy.requireSpecial && !/[^A-Za-z0-9]/.test(pwd)) {
+        throw new apiError(400, "Password must contain at least one special character");
+      }
+    } else {
+      if (String(newPassword).trim().length < 6) {
+        throw new apiError(400, "Password must be at least 6 characters long");
+      }
+    }
+  } else {
+    if (String(newPassword).trim().length < 6) {
+      throw new apiError(400, "Password must be at least 6 characters long");
+    }
   }
 
   // Check if user has login credentials
@@ -726,7 +761,7 @@ export const changeUserPassword = asyncHandler(async (req, res) => {
   }
 
   // Update password in UserLogin model
-  userLogin.password = newPassword.trim();
+  userLogin.password = String(newPassword).trim();
   userLogin.forcePasswordChange = false; // User has now changed password
   await userLogin.save();
 

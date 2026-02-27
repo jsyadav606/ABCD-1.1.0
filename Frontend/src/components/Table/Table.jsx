@@ -14,6 +14,7 @@ const Table = ({
   isRowSelectable,
   defaultSortKey = null,
   defaultSortDirection = "asc",
+  rowClassName,
 }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(() => {
@@ -42,29 +43,6 @@ const Table = ({
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [showPagination]);
-
-  // Update URL when page changes
-  useEffect(() => {
-    if (!showPagination) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const currentPage = parseInt(params.get("page"), 10) || 1;
-
-    // Only update if changed
-    if (currentPage !== page) {
-      if (page === 1) {
-        params.delete("page");
-      } else {
-        params.set("page", page);
-      }
-      
-      const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-      // Use pushState so we can navigate back, or replaceState if we just want to update URL
-      // replaceState is better for pagination to not clutter history too much, but pushState allows back button to work for pages.
-      // Let's use replaceState as per original intent to just "persist" current view.
-      window.history.replaceState({}, '', newUrl);
-    }
-  }, [page, showPagination]);
 
   const [sortConfig, setSortConfig] = useState({
     key: defaultSortKey,
@@ -113,22 +91,6 @@ const Table = ({
     return tempData;
   }, [data, search, showSearch, sortConfig]);
 
-  // Validate page range when data changes
-  useEffect(() => {
-    // Skip this validation if no data, or if we are still initializing
-    if (!showPagination || data.length === 0) return;
-    
-    const processedLen = processedData.length;
-    const maxPage = Math.ceil(processedLen / pageSize) || 1;
-    
-    // Only adjust if strictly greater AND we aren't at initial load (prevent flash)
-    // Actually, we should allow being at page X if we expect data to be there.
-    // But if data changed (deleted), we should go back.
-    if (page > maxPage) {
-      setPage(maxPage);
-    }
-  }, [processedData.length, pageSize, page, showPagination, data.length]);
-
   useEffect(() => {
     onSelectionChange?.(selectedRows);
   }, [selectedRows, onSelectionChange]);
@@ -149,15 +111,34 @@ const Table = ({
       );
   };
 
-  const totalPages = showPagination ? Math.ceil(processedData.length / pageSize) : 1;
+  const totalPages = showPagination ? Math.ceil(processedData.length / pageSize) || 1 : 1;
+  const currentPage = showPagination ? Math.min(page, totalPages) : 1;
+
+  useEffect(() => {
+    if (!showPagination) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlPage = parseInt(params.get("page"), 10) || 1;
+
+    if (urlPage !== currentPage) {
+      if (currentPage === 1) {
+        params.delete("page");
+      } else {
+        params.set("page", currentPage);
+      }
+
+      const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [currentPage, showPagination]);
 
   const tableData = showPagination
-    ? processedData.slice((page - 1) * pageSize, page * pageSize)
+    ? processedData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : processedData;
 
   const totalItems = processedData.length;
-  const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endIndex = Math.min(totalItems, page * pageSize);
+  const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endIndex = Math.min(totalItems, currentPage * pageSize);
 
   const canSelectRow = (row) => !isRowSelectable || isRowSelectable(row);
 
@@ -205,10 +186,10 @@ const Table = ({
 
             {showPagination && (
               <TablePagination
-                page={page}
+                page={currentPage}
                 totalPages={totalPages}
-                onPrev={() => setPage((p) => Math.max(p - 1, 1))}
-                onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
+                onPrev={() => setPage((p) => Math.max(Math.min(p, totalPages) - 1, 1))}
+                onNext={() => setPage((p) => Math.min(Math.min(p, totalPages) + 1, totalPages))}
               />
             )}
           </div>
@@ -260,7 +241,11 @@ const Table = ({
             {tableData.map((row) => (
               <tr
                 key={row._id}
-                className={selectedRows.includes(row._id) ? "table__row table__row--selected" : "table__row"}
+                className={`${
+                  selectedRows.includes(row._id)
+                    ? "table__row table__row--selected"
+                    : "table__row"
+                } ${rowClassName ? rowClassName(row) : ""}`}
               >
                 <td>
                   <input

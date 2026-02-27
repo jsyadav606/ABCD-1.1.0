@@ -9,11 +9,11 @@ const AuthContext = createContext({
   error: '',
   isAuthenticated: false,
   deviceId: null,
-  login: async (_loginId, _password) => ({ success: false }),
-  register: async (_userData) => ({ success: false }),
+  login: async () => ({ success: false }),
+  register: async () => ({ success: false }),
   logout: async () => {},
   logoutAll: async () => {},
-  changePassword: async (_old, _next, _confirm) => ({ success: false }),
+  changePassword: async () => ({ success: false }),
   clearError: () => {}
 })
 
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
             } else if ((data?.user?.role || parsed?.role) === 'super_admin') {
               localStorage.setItem('permissions', JSON.stringify(['*']))
             }
-          } catch (e) {
+          } catch {
             // Ignore profile errors; keep current session
           }
         } catch (err) {

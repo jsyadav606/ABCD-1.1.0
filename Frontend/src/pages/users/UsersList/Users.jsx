@@ -647,7 +647,9 @@ const Users = () => {
         </section>
 
         <div className="users-table">
-          <Table
+          <
+// @ts-ignore
+          Table
             columns={columns}
             data={allUsers}
             pageSize={pageSize}

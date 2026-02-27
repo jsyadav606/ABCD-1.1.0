@@ -138,7 +138,9 @@ Reporting To or Edit Role ke buttons ke role & rights bhi bnao. or make sure, ye
 
 
 
-
+1. now update new add rolemodel popup, m chahta hu ki age m nya role add kar rha hu to real time search kre ki jo m likh rha hu us naam se koi role phle se bna to nhi h agr h to ek msg show kar de, 
+2. jo m role display name me dalu vo apne aap internal name me aata rhe or  agr role dispaly name me 2 ya jyada word h or bhich me space h to space ko _ me convert kar de.
+3. ek logics add kro ki agr new arole me m kis exist role ke sabhi permission copy krna chahu to kar skta hu, us exist role ko select kar ke mge exist role ke permission or logics per koi frk na pde.
 
 
 

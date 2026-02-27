@@ -1,4 +1,6 @@
+// @ts-ignore
 import React, { useState, useEffect, useMemo } from "react";
+// @ts-ignore
 import { Modal, Button, Alert, Card } from "../../components";
 import { roleAPI } from "../../services/api";
 import { PERMISSION_MODULES } from "../../constants/permissions";
@@ -10,14 +12,6 @@ const hasPermission = (assignedKeys, moduleKey, pageKey, actionKey) => {
   // Check exact match: module:page:action
   const fullKey = `${moduleKey}:${pageKey}:${actionKey}`;
   return assignedKeys.includes(fullKey);
-};
-
-// Helper to check if all actions in a page are assigned
-const isPageFullyAssigned = (assignedKeys, moduleKey, pageKey, actions) => {
-  if (assignedKeys.includes("*")) return true;
-  return actions.every((action) =>
-    assignedKeys.includes(`${moduleKey}:${pageKey}:${action.key}`)
-  );
 };
 
 const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
@@ -207,7 +201,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
       onClose();
     } catch (err) {
       const message =
-        err.response?.data?.message || err.message || "Failed to update permissions";
+        err.response?.data?.message || err.message || "Failed to update rights";
       setError(message);
     } finally {
       setSaving(false);
@@ -219,8 +213,9 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
   return (
     <Modal
       isOpen={isOpen}
-      title={`Manage Permissions - ${role?.displayName || "Role"}`}
+      title={`Manage Rights - ${role?.displayName || "Role"}`}
       onClose={onClose}
+      // @ts-ignore
       width="900px"
       footer={
         <div style={{ display: "flex", gap: "0.5rem", justifyContent: "space-between", width: "100%" }}>
@@ -228,7 +223,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
             variant="info" 
             onClick={() => setPreviewMode(!previewMode)}
           >
-            {previewMode ? "Edit Permissions" : "Preview Sidebar"}
+            {previewMode ? "Edit Rights" : "Preview Sidebar"}
           </Button>
 
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -237,7 +232,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
             </Button>
             {!isSuperAdmin && !previewMode && (
               <Button variant="primary" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save Permissions"}
+                {saving ? "Saving..." : "Save Rights"}
               </Button>
             )}
           </div>
@@ -246,12 +241,15 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
     >
       {error && (
         <div className="setup-error">
-          <Alert type="danger" message={error} />
+          <Alert type="danger" 
+// @ts-ignore
+          message={error} />
         </div>
       )}
 
       {isSuperAdmin && (
-        <Alert type="info" message="This role has Super Admin privileges (Full Access). Individual permissions cannot be modified." />
+        // @ts-ignore
+        <Alert type="info" message="This role has Super Admin privileges (Full Access). Individual rights cannot be modified." />
       )}
 
       {!previewMode && (
@@ -317,7 +315,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
           <div className="tree-root">
             {filteredModules.length === 0 && (
                 <div style={{ padding: "1rem", textAlign: "center", color: "#6b7280" }}>
-                  No matching permissions found.
+                  No matching rights found.
                 </div>
             )}
 
@@ -327,6 +325,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
                 <div 
                   className="module-header" 
                   onClick={(e) => {
+                    // @ts-ignore
                     if (e.target.type !== 'checkbox') {
                       toggleModuleExpand(module.key);
                     }
@@ -373,9 +372,7 @@ const PermissionsModal = ({ isOpen, onClose, role, onSaveSuccess }) => {
                                 type="checkbox"
                                 checked={isViewAssigned}
                                 disabled={isDisabled}
-                                onChange={(e) => 
-                                  handleActionToggle(module.key, page.key, "view")
-                                }
+                                onChange={() => handleActionToggle(module.key, page.key, "view")}
                               />
                               <span>{page.label}</span>
                             </label>

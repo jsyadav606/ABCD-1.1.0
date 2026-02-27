@@ -31,29 +31,31 @@ async function seedBranches() {
 
     // Define branches to seed
     const branchesToSeed = [
-      { name: "ABCD East", code: "abcd-east" },
-      { name: "ABCD West", code: "abcd-west" },
-      { name: "ABCD North", code: "abcd-north" },
-      { name: "ABCD South", code: "abcd-south" },
-      { name: "Center", code: "center" },
+      { branchName: "ABCD East", branchCode: "ABCD-EAST" },
+      { branchName: "ABCD West", branchCode: "ABCD-WEST" },
+      { branchName: "ABCD North", branchCode: "ABCD-NORTH" },
+      { branchName: "ABCD South", branchCode: "ABCD-SOUTH" },
+      { branchName: "Center", branchCode: "CENTER" },
     ];
 
     // Create or update branches
     for (const branchData of branchesToSeed) {
-      const existingBranch = await Branch.findOne({ 
-        name: branchData.name, 
-        organizationId: orgId 
+      const existingBranch = await Branch.findOne({
+        organizationId: orgId,
+        branchCode: branchData.branchCode,
       });
 
       if (existingBranch) {
         console.log(`Branch '${branchData.name}' already exists. Skipping...`);
       } else {
         const newBranch = await Branch.create({
-          ...branchData,
           organizationId: orgId,
-          isActive: true,
+          branchName: branchData.branchName,
+          branchCode: branchData.branchCode,
+          type: "SUB",
+          status: "ACTIVE",
         });
-        console.log(`✅ Created branch: ${newBranch.name} (${newBranch._id.toString()})`);
+        console.log(`✅ Created branch: ${newBranch.branchName} (${newBranch._id.toString()})`);
       }
     }
 

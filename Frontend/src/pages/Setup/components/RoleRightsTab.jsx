@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { roleAPI } from "../../../services/api.js";
 import { Table, Button, Input, Modal, Card, Alert } from "../../../components";
 import PermissionsModal from "../PermissionsModal";
 
-const RoleRightsTab = ({ toast, setToast }) => {
+const RoleRightsTab = ({ setToast }) => {
   const [roles, setRoles] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
@@ -19,9 +20,14 @@ const RoleRightsTab = ({ toast, setToast }) => {
     isActive: true,
     isDefault: false,
     permissions: [],
+    permissionKeys: [],
   });
   const [roleFormError, setRoleFormError] = useState("");
   const [savingRole, setSavingRole] = useState(false);
+  
+  // New State for enhancements
+  const [nameValidationMsg, setNameValidationMsg] = useState("");
+  const [copyFromRoleId, setCopyFromRoleId] = useState("");
 
   const loadRoles = async () => {
     try {
@@ -43,6 +49,34 @@ const RoleRightsTab = ({ toast, setToast }) => {
     loadRoles();
   }, []);
 
+  // Real-time Validation Effect (Debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!roleModalOpen) return;
+
+      if (roleForm.name) {
+        // Check for duplicate internal name
+        const nameExists = roles.some(
+          (r) =>
+            r.name === roleForm.name &&
+            (!editingRole || r._id !== editingRole._id)
+        );
+
+        if (nameExists) {
+          setNameValidationMsg(
+            "This role name already exists. Please choose a different name."
+          );
+        } else {
+          setNameValidationMsg("");
+        }
+      } else {
+        setNameValidationMsg("");
+      }
+    }, 500); // 500ms debounce delay
+
+    return () => clearTimeout(timer);
+  }, [roleForm.name, roles, editingRole, roleModalOpen]);
+
   const openCreateRoleModal = () => {
     setEditingRole(null);
     setRoleForm({
@@ -53,12 +87,15 @@ const RoleRightsTab = ({ toast, setToast }) => {
       isActive: true,
       isDefault: false,
       permissions: [],
+      permissionKeys: [],
     });
     setRoleFormError("");
+    setNameValidationMsg("");
+    setCopyFromRoleId("");
     setRoleModalOpen(true);
   };
 
-  const openEditRoleModal = (role) => {
+  const openEditRoleModal = (/** @type {{ name: any; displayName: any; description: any; priority: any; isActive: boolean; isDefault: boolean; permissions: any; permissionKeys: any; }} */ role) => {
     setEditingRole(role);
     setRoleForm({
       name: role.name || "",
@@ -68,12 +105,14 @@ const RoleRightsTab = ({ toast, setToast }) => {
       isActive: role.isActive !== false,
       isDefault: role.isDefault === true,
       permissions: role.permissions || [],
+      permissionKeys: role.permissionKeys || [],
     });
     setRoleFormError("");
+    setNameValidationMsg("");
     setRoleModalOpen(true);
   };
 
-  const openPermissionsModal = (role) => {
+  const openPermissionsModal = (/** @type {any} */ role) => {
     setEditingRole(role);
     setPermissionsModalOpen(true);
   };
@@ -88,15 +127,58 @@ const RoleRightsTab = ({ toast, setToast }) => {
     setEditingRole(null);
   };
 
-  const handleRoleInputChange = (e) => {
+  const handleRoleInputChange = (/** @type {{ target: { name: any; value: any; }; }} */ e) => {
     const { name, value } = e.target;
-    setRoleForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    setRoleForm((prev) => {
+      let updates = { [name]: value };
+
+      // Automatic Internal Name Generation
+      if (name === "displayName" && !editingRole) {
+        const internalName = value
+          .toLowerCase()
+          .replace(/\s+/g, "_") // Replace spaces with underscores
+          .replace(/[^a-z0-9_]/g, ""); // Remove special chars except underscore
+        updates.name = internalName;
+      }
+
+      return {
+        ...prev,
+        ...updates,
+      };
+    });
   };
 
-  const handleRoleToggleChange = (name) => {
+  const handleCopyPermissions = (/** @type {import("react").SetStateAction<string>} */ sourceRoleId) => {
+    setCopyFromRoleId(sourceRoleId);
+    if (!sourceRoleId) return;
+
+    const sourceRole = roles.find(
+      (r) => r._id === sourceRoleId || r.id === sourceRoleId
+    );
+
+    if (sourceRole) {
+      if (
+        window.confirm(
+          `Are you sure you want to copy rights from "${sourceRole.displayName}"? This will overwrite any current rights for the new role.`
+        )
+      ) {
+        setRoleForm((prev) => ({
+          ...prev,
+          permissionKeys: [...(sourceRole.permissionKeys || [])],
+          permissions: [...(sourceRole.permissions || [])],
+        }));
+        setToast({
+          type: "success",
+          message: `Rights copied from ${sourceRole.displayName}`,
+        });
+      } else {
+        setCopyFromRoleId(""); // Reset if cancelled
+      }
+    }
+  };
+
+  const handleRoleToggleChange = (/** @type {string} */ name) => {
     setRoleForm((prev) => ({
       ...prev,
       [name]: !prev[name],
@@ -106,6 +188,11 @@ const RoleRightsTab = ({ toast, setToast }) => {
   const saveRole = async () => {
     if (!roleForm.name.trim() || !roleForm.displayName.trim()) {
       setRoleFormError("Role name and display name are required");
+      return;
+    }
+
+    if (nameValidationMsg) {
+      setRoleFormError("Please fix validation errors before saving.");
       return;
     }
 
@@ -121,7 +208,7 @@ const RoleRightsTab = ({ toast, setToast }) => {
         isActive: roleForm.isActive,
         isDefault: roleForm.isDefault,
         permissions: [],
-        permissionKeys: [],
+        permissionKeys: roleForm.permissionKeys || [],
       };
 
       if (editingRole) {
@@ -144,11 +231,11 @@ const RoleRightsTab = ({ toast, setToast }) => {
   };
 
   const handlePermissionsSaveSuccess = async () => {
-    setToast({ type: "success", message: "Permissions updated successfully" });
+    setToast({ type: "success", message: "Rights updated successfully" });
     await loadRoles();
   };
 
-  const deleteRole = async (role) => {
+  const deleteRole = async (/** @type {{ _id: any; id: any; }} */ role) => {
     if (!window.confirm("Are you sure you want to delete this role?")) {
       return;
     }
@@ -180,28 +267,28 @@ const RoleRightsTab = ({ toast, setToast }) => {
     {
       header: "Status",
       key: "isActive",
-      render: (row) => (row.isActive ? "Active" : "Inactive"),
+      render: (/** @type {{ isActive: any; }} */ row) => (row.isActive ? "Active" : "Inactive"),
     },
     {
       header: "Default",
       key: "isDefault",
-      render: (row) => (row.isDefault ? "Yes" : "No"),
+      render: (/** @type {{ isDefault: any; }} */ row) => (row.isDefault ? "Yes" : "No"),
     },
     {
       header: "Rights Summary",
       key: "permissions",
-      render: (row) => {
+      render: (/** @type {{ name: string; permissionKeys: string | string[]; }} */ row) => {
         if (row.name === "super_admin" || (row.permissionKeys && row.permissionKeys.includes("*"))) return "All Access (*)";
         
         // Show count of permissions
         const count = row.permissionKeys?.length || 0;
-        return `${count} Permission${count !== 1 ? 's' : ''}`;
+        return `${count} Right${count !== 1 ? 's' : ''}`;
       },
     },
     {
       header: "Actions",
       key: "actions",
-      render: (row) => (
+      render: (/** @type {{ isActive: any; category: string; _id: any; id: any; }} */ row) => (
         <div className="setup-table-actions">
           <Button
             size="sm"
@@ -215,7 +302,7 @@ const RoleRightsTab = ({ toast, setToast }) => {
             variant="info"
             onClick={() => openPermissionsModal(row)}
           >
-            Permissions
+            Rights
           </Button>
           {row.isActive && row.category !== "system" && (
             <Button
@@ -269,7 +356,12 @@ const RoleRightsTab = ({ toast, setToast }) => {
         {rolesLoading ? (
           <div className="setup-loading">Loading roles...</div>
         ) : (
-          <Table columns={roleColumns} data={roles} pageSize={10} />
+          <Table 
+            columns={roleColumns} 
+            data={roles} 
+            pageSize={10} 
+            rowClassName={(/** @type {{ isActive: any; }} */ row) => !row.isActive ? "table__row--inactive" : ""}
+          />
         )}
       </Card>
 
@@ -306,14 +398,21 @@ const RoleRightsTab = ({ toast, setToast }) => {
               required
             />
             {!editingRole && (
-              <Input
-                name="name"
-                label="Role Internal Name"
-                value={roleForm.name}
-                onChange={handleRoleInputChange}
-                placeholder="e.g., user_admin (no spaces)"
-                required
-              />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <Input
+                  name="name"
+                  label="Role Internal Name"
+                  value={roleForm.name}
+                  onChange={handleRoleInputChange}
+                  placeholder="e.g., user_admin (no spaces)"
+                  required
+                />
+                {nameValidationMsg && (
+                  <span style={{ color: "#dc2626", fontSize: "0.8rem", marginTop: "-0.5rem", marginBottom: "1rem" }}>
+                    {nameValidationMsg}
+                  </span>
+                )}
+              </div>
             )}
             <Input
               name="priority"
@@ -342,6 +441,30 @@ const RoleRightsTab = ({ toast, setToast }) => {
               </label>
             </div>
           </div>
+
+          {!editingRole && (
+             <div className="setup-modal-full" style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 500, fontSize: "0.9rem" }}>
+                  Copy Rights from Existing Role
+                </label>
+                <select
+                  className="setup-input"
+                  value={copyFromRoleId}
+                  onChange={(e) => handleCopyPermissions(e.target.value)}
+                  style={{ width: "100%", padding: "0.5rem", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                >
+                  <option value="">-- Select a role to copy rights --</option>
+                  {roles.map((r) => (
+                    <option key={r._id || r.id} value={r._id || r.id}>
+                      {r.displayName} ({r.permissionKeys?.length || 0} rights)
+                    </option>
+                  ))}
+                </select>
+                <small style={{ color: "#6b7280", display: "block", marginTop: "0.25rem" }}>
+                  Select a role to automatically copy its rights to this new role.
+                </small>
+             </div>
+          )}
 
           <div className="setup-modal-full">
             <Input
