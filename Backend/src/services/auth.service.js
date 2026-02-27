@@ -1,3 +1,28 @@
+/**
+ * Auth Service
+ * 
+ * Logics:
+ * - login(loginId, password, deviceId, ipAddress, userAgent):
+ *   Validates loginId, resolves UserLogin by username/userId/email,
+ *   enforces locks, verifies password, enforces user.canLogin && user.isActive,
+ *   enforces org auth settings (optional), resets counters, generates access/refresh tokens,
+ *   returns user with deduped permissions and deviceId.
+ * - logout(userId, deviceId):
+ *   Logs out a specific device if given; otherwise all devices.
+ * - logoutAllDevices(userId):
+ *   Revokes all devices for the user.
+ * - getActiveDevices(userId):
+ *   Returns devices still carrying a refresh token.
+ * - revokeToken(userId, token):
+ *   Removes a specific refresh token from any device.
+ * - changePassword(userId, oldPassword, newPassword):
+ *   Verifies old password, updates password, logs out all devices.
+ * - refreshTokens(refreshToken, deviceId?):
+ *   Validates refresh token, rotates token for device, returns a new access token.
+ * - validateAccessToken(token):
+ *   Verifies access token and returns decoded payload details.
+ */
+
 import jwt from "jsonwebtoken";
 import { UserLogin } from "../models/userLogin.model.js";
 import { User } from "../models/user.model.js";

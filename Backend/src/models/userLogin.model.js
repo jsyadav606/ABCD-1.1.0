@@ -1,4 +1,22 @@
-// models/userLogin.model.js
+/**
+ * UserLogin Model
+ * 
+ * Logics:
+ * - Credentials:
+ *   username (unique, lowercase), password (hashed in pre-save hook).
+ * - User Link:
+ *   user (ref User, unique) ensures one credential per user.
+ * - Security Flags:
+ *   forcePasswordChange, failedLoginAttempts, lockLevel, lockUntil, isPermanentlyLocked.
+ * - Session State:
+ *   isLoggedIn, lastLogin, loggedInDevices with per-device refreshToken and history.
+ * - Hooks/Methods:
+ *   - pre('save'): hash password if modified.
+ *   - comparePassword(candidate): bcrypt compare.
+ *   - generateAccessToken(deviceId): JWT with optional device versioning.
+ *   - generateRefreshToken(deviceId, ip, ua): issues refresh, updates device entries, persists.
+ */
+
 import mongoose, { Schema } from "mongoose";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";

@@ -1,3 +1,17 @@
+/**
+ * Sidebar Layout
+ * 
+ * Logics:
+ * - Navigation and User Panel:
+ *   Renders main menu, handles mobile/desktop behavior, click-outside to close user panel.
+ * - Assets Dropdown:
+ *   Hover on desktop and toggle on mobile for asset module links.
+ * - Change Password Modal:
+ *   Local state for old/new/confirm, client-side validations,
+ *   calls authAPI.changePassword(old, new, confirm), handles errors, forces logout on success.
+ * - Logout:
+ *   Calls backend logout and clears local session, with fallback on failure.
+ */
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";

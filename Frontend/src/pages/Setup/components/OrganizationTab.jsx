@@ -40,6 +40,10 @@ const DEFAULT_SETTINGS = {
     subject: "",
     body: "",
   },
+  transfer: {
+    allowAssetTransfer: true,
+    allowUserTransfer: true,
+  },
 };
 
 const mergeSettings = (base, incoming) => {
@@ -61,6 +65,10 @@ const mergeSettings = (base, incoming) => {
     confirmationEmail: {
       ...base.confirmationEmail,
       ...(safe.confirmationEmail && typeof safe.confirmationEmail === "object" ? safe.confirmationEmail : {}),
+    },
+    transfer: {
+      ...base.transfer,
+      ...(safe.transfer && typeof safe.transfer === "object" ? safe.transfer : {}),
     },
   };
 };
@@ -669,6 +677,39 @@ const OrganizationTab = ({ setToast }) => {
                 </div>
               </div>
             )}
+
+            <div className="org-section">
+              <div className="org-section-title">Transfer Rules</div>
+              <div className="org-setting-row">
+                <div>
+                  <div className="org-setting-label">Allow Asset Transfer</div>
+                  <div className="org-setting-desc">Allow assets to be transferred across branches in this organization.</div>
+                </div>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(settingsDraft.transfer?.allowAssetTransfer)}
+                    onChange={() => setSetting("transfer.allowAssetTransfer", !settingsDraft.transfer?.allowAssetTransfer)}
+                  />
+                  <span className="switch-slider" />
+                </label>
+              </div>
+
+              <div className="org-setting-row">
+                <div>
+                  <div className="org-setting-label">Allow User Transfer</div>
+                  <div className="org-setting-desc">Allow users to be reassigned across branches in this organization.</div>
+                </div>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(settingsDraft.transfer?.allowUserTransfer)}
+                    onChange={() => setSetting("transfer.allowUserTransfer", !settingsDraft.transfer?.allowUserTransfer)}
+                  />
+                  <span className="switch-slider" />
+                </label>
+              </div>
+            </div>
 
             {enabledFeatures.includes("CONFIRMATION_EMAIL") && (
               <div className="org-section">

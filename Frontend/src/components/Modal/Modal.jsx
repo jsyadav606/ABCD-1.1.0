@@ -1,3 +1,14 @@
+/**
+ * Modal Component
+ * 
+ * Logics:
+ * - Controlled visibility via isOpen prop.
+ * - Overlay Close Behavior:
+ *   Closes only when both mousedown and mouseup occur on overlay;
+ *   prevents accidental close when drag starts inside and ends outside.
+ * - Structure:
+ *   Header with optional close button, body for children, optional footer area.
+ */
 import { useRef } from 'react';
 import './Modal.css';
 

@@ -1,3 +1,26 @@
+/**
+ * Organization Model
+ * 
+ * Logics:
+ * - Identity & Codes:
+ *   name, code (unique uppercase), sortName (unique uppercase), type enum.
+ * - Registration & Contact:
+ *   registrationDetails, contactInfo, address.
+ * - Subscription & Limits:
+ *   subscription (planName, maxBranches, maxUsers, maxAssets, dates, isActive).
+ * - Asset Stats:
+ *   aggregate counters for organization-wide assets.
+ * - Branch & Admin Relations:
+ *   branches [Branch refs], admins [User refs].
+ * - Status & Metadata:
+ *   status enum, metadata (logoUrl, description, establishedYear, totalEmployees).
+ * - User ID Sequence:
+ *   userSequence: numeric counter for org-scoped user IDs.
+ *   settings: mixed bag including userIdSequenceStart and userIdPrefix for ID generation policy.
+ * - Hooks:
+ *   pre-validate ensures uppercase/trim for code and sortName.
+ */
+
 import mongoose from "mongoose";
 
 // Utility defaults from ENV with safe fallbacks

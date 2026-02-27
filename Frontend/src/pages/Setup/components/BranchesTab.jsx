@@ -29,7 +29,6 @@ const BranchesTab = ({ setToast }) => {
     contactInfo: { email: "", phone: "" },
     address: { line1: "", line2: "", city: "", state: "", pincode: "", country: "India" },
     geoLocation: { latitude: "", longitude: "" },
-    settings: { allowAssetTransfer: true, allowUserTransfer: true },
   });
   const [branchFormError, setBranchFormError] = useState("");
   const [savingBranch, setSavingBranch] = useState(false);
@@ -64,7 +63,6 @@ const BranchesTab = ({ setToast }) => {
       contactInfo: { email: "", phone: "" },
       address: { line1: "", line2: "", city: "", state: "", pincode: "", country: "India" },
       geoLocation: { latitude: "", longitude: "" },
-      settings: { allowAssetTransfer: true, allowUserTransfer: true },
     });
     setBranchFormError("");
     setBranchModalOpen(true);
@@ -93,10 +91,6 @@ const BranchesTab = ({ setToast }) => {
         latitude: branch.geoLocation?.latitude ?? "",
         longitude: branch.geoLocation?.longitude ?? "",
       },
-      settings: {
-        allowAssetTransfer: branch.settings?.allowAssetTransfer !== false,
-        allowUserTransfer: branch.settings?.allowUserTransfer !== false,
-      },
     });
     setBranchFormError("");
     setBranchModalOpen(true);
@@ -122,19 +116,7 @@ const BranchesTab = ({ setToast }) => {
     });
   };
 
-  const handleBranchToggleChange = (name) => {
-    const parts = name.split(".");
-    setBranchForm((prev) => {
-      const next = structuredClone(prev);
-      let cur = next;
-      for (let i = 0; i < parts.length - 1; i += 1) {
-        cur[parts[i]] = cur[parts[i]] ?? {};
-        cur = cur[parts[i]];
-      }
-      cur[parts[parts.length - 1]] = !cur[parts[parts.length - 1]];
-      return next;
-    });
-  };
+  // Removed branch-level transfer toggles. Transfers are now controlled at Organization level.
 
   const saveBranch = async () => {
     if (!branchForm.branchName.trim()) {
@@ -392,24 +374,7 @@ const BranchesTab = ({ setToast }) => {
             />
           </div>
 
-          <div className="setup-toggle-row">
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={branchForm.settings.allowAssetTransfer}
-                onChange={() => handleBranchToggleChange("settings.allowAssetTransfer")}
-              />
-              <span className="toggle-label">Allow Asset Transfer</span>
-            </label>
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={branchForm.settings.allowUserTransfer}
-                onChange={() => handleBranchToggleChange("settings.allowUserTransfer")}
-              />
-              <span className="toggle-label">Allow User Transfer</span>
-            </label>
-          </div>
+          {/* Transfer rules moved to Organization settings */}
         </Modal>
       )}
     </div>

@@ -1,3 +1,31 @@
+/**
+ * userApi
+ * 
+ * Logics:
+ * - fetchAllUsers(limit, page):
+ *   GET /users with pagination; maps backend items to UI-friendly fields (status, branch string).
+ * - createNewUser(userData):
+ *   POST /users to create server-generated userId user.
+ * - fetchRolesForDropdown():
+ *   GET /users/dropdown/roles for form select.
+ * - fetchBranchesForDropdown(organizationId):
+ *   GET /users/dropdown/branches scoped to organization.
+ * - fetchUsersForDropdown(organizationId):
+ *   GET /users/dropdown/users scoped to organization.
+ * - disableUser(userId) / enableUser(userId):
+ *   Toggles isActive flag via POST /users/:id/toggle-is-active.
+ * - toggleCanLogin(userId, enable):
+ *   Toggles login via POST /users/:id/toggle-can-login.
+ * - fetchUserById(userId):
+ *   GET /users/:id for details.
+ * - updateUser(userId, userData):
+ *   PUT /users/:id to update general fields.
+ * - changeUserPassword(userId, newPassword):
+ *   POST /users/:id/change-password.
+ * - fetchNextUserId(organizationId):
+ *   GET /users/next-id to preview next userId (non-mutating).
+ */
+
 import API from './api'
 
 export const fetchAllUsers = async (limit = 100, page = 1) => {

@@ -1,3 +1,33 @@
+/**
+ * Users Controller
+ * 
+ * Logics:
+ * - isInReportingChain(targetUserId, managerUserId):
+ *   Checks upward reporting chain to see if target reports (directly/indirectly) to manager.
+ * - createUser(req, res):
+ *   Validates input, atomically increments organization's userSequence (with configurable start/prefix),
+ *   generates immutable seqId and userId, assigns branches/role, creates user.
+ * - getUserById(req, res):
+ *   Fetches a user by id with role and branch population, and enforces access/visibility.
+ * - listUsers(req, res):
+ *   Server-side pagination, role/active filters, search, and strict branch-based visibility:
+ *   non‑super users only see users whose branchId overlaps with their branches; if no branches, only self.
+ * - updateUser(req, res):
+ *   Updates general fields (not canLogin/isActive), enforcing access.
+ * - toggleCanLogin(req, res):
+ *   Enables/disables login; when enabling, creates credentials with username = user.userId.
+ * - toggleIsActive(req, res):
+ *   Activates/deactivates user; deactivation also disables login.
+ * - changeUserRole(req, res):
+ *   Changes role by id or role name.
+ * - softDeleteUser / restoreUser / deleteUserPermanent:
+ *   Account lifecycle operations with minimal side effects.
+ * - getRolesForDropdown / getBranchesForDropdown / getUsersForDropdown:
+ *   Provides dropdown datasets for UI forms with necessary scoping.
+ * - getNextUserId(req, res):
+ *   Returns a non-mutating preview of the next userId for the given organization.
+ */
+
 import { User } from "../models/user.model.js";
 import { Role } from "../models/role.model.js";
 import { Branch } from "../models/branch.model.js"; 

@@ -1,3 +1,15 @@
+/**
+ * AddUser Page
+ * 
+ * Logics:
+ * - Loads organizationId from /auth/profile (logged-in user context).
+ * - Fetches next userId via GET /users/next-id and displays in a readonly field.
+ * - Loads branches for the organization for multi-select assignment.
+ * - Validates core fields (userId preview, name, gender, at least one branch, optional email/phone).
+ * - Submits to POST /users; backend generates immutable userId/seqId.
+ * - Shows success message and navigates back to users list.
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../../components/Input/Input.jsx';

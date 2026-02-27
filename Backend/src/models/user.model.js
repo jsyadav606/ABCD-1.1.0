@@ -1,3 +1,27 @@
+/**
+ * User Model
+ * 
+ * Logics:
+ * - Immutable Identifiers:
+ *   - userId: String, immutable; unique per organization.
+ *   - seqId: Number, immutable; unique per organization; generated from Organization.userSequence.
+ * - Core Profile:
+ *   name, gender, dob, designation, department, contact fields (email, personalEmail, phone_no).
+ * - Role & Permissions:
+ *   roleId (ref Role), permissions array (string keys).
+ * - Organization & Branching:
+ *   organizationId (ref Organization, required),
+ *   branchId (legacy array of Branch refs),
+ *   primaryBranchId (single Branch),
+ *   assignedBranches (array of Branch refs).
+ * - Status Flags:
+ *   canLogin, isActive, isBlocked, remarks, createdBy.
+ * - Indexes:
+ *   - unique (organizationId, userId)
+ *   - unique (organizationId, seqId)
+ *   - roleId, organizationId, email, isActive, isBlocked, createdAt for performance
+ */
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(

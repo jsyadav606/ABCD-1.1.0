@@ -1,3 +1,23 @@
+/**
+ * API Service (Axios Wrapper)
+ * 
+ * Logics:
+ * - Base Instance:
+ *   Creates axios instance with baseURL from VITE_API_URL and JSON headers; withCredentials for cookies.
+ * - Request Interceptor:
+ *   Adds Authorization header from accessToken in localStorage.
+ * - Response Interceptor:
+ *   On 401 (non-auth endpoints), attempts token refresh using /auth/refresh and deviceId from sessionStorage.
+ *   Queues concurrent 401s while refresh is in progress; redirects to /login on failure.
+ *   Handles 429 (account lock) and 403 (forbidden) gracefully without auto-logout.
+ * - Utility:
+ *   clearAuthHeaders() to purge default Authorization.
+ * - Exported API Groups:
+ *   authAPI (login, logout, profile, changePassword, etc.),
+ *   userAPI (CRUD),
+ *   organizationAPI, branchAPI, roleAPI.
+ */
+
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL

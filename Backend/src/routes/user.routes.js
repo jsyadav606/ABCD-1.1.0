@@ -1,3 +1,23 @@
+/**
+ * User Routes
+ * 
+ * Logics:
+ * - All routes require verifyJWT (authenticated).
+ * - Dropdowns:
+ *   /dropdown/roles, /dropdown/branches, /dropdown/users for form population.
+ * - Creation:
+ *   POST / → createUser (server generates userId/seqId).
+ * - Preview Next ID:
+ *   GET /next-id → next userId without mutating sequence (for UI preview).
+ * - Listing & Details:
+ *   GET / → listUsers (with branch scoping); GET /:id → user by id.
+ * - Updates:
+ *   PUT /:id → general updates; toggle isActive, canLogin, role change;
+ *   change-password bound to a user id.
+ * - Deletion:
+ *   soft-delete, restore, permanent delete endpoints.
+ */
+
 import express from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { verifyPermission } from "../middlewares/permission.middleware.js";

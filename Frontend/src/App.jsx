@@ -1,3 +1,14 @@
+/**
+ * App Router
+ * 
+ * Logics:
+ * - Routing:
+ *   Public routes for login/register/404; protected routes wrap pages in ProtectedRoute and MainLayout.
+ * - Auth Context:
+ *   AuthProvider wraps entire route tree to provide user/session state.
+ * - Navigation:
+ *   Root redirects to /dashboard.
+ */
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import MainLayout from "./layouts/MainLayout";
