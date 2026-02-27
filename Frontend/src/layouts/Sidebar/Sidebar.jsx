@@ -130,11 +130,11 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
     setChangePwdModal(prev => ({ ...prev, isSubmitting: true, error: "" }));
 
     try {
-      await authAPI.changePassword({
-        oldPassword: changePwdModal.oldPassword,
-        newPassword: changePwdModal.newPassword,
-        confirmPassword: changePwdModal.confirmPassword
-      });
+      await authAPI.changePassword(
+        changePwdModal.oldPassword,
+        changePwdModal.newPassword,
+        changePwdModal.confirmPassword
+      );
       
       alert("Password changed successfully. Please login again.");
       logout();

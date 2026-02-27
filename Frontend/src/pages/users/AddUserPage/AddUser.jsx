@@ -10,14 +10,16 @@ import { SetPageTitle } from '../../../components/SetPageTitle/SetPageTitle.jsx'
 import {
   createNewUser,
   fetchBranchesForDropdown,
+  fetchNextUserId,
 } from '../../../services/userApi.js';
+import { authAPI } from '../../../services/api.js';
 import './AddUser.css';
 
 const AddUser = () => {
   const navigate = useNavigate();
 
-  // Organization ID (Fixed for all users as per requirement)
-  const ORGANIZATION_ID = '6991f27977da956717ec33f5';
+  // Organization ID (loaded from /auth/profile)
+  const [organizationId, setOrganizationId] = useState('');
 
   // Form State
   const [formData, setFormData] = useState({
@@ -35,7 +37,7 @@ const AddUser = () => {
     dateOfJoining: '',
     branchId: [],
     remarks: '',
-    organizationId: ORGANIZATION_ID,
+    organizationId: '',
   });
 
   // Dropdown Data
@@ -61,15 +63,26 @@ const AddUser = () => {
     return () => clearTimeout(t);
   }, [successMessage]);
 
-  // Fetch branches on component mount
+  // Fetch orgId, then next userId + branches on component mount
   useEffect(() => {
     const loadDropdownData = async () => {
       try {
         setLoading(true);
         setErrorMessage('');
 
+        // Load organizationId from profile
+        const prof = await authAPI.getProfile();
+        const orgIdFromProfile = prof.data?.data?.user?.organizationId || '';
+        setOrganizationId(orgIdFromProfile);
+        // Update form org
+        setFormData((prev) => ({ ...prev, organizationId: orgIdFromProfile }));
+
+        // Fetch next userId (readonly preview)
+        const nextId = await fetchNextUserId(orgIdFromProfile);
+        setFormData((prev) => ({ ...prev, userId: nextId || '' }));
+
         // Fetch branches
-        const branchesData = await fetchBranchesForDropdown(ORGANIZATION_ID);
+        const branchesData = await fetchBranchesForDropdown(orgIdFromProfile);
         setBranches(branchesData);
       } catch (error) {
         console.error('❌ Failed to load dropdown data:', error);
@@ -246,9 +259,10 @@ const AddUser = () => {
                 label="User ID"
                 type="text"
                 value={formData.userId}
-                onChange={handleInputChange}
+                readOnly
+                disabled
                 error={errors.userId}
-                placeholder="Enter unique user ID"
+                placeholder="Auto-generated"
                 required
               />
               <Input

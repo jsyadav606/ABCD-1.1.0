@@ -25,19 +25,26 @@ const isInReportingChain = async (targetUserId, managerUserId, maxDepth = 20) =>
   return false;
 };
 
-// =====================================================
-// HELPER FUNCTION: Create UserLogin with username generation
-// =====================================================
 const createUserLoginCredentials = async (userId, userName, providedLoginId = null) => {
   try {
     const defaultPlain = process.env.DEFAULT_PASSWORD || "12345678";
     let baseUsername = null;
 
-    // Determine username: use provided loginId or generate from name
     if (providedLoginId) {
       baseUsername = String(providedLoginId).toLowerCase().trim();
+      const existing = await UserLogin.findOne({ username: baseUsername });
+      if (existing) {
+        throw new apiError(409, "Login ID already exists");
+      }
+      const login = new UserLogin({
+        user: userId,
+        username: baseUsername,
+        password: defaultPlain,
+        forcePasswordChange: true,
+      });
+      await login.save();
+      return { success: true, username: baseUsername, login };
     } else if (userName) {
-      // generate from name: first.last (lowercase)
       const parts = userName.trim().toLowerCase().split(/\s+/);
       if (parts.length === 1) baseUsername = parts[0];
       else baseUsername = `${parts[0]}.${parts[parts.length - 1]}`;
@@ -112,23 +119,65 @@ const hasUserAccess = async (reqUser, targetUser) => {
 export const createUser = asyncHandler(async (req, res) => {
   const payload = req.body;
 
-  console.log('📥 createUser called with payload:', payload);
-  console.log('✓ userId:', payload.userId);
-  console.log('✓ name:', payload.name);
-  console.log('✓ organizationId:', payload.organizationId);
+  if (process.env.NODE_ENV === 'development') {
+    console.log('📥 createUser called with payload:', payload);
+    console.log('✓ name:', payload.name);
+    console.log('✓ organizationId:', payload.organizationId);
+  }
 
-  if (!payload.userId || !payload.name || !payload.organizationId) {
+  const orgId = payload.organizationId || req.user?.organizationId || null;
+
+  if (!payload.name || !orgId) {
     console.error('❌ Missing required fields');
-    throw new apiError(400, "userId, name and organizationId are required");
+    throw new apiError(400, "name and organizationId are required");
   }
 
   if (!payload.gender || !["Male", "Female", "Other"].includes(payload.gender)) {
     throw new apiError(400, "gender is required and must be one of: Male, Female, Other");
   }
 
+  // Atomically bump userSequence respecting configurable start (settings.userIdSequenceStart, default 21000)
+  // Use MongoDB pipeline update in a single findOneAndUpdate call for thread-safety.
+  const org = await Organization.findOneAndUpdate(
+    { _id: orgId },
+    [
+      { $set: { settings: { $ifNull: ["$settings", {}] } } },
+      {
+        $set: {
+          userSequence: {
+            $cond: [
+              { $lt: ["$userSequence", { $ifNull: ["$settings.userIdSequenceStart", 21000] }] },
+              { $add: [{ $ifNull: ["$settings.userIdSequenceStart", 21000] }, 1] },
+              { $add: ["$userSequence", 1] }
+            ]
+          }
+        }
+      }
+    ],
+    { new: true, projection: { userSequence: 1, settings: 1 }, updatePipeline: true }
+  );
+
+  if (!org) {
+    throw new apiError(404, "Organization not found");
+  }
+
+  const seqId = org.userSequence;
+  const prefix = (org.settings && typeof org.settings.userIdPrefix === "string" && org.settings.userIdPrefix.trim())
+    ? org.settings.userIdPrefix.trim()
+    : "U";
+  const generatedUserId = `${prefix}${String(seqId)}`;
+
+  const assignedBranches = Array.isArray(payload.assignedBranches)
+    ? payload.assignedBranches
+    : Array.isArray(payload.branchId)
+    ? payload.branchId
+    : [];
+  const primaryBranchId = payload.primaryBranchId || (assignedBranches.length > 0 ? assignedBranches[0] : null);
+
   // Prevent client from forcing fields we manage server-side
   const toCreate = {
-    userId: payload.userId,
+    userId: generatedUserId,
+    seqId,
     name: payload.name,
     designation: payload.designation || "NA",
     department: payload.department || "NA",
@@ -138,13 +187,14 @@ export const createUser = asyncHandler(async (req, res) => {
     email: payload.email || null,
     personalEmail: payload.personalEmail || null,
     phone_no: payload.phone_no || null,
-    // Default role assignment: always "User" (will be resolved below)
     roleId: null,
     permissions: [],
     reportingTo: payload.reportingTo || null,
-    organizationId: payload.organizationId,
-    branchId: payload.branchId || [],
-    canLogin: false, // Default: cannot login until enabled
+    organizationId: orgId,
+    branchId: assignedBranches,
+    primaryBranchId,
+    assignedBranches,
+    canLogin: false,
     isActive: payload.isActive !== false,
     isBlocked: payload.isBlocked === true,
     remarks: payload.remarks != null && payload.remarks !== '' ? String(payload.remarks).trim() : '',
@@ -167,6 +217,7 @@ export const createUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create(toCreate);
+  console.log(`🆔 User created with userId=${user.userId}, seqId=${user.seqId}, org=${orgId}`);
 
   // canLogin is always false on creation now, so no need to create credentials here.
   // Admin must enable login explicitly later.
@@ -196,8 +247,10 @@ export const listUsers = asyncHandler(async (req, res) => {
   const limit = Math.max(parseInt(req.query.limit || 25, 10), 1);
   const skip = (page - 1) * limit;
 
-  console.log("🔍 listUsers: Request User Role:", req.user?.role);
-  console.log("🔍 listUsers: Request User Org:", req.user?.organizationId);
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 listUsers: Request User Role:", req.user?.role);
+    console.log("🔍 listUsers: Request User Org:", req.user?.organizationId);
+  }
 
   const filter = {};
   // Support filtering by role name or roleId
@@ -215,108 +268,33 @@ export const listUsers = asyncHandler(async (req, res) => {
   if (req.query.canLogin !== undefined) filter.canLogin = req.query.canLogin === "true";
   if (req.query.organizationId) filter.organizationId = req.query.organizationId;
 
-  // Branch scope: non-super users only see users from their assigned branches and hierarchy
+  // Branch scope: non-super users should ONLY see users whose branches are a subset of the viewer's branches
   const roleName = String(req.user?.role || "").toLowerCase();
   const isSuper = roleName === "super_admin" || roleName === "super admin";
   const isEnterprise = roleName === "enterprise_admin" || roleName === "enterprise admin";
   
   if (!isSuper) {
-    // 1. Enterprise Admin: All users in their Organization
+    // Restrict organization for non-super roles
     if (isEnterprise && req.user?.organizationId) {
       filter.organizationId = req.user.organizationId;
-      console.log("🔍 listUsers: Enterprise Admin Org Filter:", filter.organizationId);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔍 listUsers: Enterprise Admin Org Filter:", filter.organizationId);
+      }
     } else {
-      // 2. Branch/Standard User: Branch Scope OR Hierarchy Scope
-      // Do not force organization filter here to avoid hiding branch/hierarchy users
-
-      // Extract branch IDs safely (handling populated or unpopulated)
-      const userBranchIds = Array.isArray(req.user?.branchId)
+      // Branch/Standard users: strictly subset branch visibility
+      if (req.user?.organizationId) {
+        filter.organizationId = req.user.organizationId;
+      }
+      const viewerBranches = Array.isArray(req.user?.branchId)
         ? req.user.branchId.map((b) => (b && b._id ? b._id : b))
         : [];
-      
-      console.log(`🔍 listUsers: User ${req.user.name} (${req.user._id}) has branches:`, userBranchIds);
 
-      // Visibility Conditions:
-      // 1. Always see self
-      // 2. See direct reports
-      // 3. See branch users (if any branch assigned)
-      // 4. See recursive reports
-      const visibilityConditions = [
-        { _id: req.user._id }, // Always see self
-        { reportingTo: req.user._id } // See direct reports
-      ];
-
-      // See branch users
-      // FIX: Ensure that we match users who have AT LEAST ONE branch in common with the logged-in user
-      // AND (crucially) are part of the reporting hierarchy OR are peers if the business logic allows peers to see each other.
-      // However, the user specifically asked for "reporting users of same branch".
-      // Let's interpret "reporting users" as subordinates.
-      // But usually "users of same branch" means everyone in the branch.
-      // The user said: "loged in user unale to fatch his reporting user of same branch which is/are assigned to logedin user."
-      // This implies: User A is Manager. User B reports to A. User B is in Branch X. User A is in Branch X.
-      // User A should see User B.
-      
-      // The current logic adds `branchId: { $in: userBranchIds }` as an OR condition.
-      // This means "See anyone in my branch" OR "See anyone reporting to me".
-      // This is actually BROADER than "reporting user of same branch".
-      // If it's failing, maybe `userBranchIds` is empty or mismatching types?
-      
-      // Let's ensure strict type matching for Branch IDs
-      const safeBranchIds = userBranchIds.map(id => String(id));
-      
-      if (safeBranchIds.length > 0) {
-        // We use $in with both ObjectIds and Strings to be safe because Mongoose sometimes is finicky with mixed types in arrays
-        // But since we are using `lean()`, we might need to be careful.
-        // Let's rely on Mongoose's automatic casting for query by passing the original array if it contains ObjectIds,
-        // or constructing a query that checks both.
-        visibilityConditions.push({ branchId: { $in: userBranchIds } });
+      if (viewerBranches.length === 0) {
+        filter._id = req.user._id;
       } else {
-         console.log("⚠️ User has no branches assigned, visibility limited to hierarchy.");
-      }
-
-      // If we want recursive hierarchy in the filter without aggregate:
-      // For now, let's use the aggregate descendant IDs we already have logic for
-      try {
-        const graph = await User.aggregate([
-          { $match: { _id: req.user._id } }, // Ensure we match by ObjectId
-          {
-            $graphLookup: {
-              from: "users",
-              startWith: "$_id",
-              connectFromField: "_id",
-              connectToField: "reportingTo",
-              as: "descendants",
-              maxDepth: 10,
-              depthField: "level"
-            }
-          }
-        ]);
-        
-        const descendants = graph?.[0]?.descendants || [];
-        const descendantIds = descendants.map(d => d._id);
-        
-        console.log(`🔍 listUsers: Found ${descendantIds.length} descendants for user ${req.user.name}`);
-        
-        if (descendantIds.length > 0) {
-           // We add descendant IDs to the visibility list. 
-           // Note: The previous logic was adding it as a separate OR condition.
-           // That is fine.
-           visibilityConditions.push({ _id: { $in: descendantIds } });
-        }
-      } catch (err) {
-        console.error("❌ Hierarchy Aggregate Error:", err.message);
-      }
-
-      // Combine into main OR filter
-      if (filter.$or) {
-        // If existing OR (e.g. from search), wrap it
-        filter.$and = [
-          { $or: filter.$or },
-          { $or: visibilityConditions }
-        ];
-        delete filter.$or;
-      } else {
-        filter.$or = visibilityConditions;
+        const branchOverlap = { branchId: { $in: viewerBranches } };
+        if (filter.$and) filter.$and.push(branchOverlap);
+        else filter.$and = [branchOverlap];
       }
     }
   }
@@ -437,7 +415,8 @@ export const toggleCanLogin = asyncHandler(async (req, res) => {
     if (!existingLogin) {
       // Use helper to create UserLogin with username generation logic
       try {
-        const loginResult = await createUserLoginCredentials(user._id, user.name, loginId);
+        const enforcedLoginId = loginId || user.userId;
+        const loginResult = await createUserLoginCredentials(user._id, user.name, enforcedLoginId);
         console.log(`✅ Login credentials created for user ${user._id}: username = ${loginResult.username}`);
       } catch (loginError) {
         console.error(`❌ Failed to create login credentials:`, loginError.message);
@@ -586,13 +565,15 @@ export const getRolesForDropdown = asyncHandler(async (req, res) => {
       const UserModel = (await import("../models/user.model.js")).User;
       
       // Ensure organization exists
-      let org = await Organization.findOne({ code: "abcd" });
+      let org = await Organization.findOne({ code: "ABCD" });
       if (!org) {
         org = await Organization.create({
           name: "ABCD",
-          code: "abcd",
-          contactEmail: "abcd@local",
-          isActive: true,
+          code: "ABCD",
+          sortName: "ABCD",
+          contactInfo: { primaryEmail: "abcd@local" },
+          status: "ACTIVE",
+          createdBy: seedUser._id,
         });
         console.log("🏗️ Created default organization ABCD");
       }
@@ -701,6 +682,27 @@ export const getUsersForDropdown = asyncHandler(async (req, res) => {
   }));
 
   return res.status(200).json(new apiResponse(200, formattedUsers, "Users retrieved successfully"));
+});
+
+// Preview next userId without mutating sequence
+export const getNextUserId = asyncHandler(async (req, res) => {
+  const orgId = req.query.organizationId || req.user?.organizationId || null;
+  if (!orgId) {
+    throw new apiError(400, "organizationId is required");
+  }
+  const org = await Organization.findById(orgId).select("userSequence settings");
+  if (!org) {
+    throw new apiError(404, "Organization not found");
+  }
+  const start = (org.settings && Number.isFinite(Number(org.settings.userIdSequenceStart)))
+    ? Number(org.settings.userIdSequenceStart)
+    : 21000;
+  const prefix = (org.settings && typeof org.settings.userIdPrefix === "string" && org.settings.userIdPrefix.trim())
+    ? org.settings.userIdPrefix.trim()
+    : "U";
+  const nextNumeric = Math.max(org.userSequence || 0, start) + 1;
+  const nextId = `${prefix}${nextNumeric}`;
+  return res.status(200).json(new apiResponse(200, { nextId, nextNumeric, prefix, start }, "Next userId preview"));
 });
 
 // Change user password

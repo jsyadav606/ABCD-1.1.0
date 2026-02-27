@@ -16,6 +16,7 @@ import {
   getBranchesForDropdown,
   getUsersForDropdown,
   changeUserPassword,
+  getNextUserId,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -34,6 +35,9 @@ router.get("/dropdown/users", verifyPermission("users:users_list:view"), getUser
 
 // Create a new user
 router.post("/", verifyPermission("users:users_list:add"), createUser);
+
+// Preview next userId (readonly, non-mutating)
+router.get("/next-id", verifyPermission("users:users_list:add"), getNextUserId);
 
 // List all users with filters and pagination
 router.get("/", verifyPermission("users:users_list:view"), listUsers);

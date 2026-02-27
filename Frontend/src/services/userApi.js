@@ -13,7 +13,7 @@ export const fetchAllUsers = async (limit = 100, page = 1) => {
       remarks: user.remarks || '--',
       // Transform branchId array to branch string
       branch: user.branchId && user.branchId.length > 0 
-        ? user.branchId.map(b => b.name || b).join(', ')
+        ? user.branchId.map(b => b.branchName || b).join(', ')
         : '--'
     }))
   } catch (error) {
@@ -30,6 +30,20 @@ export const createNewUser = async (userData) => {
     console.error('Failed to create user:', error)
     const msg = error.response?.data?.message ?? error.message
     throw new Error(typeof msg === 'string' ? msg : 'Failed to create user')
+  }
+}
+
+export const fetchNextUserId = async (organizationId) => {
+  try {
+    const url = organizationId
+      ? `/users/next-id?organizationId=${organizationId}`
+      : '/users/next-id'
+    const response = await API.get(url)
+    const data = response.data?.data || response.data
+    return data?.nextId || null
+  } catch (error) {
+    console.error('Failed to fetch next userId:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch next userId')
   }
 }
 

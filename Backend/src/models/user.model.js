@@ -6,6 +6,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      immutable: true,
+    },
+    seqId: {
+      type: Number,
+      default: null,
+      immutable: true,
+      index: true,
     },
 
     name: {
@@ -99,6 +106,18 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+    primaryBranchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Branch",
+      default: null,
+    },
+    assignedBranches: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Branch",
+      },
+    ],
+
     isActive: {
       type: Boolean,
       default: true,
@@ -124,7 +143,8 @@ const userSchema = new mongoose.Schema(
 );
 
 // Indexes for better query performance
-userSchema.index({ userId: 1, organizationId: 1 }, { unique: true });
+userSchema.index({ organizationId: 1, userId: 1 }, { unique: true });
+userSchema.index({ organizationId: 1, seqId: 1 }, { unique: true });
 userSchema.index({ email: 1 });
 userSchema.index({ organizationId: 1 });
 // Use roleId index (role string removed in new schema)

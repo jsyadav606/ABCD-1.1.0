@@ -159,8 +159,13 @@ const OrganizationTab = ({ setToast }) => {
       code: "",
       contactEmail: "",
       contactPhone: "",
-      address: "",
-      isActive: true,
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "",
+      status: "ACTIVE",
     });
     setOrganizationFormError("");
     setOrganizationModalOpen(true);
@@ -172,10 +177,15 @@ const OrganizationTab = ({ setToast }) => {
     setOrganizationForm({
       name: selectedOrganization.name || "",
       code: selectedOrganization.code || "",
-      contactEmail: selectedOrganization.contactEmail || "",
-      contactPhone: selectedOrganization.contactPhone || "",
-      address: selectedOrganization.address || "",
-      isActive: selectedOrganization.isActive !== false,
+      contactEmail: selectedOrganization.contactInfo?.primaryEmail || "",
+      contactPhone: selectedOrganization.contactInfo?.primaryPhone || "",
+      addressLine1: selectedOrganization.address?.line1 || "",
+      addressLine2: selectedOrganization.address?.line2 || "",
+      city: selectedOrganization.address?.city || "",
+      state: selectedOrganization.address?.state || "",
+      pincode: selectedOrganization.address?.pincode || "",
+      country: selectedOrganization.address?.country || "",
+      status: selectedOrganization.status || "ACTIVE",
     });
     setOrganizationFormError("");
     setOrganizationModalOpen(true);
@@ -220,11 +230,20 @@ const OrganizationTab = ({ setToast }) => {
 
       const payload = {
         name: organizationForm.name.trim(),
-        code: organizationForm.code.trim().toLowerCase(),
-        contactEmail: organizationForm.contactEmail.trim(),
-        contactPhone: organizationForm.contactPhone.trim(),
-        address: organizationForm.address.trim(),
-        isActive: organizationForm.isActive,
+        code: organizationForm.code.trim().toUpperCase(),
+        contactInfo: {
+          primaryEmail: organizationForm.contactEmail.trim(),
+          primaryPhone: organizationForm.contactPhone.trim(),
+        },
+        address: {
+          line1: organizationForm.addressLine1.trim(),
+          line2: organizationForm.addressLine2.trim(),
+          city: organizationForm.city.trim(),
+          state: organizationForm.state.trim(),
+          pincode: organizationForm.pincode.trim(),
+          country: organizationForm.country.trim(),
+        },
+        status: organizationForm.status || "ACTIVE",
       };
 
       if (editingOrganization) {
@@ -412,6 +431,7 @@ const OrganizationTab = ({ setToast }) => {
                   label="Organization"
                   value={selectedOrgId}
                   onChange={(e) => setSelectedOrgId(e.target.value)}
+                  onBlur={() => {}}
                   options={orgSelectOptions}
                 />
               </div>
@@ -447,15 +467,28 @@ const OrganizationTab = ({ setToast }) => {
               <div className="org-details-grid">
                 <div className="org-detail-item">
                   <div className="org-detail-label">Contact Email</div>
-                  <div className="org-detail-value">{selectedOrganization.contactEmail || "-"}</div>
+                  <div className="org-detail-value">{selectedOrganization.contactInfo?.primaryEmail || "-"}</div>
                 </div>
                 <div className="org-detail-item">
                   <div className="org-detail-label">Contact Phone</div>
-                  <div className="org-detail-value">{selectedOrganization.contactPhone || "-"}</div>
+                  <div className="org-detail-value">{selectedOrganization.contactInfo?.primaryPhone || "-"}</div>
                 </div>
                 <div className="org-detail-item org-detail-item-full">
                   <div className="org-detail-label">Address</div>
-                  <div className="org-detail-value">{selectedOrganization.address || "-"}</div>
+                  <div className="org-detail-value">
+                    {selectedOrganization.address
+                      ? [
+                          selectedOrganization.address.line1,
+                          selectedOrganization.address.line2,
+                          selectedOrganization.address.city,
+                          selectedOrganization.address.state,
+                          selectedOrganization.address.pincode,
+                          selectedOrganization.address.country,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")
+                      : "-"}
+                  </div>
                 </div>
               </div>
             </div>
