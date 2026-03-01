@@ -32,7 +32,7 @@ const Select = ({
         className={`select-field ${error ? 'select-error' : ''} ${className}`}
         {...props}
       >
-        <option value="">{placeholder}</option>
+        {placeholder && <option value="">{placeholder}</option>}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

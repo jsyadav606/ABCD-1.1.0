@@ -52,21 +52,13 @@ const fixPermissions = async () => {
     "setup:branches:view",
     "setup:branches:manage",
 
-    // Assets (Assuming full access for enterprise admin)
+    // Assets (limit to Inventory only)
     "assets:access",
     "assets:inventory:add",
     "assets:inventory:edit",
     "assets:inventory:delete",
     "assets:inventory:view",
     "assets:inventory:export",
-    "assets:accessories:add",
-    "assets:accessories:edit",
-    "assets:accessories:delete",
-    "assets:accessories:view",
-    "assets:peripherals:add",
-    "assets:peripherals:edit",
-    "assets:peripherals:delete",
-    "assets:peripherals:view",
 
     // Reports
     "reports:access",
@@ -103,12 +95,11 @@ const fixPermissions = async () => {
         "assets:inventory:add",
         "assets:inventory:edit",
         "assets:inventory:view",
-        "assets:accessories:add",
-        "assets:accessories:edit",
-        "assets:accessories:view",
-        "assets:peripherals:add",
-        "assets:peripherals:edit",
-        "assets:peripherals:view",
+        // Assets subset for admin
+        "assets:access",
+        "assets:inventory:add",
+        "assets:inventory:edit",
+        "assets:inventory:view",
     ];
 
     const admin = await Role.findOne({ name: "admin" });

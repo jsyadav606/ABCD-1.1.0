@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { isSuperAdmin, canAccessModule, canAccessPage } from "../../utils/permissionHelper";
+import { isSuperAdmin, canAccessModule } from "../../utils/permissionHelper";
 import { authAPI } from "../../services/api";
 import { Modal, Input, Button } from "../../components";
 import "./Sidebar.css";
@@ -27,8 +27,7 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
   const [userOpen, setUserOpen] = useState(false);
   const userRef = useRef(null);
 
-  // Dropdown states
-  const [assetsDropdownOpen, setAssetsDropdownOpen] = useState(false);
+  
 
   // Change Password Modal State
   const [changePwdModal, setChangePwdModal] = useState({
@@ -70,7 +69,6 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
   // Handle menu item click
   const handleMenuItemClick = () => {
     setUserOpen(false);
-    setAssetsDropdownOpen(false);
     // Close sidebar on mobile when menu item is clicked
     if (onCloseSidebar) {
       onCloseSidebar();
@@ -87,30 +85,8 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
   const toggleUserPanel = (e) => {
     e.stopPropagation();
     setUserOpen(!userOpen);
-    setAssetsDropdownOpen(false); // Close other dropdowns
   };
-
-  // Handle Assets Dropdown Hover
-  const handleAssetsMouseEnter = () => {
-    if (window.innerWidth > 992) {
-      setAssetsDropdownOpen(true);
-      setUserOpen(false);
-    }
-  };
-
-  const handleAssetsMouseLeave = () => {
-    if (window.innerWidth > 992) {
-      setAssetsDropdownOpen(false);
-    }
-  };
-
-  // Handle Assets Click (Mobile/Tablet)
-  const handleAssetsClick = (e) => {
-    if (window.innerWidth <= 992) {
-      e.preventDefault();
-      setAssetsDropdownOpen(!assetsDropdownOpen);
-    }
-  };
+  
 
   const handleCloseChangePwdModal = () => {
     setChangePwdModal({
@@ -183,46 +159,13 @@ const Sidebar = ({ isOpen, onCloseSidebar }) => {
             </li>
           )}
 
-          {/* Asset Management Module */}
+          {/* Asset Management Module - Single Clickable Item */}
           {(isSuperAdmin() || canAccessModule("assets")) && (
-            <li
-              className={`dropdown ${assetsDropdownOpen ? "open" : ""}`}
-              onMouseEnter={handleAssetsMouseEnter}
-              onMouseLeave={handleAssetsMouseLeave}
-            >
-              <a href="#" onClick={handleAssetsClick} className="dropdown-toggle">
+            <li>
+              <Link to="/assets" onClick={handleMenuItemClick}>
                 <span className="material-icons">inventory_2</span>
                 <span className="menu-text">Asset Management</span>
-                <span className="material-icons dropdown-arrow">chevron_left</span>
-              </a>
-              {assetsDropdownOpen && (
-                <ul className="dropdown-menu">
-                  {(isSuperAdmin() || canAccessPage("assets", "inventory")) && (
-                    <li>
-                      <Link to="/assets" onClick={handleMenuItemClick}>
-                        <span className="material-icons">list_alt</span>
-                        Inventory
-                      </Link>
-                    </li>
-                  )}
-                  {(isSuperAdmin() || canAccessPage("assets", "accessories")) && (
-                    <li>
-                      <Link to="/assets/accessories" onClick={handleMenuItemClick}>
-                        <span className="material-icons">headphones</span>
-                        Accessories
-                      </Link>
-                    </li>
-                  )}
-                  {(isSuperAdmin() || canAccessPage("assets", "peripherals")) && (
-                    <li>
-                      <Link to="/assets/peripherals" onClick={handleMenuItemClick}>
-                        <span className="material-icons">mouse</span>
-                        Peripherals
-                      </Link>
-                    </li>
-                  )}
-                </ul>
-              )}
+              </Link>
             </li>
           )}
 

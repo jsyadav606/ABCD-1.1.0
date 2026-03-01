@@ -29,46 +29,6 @@ export const PERMISSION_MODULES = [
     ],
   },
   {
-    key: "assets",
-    label: "Asset Management",
-    accessKey: "assets:access",
-    pages: [
-      {
-        key: "inventory",
-        label: "Inventory",
-        actions: [
-          { key: "add", label: "Add Item" },
-          { key: "edit", label: "Edit Item" },
-          { key: "delete", label: "Delete Item" },
-          { key: "view", label: "View Inventory" },
-          { key: "export", label: "Export Data" },
-        ],
-      },
-      {
-        key: "accessories",
-        label: "Accessories",
-        actions: [
-          { key: "add", label: "Add Accessory" },
-          { key: "edit", label: "Edit Accessory" },
-          { key: "delete", label: "Delete Accessory" },
-          { key: "view", label: "View Accessories" },
-        ],
-      },
-      {
-        key: "peripherals",
-        label: "Peripherals",
-        actions: [
-          { key: "add", label: "Add Peripheral" },
-          { key: "edit", label: "Edit Peripheral" },
-          { key: "delete", label: "Delete Peripheral" },
-          { key: "view", label: "View Peripherals" },
-        ],
-      },
-    ],
-  },
-  
-
-  {
     key: "upgrades",
     label: "Upgrade Module",
     accessKey: "upgrades:access",

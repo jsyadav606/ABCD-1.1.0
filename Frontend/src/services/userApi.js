@@ -111,6 +111,17 @@ export const fetchUsersForDropdown = async (organizationId) => {
   }
 }
 
+export const fetchUsersCount = async () => {
+  try {
+    const response = await API.get(`/users?limit=1&page=1`)
+    const meta = response.data?.data?.meta || response.data?.meta || {}
+    return Number(meta.total || 0)
+  } catch (error) {
+    console.error('Failed to fetch users count:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch users count')
+  }
+}
+
 export const disableUser = async (userId) => {
   try {
     const response = await API.post(`/users/${userId}/toggle-is-active`, {

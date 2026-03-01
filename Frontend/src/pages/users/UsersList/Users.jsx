@@ -22,6 +22,7 @@ import {
 } from "../../../services/userApi.js";
 import Select from "../../../components/Select/Select.jsx";
 import { SetPageTitle } from "../../../components/SetPageTitle/SetPageTitle.jsx";
+import { getSelectedBranch, onBranchChange } from "../../../utils/scope";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -73,6 +74,8 @@ const Users = () => {
   });
 
   const pageSize = Number(import.meta.env.VITE_PAGE_SIZE || import.meta.env.page_size) || 20;
+  const [selectedBranch, setSelectedBranch] = useState(getSelectedBranch() || "");
+  const [visibleUsers, setVisibleUsers] = useState([]);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -91,6 +94,28 @@ const Users = () => {
     };
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    const off = onBranchChange((branchId) => {
+      setSelectedBranch(branchId || "");
+    });
+    return off;
+  }, []);
+
+  useEffect(() => {
+    if (!selectedBranch || selectedBranch === "__ALL__") {
+      setVisibleUsers(allUsers);
+      return;
+    }
+    const filtered = allUsers.filter((u) => {
+      const ids = Array.isArray(u.branchId) ? u.branchId : [];
+      return ids.some((b) => {
+        const id = typeof b === "object" && b?._id ? String(b._id) : String(b);
+        return id === selectedBranch;
+      });
+    });
+    setVisibleUsers(filtered);
+  }, [selectedBranch, allUsers]);
 
   // Removed realtime subscription
 
@@ -651,7 +676,7 @@ const Users = () => {
 // @ts-ignore
           Table
             columns={columns}
-            data={allUsers}
+            data={visibleUsers}
             pageSize={pageSize}
             showSearch={true}
             showPagination={true}
