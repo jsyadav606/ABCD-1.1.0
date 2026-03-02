@@ -7,6 +7,7 @@ import userRoutes from "./routes/user.routes.js";
 import roleRoutes from "./routes/role.routes.js";
 import branchRoutes from "./routes/branch.routes.js";
 import organizationRoutes from "./routes/organization.routes.js";
+import assetsRoutes from "./routes/assets.routes.js";
 import { apiError } from "./utils/apiError.js";
 
 // Load environment variables
@@ -55,6 +56,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/roles", roleRoutes);
 app.use("/api/v1/branches", branchRoutes);
 app.use("/api/v1/organizations", organizationRoutes);
+app.use("/api/v1/assets", assetsRoutes);
 
 /* ===============================
    Global Error Handler

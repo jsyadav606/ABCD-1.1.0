@@ -30,9 +30,6 @@ import './AddUser.css';
 const AddUser = () => {
   const navigate = useNavigate();
 
-  // Organization ID (loaded from /auth/profile)
-  const [organizationId, setOrganizationId] = useState('');
-
   // Form State
   const [formData, setFormData] = useState({
     userId: '',
@@ -85,7 +82,6 @@ const AddUser = () => {
         // Load organizationId from profile
         const prof = await authAPI.getProfile();
         const orgIdFromProfile = prof.data?.data?.user?.organizationId || '';
-        setOrganizationId(orgIdFromProfile);
         // Update form org
         setFormData((prev) => ({ ...prev, organizationId: orgIdFromProfile }));
 

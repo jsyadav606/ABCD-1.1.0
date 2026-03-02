@@ -2,6 +2,29 @@
 
 export const PERMISSION_MODULES = [
   {
+    key: "assets",
+    label: "Asset Management",
+    accessKey: "assets:access",
+    pages: [
+      {
+        key: "templates",
+        label: "Asset Templates",
+        actions: [
+          { key: "view", label: "View Templates" },
+          { key: "manage", label: "Manage Templates" },
+        ],
+      },
+      {
+        key: "items",
+        label: "Asset Items",
+        actions: [
+          { key: "view", label: "View Items" },
+          { key: "create", label: "Create Items" },
+        ],
+      },
+    ],
+  },
+  {
     key: "users",
     label: "User Management",
     // New: Main permission key for module visibility

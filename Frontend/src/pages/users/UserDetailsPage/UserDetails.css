@@ -23,7 +23,7 @@
   border-bottom: 1px solid #374151;
 }
 
-.avatar {
+.profile-box .avatar {
   width: 70px;
   height: 70px;
   border-radius: 50%;
@@ -344,7 +344,7 @@ td {
     gap: 1rem;
   }
 
-  .avatar {
+  .profile-box .avatar {
     width: 48px;
     height: 48px;
     font-size: 18px;
@@ -454,7 +454,7 @@ td {
     gap: 1rem;
   }
 
-  .avatar {
+  .profile-box .avatar {
     width: 48px;
     height: 48px;
     font-size: 18px;
@@ -517,7 +517,7 @@ td {
     gap: 1rem;
   }
 
-  .avatar {
+  .profile-box .avatar {
     width: 48px;
     height: 48px;
     font-size: 18px;
@@ -624,7 +624,7 @@ td {
     gap: 1rem;
   }
 
-  .avatar {
+  .profile-box .avatar {
     width: 48px;
     height: 48px;
     font-size: 18px;
@@ -780,7 +780,7 @@ td {
     gap: 1rem;
   }
 
-  .avatar {
+  .profile-box .avatar {
     width: 48px;
     height: 48px;
     font-size: 18px;
