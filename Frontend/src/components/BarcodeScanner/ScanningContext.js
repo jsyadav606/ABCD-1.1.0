@@ -1,5 +1,5 @@
 import { createContext } from "react";
 
 export const ScanningContext = createContext({
-  openScan: () => {},
+  openScan: (p0: (text: any) => any) => {},
 });
