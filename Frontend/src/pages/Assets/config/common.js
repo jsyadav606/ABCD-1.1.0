@@ -1,0 +1,31 @@
+const toOptions = (arr) => arr.map((v) => ({ value: v, label: v }));
+
+export const common = {
+  assetCategories: toOptions(["Desktop", "Laptop", "Server", "Network", "Peripheral", "Other"]),
+  deviceTypes: toOptions(["Desktop", "All-in-One", "Mini PC", "Workstation", "Thin Client"]),
+  activationStatus: toOptions(["Activated", "Not Activated", "Unknown"]),
+  booleanOptions: toOptions(["Yes", "No"]),
+  depreciationMethods: toOptions(["SLM", "WDV", "None"]),
+  lifecycleStatus: toOptions(["In Stock", "Assigned", "Under Repair", "Retired"]),
+  operationalStatus: toOptions(["Good", "Repair Needed", "Damaged", "Unknown"]),
+  conditionStatus: toOptions(["New", "Good", "Fair", "Poor", "Faulty"]),
+  monitorTypes: toOptions(["LED", "LCD", "OLED", "IPS", "TN", "VA"]),
+  usageTypes: toOptions(["Office", "Lab", "Classroom", "Conference", "Other"]),
+  printerTypes: toOptions(["Laser", "Inkjet", "Dot Matrix", "Thermal"]),
+  printerFunctions: toOptions(["Single Function", "MFP"]),
+  printTechnologies: toOptions(["Laser", "Inkjet", "Thermal"]),
+  connectionTypes: toOptions(["USB", "Ethernet", "WiFi", "Bluetooth"]),
+  storageTypes: toOptions(["HDD", "SSD", "NVMe"]),
+  panelTypes: toOptions(["LED", "LCD", "OLED"]),
+  displayTechnologies: toOptions(["LCD", "LED", "DLP"]),
+  touchTechnologies: toOptions(["IR", "Capacitive", "Resistive"]),
+  mountTypes: toOptions(["Wall", "Stand", "Ceiling", "Table"]),
+  vendors: toOptions(["Dell", "HP", "Lenovo", "Acer", "ASUS"]),
+  domains: toOptions(["corp.local", "hq.local"]),
+  nicTypes: toOptions(["Ethernet", "Wi-Fi"]),
+  networks: toOptions(["Office LAN", "Guest Wi-Fi"]),
+  types: toOptions(["Static", "DHCP"]),
+  status: toOptions(["In Stock", "Assigned", "Under Repair", "Retired"]),
+  branches: [],
+};
+

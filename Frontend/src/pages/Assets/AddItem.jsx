@@ -10,7 +10,7 @@ import { fetchBranchesForDropdown } from "../../services/userApi.js";
 import { authAPI } from "../../services/api.js";
 import { getSelectedBranch } from "../../utils/scope.js";
 //@ts-ignore
-import { ITEM_FIELD_CONFIG, CATEGORY_ITEMS } from "./config/itemFieldConfig.js";
+import { CATEGORY_ITEMS, getItemFieldConfig } from "./config/itemFieldConfig.js";
 
 const CATEGORIES = [
   { value: "fixed", label: "Fixed" },
@@ -18,11 +18,6 @@ const CATEGORIES = [
   { value: "consumable", label: "Consumable" },
   { value: "intangible", label: "Intangible" },
 ];
-
-
-
-const REGISTRY = ITEM_FIELD_CONFIG;
-
 const AddItemPage = () => {
   const navigate = useNavigate();
   const { type } = useParams();
@@ -47,10 +42,12 @@ const AddItemPage = () => {
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [itemConfig, setItemConfig] = useState(null);
+  const [loadingItemConfig, setLoadingItemConfig] = useState(false);
 
   // Branch Logic
   const [branchOptions, setBranchOptions] = useState([]);
-  const [loadingBranches, setLoadingBranches] = useState(true);
+  const [_loadingBranches, setLoadingBranches] = useState(true);
 
   useEffect(() => {
     const initBranch = async () => {
@@ -107,9 +104,30 @@ const AddItemPage = () => {
     initBranch();
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!itemType) {
+        setItemConfig(null);
+        return;
+      }
+      setLoadingItemConfig(true);
+      try {
+        const cfg = await getItemFieldConfig(itemType);
+        if (!cancelled) setItemConfig(cfg || null);
+      } finally {
+        if (!cancelled) setLoadingItemConfig(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [itemType]);
+
   const sections = useMemo(() => {
     if (!category || !itemType) return [];
-    const baseSections = REGISTRY[itemType]?.sections || [];
+    const baseSections = itemConfig?.sections || [];
     
     // Inject dynamic branch options into the "Location & Assignment" section -> "branch" field
     return baseSections.map(sec => {
@@ -131,7 +149,7 @@ const AddItemPage = () => {
       }
       return sec;
     });
-  }, [category, itemType, branchOptions]);
+  }, [category, itemType, branchOptions, itemConfig]);
 
   const updateField = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -194,6 +212,10 @@ const AddItemPage = () => {
   };
 
   const submit = async () => {
+    if (!category || !itemType || loadingItemConfig || !sections.length) {
+      alert("Please select category and item");
+      return;
+    }
     if (!validate()) {
       alert("Please fill required fields (Check console for details)");
       return;
@@ -375,7 +397,7 @@ const AddItemPage = () => {
           onSubmit={submit}
           onReset={() => setForm({})}
           onCancel={onCancel}
-          submitting={submitting}
+          submitting={submitting || loadingItemConfig}
         />
       </div>
     </div>

@@ -21,7 +21,7 @@ import { authAPI } from "../../services/api";
 import { Modal, Input, Button } from "../../components";
 import "./Sidebar.css";
 
-const Sidebar = ({ isOpen, onCloseSidebar }) => {
+const Sidebar = ({ onCloseSidebar }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [userOpen, setUserOpen] = useState(false);
