@@ -5,10 +5,28 @@ import Textarea from "../../../components/Textarea/Textarea.jsx";
 import Button from "../../../components/Button/Button.jsx";
 import { useScanning } from "../../../components/BarcodeScanner/useScanning.js";
 
+const normalizeOptions = (options) => {
+  if (!Array.isArray(options)) return [];
+  return options.map((opt) => {
+    if (opt && typeof opt === "object" && "value" in opt && "label" in opt) return opt;
+    return { value: String(opt), label: String(opt) };
+  });
+};
+
 const shouldShow = (field, formData) => {
   if (!field.showIf) return true;
-  const { field: dep, equals } = field.showIf;
-  return String(formData[dep] ?? "") === String(equals ?? "");
+  const cond = field.showIf;
+  // Support verbose form: { field: 'purchaseType', equals: 'PO' }
+  if (typeof cond === "object" && "field" in cond) {
+    return String(formData[cond.field] ?? "") === String(cond.equals ?? "");
+  }
+  // Support shorthand form: { purchaseType: 'PO', other: 'X' }
+  if (typeof cond === "object") {
+    return Object.entries(cond).every(
+      ([k, v]) => String(formData[k] ?? "") === String(v ?? "")
+    );
+  }
+  return true;
 };
 
 const Field = ({ def, value, onChange, onScan, error }) => {
@@ -24,7 +42,7 @@ const Field = ({ def, value, onChange, onScan, error }) => {
     "aria-label": def.label,
     maxLength: def.maxLength,
   };
-  if (def.type === "select") return <Select onBlur={undefined} {...common} options={def.options || []} />;
+  if (def.type === "select") return <Select onBlur={undefined} {...common} options={normalizeOptions(def.options)} />;
   if (def.type === "textarea") return <Textarea onBlur={undefined} {...common} rows={def.rows || 3} />;
   const enableScan = String(def.name) === "serialNumber" || !!def.scan;
   return (
@@ -50,7 +68,7 @@ const TableField = ({ def, value, onChange, error }) => {
     "aria-label": def.label,
     maxLength: def.maxLength,
   };
-  if (def.type === "select") return <Select label={undefined} onBlur={undefined} {...common} options={def.options || []} />;
+  if (def.type === "select") return <Select label={undefined} onBlur={undefined} {...common} options={normalizeOptions(def.options)} />;
   if (def.type === "textarea") return <Textarea label={undefined} onBlur={undefined} {...common} rows={def.rows || 3} />;
   return <Input label={undefined} onBlur={undefined} onScan={undefined} {...common} type={def.type || "text"} min={def.min} max={def.max} />;
 };

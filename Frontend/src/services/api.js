@@ -203,3 +203,14 @@ export const roleAPI = {
   update: (id, data) => API.put(`/roles/${id}`, data),
   delete: (id) => API.delete(`/roles/${id}`)
 }
+
+// Vendor API endpoints
+export const vendorAPI = {
+  getDropdown: () => API.get('/vendors/dropdown'),
+  getAll: (params = {}) => API.get('/vendors', { params }),
+  getById: (id) => API.get(`/vendors/${id}`),
+  create: (data) => API.post('/vendors', data),
+  update: (id, data) => API.put(`/vendors/${id}`, data),
+  remove: (id) => API.delete(`/vendors/${id}`),
+  toggleActive: (id) => API.post(`/vendors/${id}/toggle-active`)
+}

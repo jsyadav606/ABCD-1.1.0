@@ -1,4 +1,6 @@
 import { common } from "../common.js";
+// @ts-ignore
+import { fromGeneric } from "../sectionManager.js";
 
 const toBoolEnabledDisabled = () => [
   { value: "Enabled", label: "Enabled" },
@@ -8,17 +10,19 @@ const toBoolEnabledDisabled = () => [
 export const fixedConfigs = {
   cpu: {
     sections: [
-      {
-        sectionTitle: "Basic Information",
-        fields: [
-          { name: "assetName", label: "Asset Name", type: "text", required: true, maxLength: 120 },
-          { name: "assetCategory", label: "Asset Category", type: "select", options: common.assetCategories },
-          { name: "manufacturer", label: "Manufacturer", type: "text", required: true, maxLength: 100 },
-          { name: "model", label: "Model", type: "text", required: true, maxLength: 100 },
+      fromGeneric("Basic Information", {
+        // Example: hide description field coming from generic
+        omitFields: ["assetDescription", "barcode"],
+        overrideFields: [
+          { name: "assetCategory", options: common.assetCategories },
+          { name: "manufacturer", required: true },
+          { name: "model", required: true },
+        ],
+        addFields: [
           { name: "deviceType", label: "Device Type", type: "select", options: common.deviceTypes },
           { name: "domain", label: "Domain / Workgroup", type: "select", options: common.domains },
         ],
-      },
+      }),
       {
         sectionTitle: "Operating System",
         fields: [
@@ -154,52 +158,18 @@ export const fixedConfigs = {
           { name: "secureBootEnabled", label: "Secure Boot Enabled", type: "select", options: common.booleanOptions },
         ],
       },
-      {
-        sectionTitle: "Asset Financial Details",
-        fields: [
-          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
-          { name: "serialNumber", label: "Serial Number", type: "text", required: true, maxLength: 120 },
-          { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
-          { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 50000000 },
-          { name: "acquisitionDate", label: "Acquisition Date", type: "date" },
-          { name: "warrantyExpiryDate", label: "Warranty Expiry Date", type: "date" },
-          { name: "depreciationMethod", label: "Depreciation Method", type: "select", options: common.depreciationMethods },
-          { name: "usefulLifeYears", label: "Useful Life (Years)", type: "number", min: 1, max: 20 },
-          { name: "residualValue", label: "Residual Value", type: "number", min: 0, max: 10000000 },
-        ],
-      },
-      {
-        sectionTitle: "Location & Assignment",
-        fields: [
-          { name: "branch", label: "Branch", type: "select", options: common.branches },
-          { name: "building", label: "Building", type: "text", maxLength: 100 },
-          { name: "floor", label: "Floor", type: "text", maxLength: 40 },
-          { name: "room", label: "Room", type: "text", maxLength: 80 },
-          { name: "assignedTo", label: "Assigned To (User ID)", type: "text", maxLength: 80 },
-          { name: "assignmentDate", label: "Assignment Date", type: "date" },
-        ],
-      },
-      {
-        sectionTitle: "Asset Lifecycle Status",
-        fields: [
-          { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
-          { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
-          { name: "lastAuditDate", label: "Last Physical Audit Date", type: "date" },
-          { name: "remarks", label: "Remarks", type: "textarea", maxLength: 500 },
-        ],
-      },
-      {
-        sectionTitle: "Network Details",
-        fields: [
-          { name: "hostname", label: "Hostname", type: "text", maxLength: 120 },
-          { name: "ipAddress", label: "IP Address", type: "text", maxLength: 40 },
-          { name: "macAddress", label: "MAC Address", type: "text", maxLength: 40 },
-          { name: "nicType", label: "NIC Type", type: "select", options: common.nicTypes },
-          { name: "vlan", label: "VLAN", type: "text", maxLength: 40 },
-          { name: "dhcpEnabled", label: "DHCP Enabled", type: "select", options: common.booleanOptions },
-          { name: "dnsHostname", label: "DNS Hostname", type: "text", maxLength: 120 },
-        ],
-      },
+
+      //! Purchase Information
+      fromGeneric("Purchase Information"),
+      
+      //! Location Information
+      fromGeneric("Location Information",{
+         omitFields: ["organization","rackNumber","rackUnit"],
+      } ),
+      
+      
+      //! Network Details
+      fromGeneric("Network Details"),
     ],
   },
   monitor: {
@@ -273,7 +243,7 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Location & Assignment",
+        sectionTitle: "Location Information",
         fields: [
           { name: "branch", label: "Branch", type: "select", options: common.branches },
           { name: "building", label: "Building", type: "text", maxLength: 100 },

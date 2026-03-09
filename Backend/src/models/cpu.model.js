@@ -7,7 +7,7 @@ const cpuSchema = new mongoose.Schema(
     // 1. Basic Information / Identity
     basicInfo: {
       assetTag: { type: String, required: true, trim: true, index: true },
-      serialNumber: { type: String, required: true, trim: true, index: true },
+      serialNumber: { type: String,  trim: true, index: true },
       assetName: { type: String, required: true, trim: true },
       assetCategory: { type: String, default: null, trim: true },
       manufacturer: { type: String, required: true, trim: true },

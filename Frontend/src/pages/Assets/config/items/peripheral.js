@@ -1,14 +1,17 @@
 import { common } from "../common.js";
+import { fromGeneric } from "../sectionManager.js";
 
 export const peripheralConfigs = {
   webcam: {
     sections: [
-      {
-        sectionTitle: "Basic Information",
-        fields: [
-          { name: "name", label: "Webcam Name", type: "text", required: true, maxLength: 80 },
-          { name: "model", label: "Model", type: "text", maxLength: 80 },
-          { name: "manufacturer", label: "Manufacturer", type: "text", required: true, maxLength: 80 },
+      fromGeneric("Basic Information", {
+        pickFields: ["assetName", "manufacturer", "model"],
+        overrideFields: [
+          { name: "assetName", label: "Webcam Name", required: true, maxLength: 80 },
+          { name: "manufacturer", required: true, maxLength: 80 },
+          { name: "model", maxLength: 80 },
+        ],
+        addFields: [
           { name: "deviceTag", label: "Device Tag", type: "text", maxLength: 50 },
           {
             name: "webcamType",
@@ -22,7 +25,7 @@ export const peripheralConfigs = {
             ],
           },
         ],
-      },
+      }),
       {
         sectionTitle: "Camera Specifications",
         fields: [

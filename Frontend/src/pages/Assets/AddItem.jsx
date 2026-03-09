@@ -11,6 +11,7 @@ import { authAPI } from "../../services/api.js";
 import { getSelectedBranch } from "../../utils/scope.js";
 //@ts-ignore
 import { CATEGORY_ITEMS, getItemFieldConfig } from "./config/itemFieldConfig.js";
+import { vendorAPI } from "../../services/api.js";
 
 const CATEGORIES = [
   { value: "fixed", label: "Fixed" },
@@ -48,6 +49,8 @@ const AddItemPage = () => {
   // Branch Logic
   const [branchOptions, setBranchOptions] = useState([]);
   const [_loadingBranches, setLoadingBranches] = useState(true);
+  const [vendorOptions, setVendorOptions] = useState([]);
+  const [_loadingVendors, setLoadingVendors] = useState(true);
 
   useEffect(() => {
     const initBranch = async () => {
@@ -125,13 +128,39 @@ const AddItemPage = () => {
     };
   }, [itemType]);
 
+  // Load vendor dropdown
+  useEffect(() => {
+    let cancelled = false;
+    const loadVendors = async () => {
+      try {
+        setLoadingVendors(true);
+        const res = await vendorAPI.getDropdown();
+        const items = res.data?.data || res.data || [];
+        const opts = items.map((v) => ({
+          value: v.value ?? v._id,
+          label: v.label ?? v.name,
+        }));
+        if (!cancelled) setVendorOptions(opts);
+      } catch (e) {
+        console.warn("Failed to load vendors dropdown:", e?.response?.data?.message || e.message);
+        if (!cancelled) setVendorOptions([]);
+      } finally {
+        if (!cancelled) setLoadingVendors(false);
+      }
+    };
+    loadVendors();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const sections = useMemo(() => {
     if (!category || !itemType) return [];
     const baseSections = itemConfig?.sections || [];
     
     // Inject dynamic branch options into the "Location & Assignment" section -> "branch" field
     return baseSections.map(sec => {
-      if (sec.sectionTitle === "Location & Assignment") {
+      if (sec.sectionTitle === "Location Information") {
         return {
           ...sec,
           fields: sec.fields.map(f => {
@@ -147,9 +176,24 @@ const AddItemPage = () => {
           })
         };
       }
+      // Inject vendor dropdown into "Purchase Information" -> vendorId field
+      if (sec.sectionTitle === "Purchase Information") {
+        return {
+          ...sec,
+          fields: sec.fields.map(f => {
+            if (f.name === "vendorId") {
+              return {
+                ...f,
+                options: vendorOptions,
+              };
+            }
+            return f;
+          })
+        };
+      }
       return sec;
     });
-  }, [category, itemType, branchOptions, itemConfig]);
+  }, [category, itemType, branchOptions, vendorOptions, itemConfig]);
 
   const updateField = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));

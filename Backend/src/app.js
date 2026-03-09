@@ -10,6 +10,7 @@ import organizationRoutes from "./routes/organization.routes.js";
 import assetRoutes from "./routes/asset.routes.js";
 import { apiError } from "./utils/apiError.js";
 import lookupRoutes from "./routes/lookup.routes.js";
+import vendorRoutes from "./routes/vendor.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +60,7 @@ app.use("/api/v1/branches", branchRoutes);
 app.use("/api/v1/organizations", organizationRoutes);
 app.use("/api/v1/assets", assetRoutes);
 app.use("/api/v1/lookups", lookupRoutes);
+app.use("/api/v1/vendors", vendorRoutes);
 
 /* ===============================
    Global Error Handler

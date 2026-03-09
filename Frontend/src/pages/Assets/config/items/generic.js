@@ -1,48 +1,5 @@
+// @ts-ignore
 import { common } from "../common.js";
-
-// export const genericConfig = {
-//   sections: [
-//     {
-//       sectionTitle: "Basic Information",
-//       fields: [
-//         { name: "assetName", label: "Asset Name", type: "text", required: true, maxLength: 120 },
-//         { name: "manufacturer", label: "Manufacturer", type: "text", maxLength: 100 },
-//         { name: "model", label: "Model", type: "text", maxLength: 100 },
-//       ],
-//     },
-//     {
-//       sectionTitle: "Asset Financial Details",
-//       fields: [
-//         { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
-//         { name: "serialNumber", label: "Serial Number", type: "text", maxLength: 120 },
-//         { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
-//         { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
-//         { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 50000000 },
-//         { name: "acquisitionDate", label: "Acquisition Date", type: "date" },
-//         { name: "warrantyExpiryDate", label: "Warranty Expiry Date", type: "date" },
-//       ],
-//     },
-//     {
-//       sectionTitle: "Location & Assignment",
-//       fields: [
-//         { name: "branch", label: "Branch", type: "select", options: common.branches },
-//         { name: "building", label: "Building", type: "text", maxLength: 100 },
-//         { name: "floor", label: "Floor", type: "text", maxLength: 40 },
-//         { name: "room", label: "Room", type: "text", maxLength: 80 },
-//         { name: "assignedTo", label: "Assigned To (User ID)", type: "text", maxLength: 80 },
-//         { name: "assignmentDate", label: "Assignment Date", type: "date" },
-//       ],
-//     },
-//     {
-//       sectionTitle: "Asset Lifecycle Status",
-//       fields: [
-//         { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
-//         { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
-//         { name: "remarks", label: "Remarks", type: "textarea", maxLength: 500 },
-//       ],
-//     },
-//   ],
-// };
 
 export const genericConfig = {
   sections: [
@@ -52,7 +9,7 @@ export const genericConfig = {
       fields: [
         { name: "assetId", label: "Asset ID", type: "text", readOnly: true },
         { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
-        // { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
+        { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
 
         { name: "assetName", label: "Asset Name", type: "text", required: true, maxLength: 120 },
         { name: "assetDescription", label: "Description", type: "textarea", maxLength: 500 },
@@ -77,6 +34,7 @@ export const genericConfig = {
       ],
     },
 
+    //! Purchase Information
     {
       sectionTitle: "Purchase Information",
       fields: [
@@ -84,7 +42,6 @@ export const genericConfig = {
         
         { name: "poNumber", label: "PO Number", type: "text", maxLength: 80, showIf: { purchaseType: "PO" } },
         { name: "poDate", label: "PO Date", type: "date", showIf: { purchaseType: "PO" } },
-        // { name: "poAmount", label: "PO Amount", type: "number", showIf: { purchaseType: "PO" } },
         
         { name: "purchaseDate", label: "Purchase Date", type: "date" },
         { name: "vendorId", label: "Vendor", type: "select", options: common.vendors },
@@ -103,6 +60,7 @@ export const genericConfig = {
       ],
     },
 
+    //! Warranty Information
     {
       sectionTitle: "Warranty Information",
       fields: [
@@ -150,6 +108,7 @@ export const genericConfig = {
     //   ],
     // },
 
+    //! Location Information
     {
       sectionTitle: "Location Information",
       fields: [
@@ -167,6 +126,21 @@ export const genericConfig = {
       ],
     },
 
+    //! Network Details
+    {
+        sectionTitle: "Network Details",
+        fields: [
+          { name: "hostname", label: "Hostname", type: "text", maxLength: 120 },
+          { name: "ipAddress", label: "IP Address", type: "text", maxLength: 40 },
+          { name: "macAddress", label: "MAC Address", type: "text", maxLength: 40 },
+          { name: "nicType", label: "NIC Type", type: "select", options: common.nicTypes },
+          { name: "vlan", label: "VLAN", type: "text", maxLength: 40 },
+          { name: "dhcpEnabled", label: "DHCP Enabled", type: "select", options: common.booleanOptions },
+          { name: "dnsHostname", label: "DNS Hostname", type: "text", maxLength: 120 },
+        ],
+      },
+
+    //! Repair & Maintenance
     // {
     //   sectionTitle: "Repair & Maintenance",
     //   fields: [
