@@ -285,4 +285,7 @@
   .fr-table-head-cell {
     font-size: 12px;
   }
+  .fr-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }

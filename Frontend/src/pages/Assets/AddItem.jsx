@@ -413,14 +413,15 @@ const AddItemPage = () => {
         memorySec && Array.isArray(memorySec.rows)
           ? {
               ramModules: memorySec.rows.map((r) => ({
-                manufacturer: r.ramManufacturer ?? null,
-                modelNumber: r.ramModelNumber ?? null,
-                capacityGB: r.ramCapacityGB != null ? Number(r.ramCapacityGB) : null,
-                type: r.ramType ?? null,
-                speedMHz: r.ramSpeedMHz != null ? Number(r.ramSpeedMHz) : null,
-                formFactor: r.ramFormFactor ?? null,
-                slot: r.ramSlot ?? null,
-                channel: r.ramChannel ?? null,
+                ramManufacturer: r.ramManufacturer ?? null,
+                ramModelNumber: r.ramModelNumber ?? null,
+                ramCapacityGB: r.ramCapacityGB != null ? Number(r.ramCapacityGB) : null,
+                ramType: r.ramType ?? null,
+                ramSpeedMHz: r.ramSpeedMHz != null ? Number(r.ramSpeedMHz) : null,
+                ramFormFactor: r.ramFormFactor ?? null,
+                ramSlot: r.ramSlot ?? null,
+                ramChannel: r.ramChannel ?? null,
+                ramSerialNumber: r.ramSerialNumber ?? null,
               })),
               totalNoOfMemory: memorySec.rows.filter(
                 (r) =>
@@ -432,15 +433,17 @@ const AddItemPage = () => {
         storageSec && Array.isArray(storageSec.rows)
           ? {
               storageDevices: storageSec.rows.map((r) => ({
-                manufacturer: r.driveManufacturer ?? null,
-                modelNumber: r.driveModelNumber ?? null,
-                capacityGB: r.driveCapacityGB != null ? Number(r.driveCapacityGB) : null,
-                type: r.driveType ?? null,
-                formFactor: r.driveFormFactor ?? null,
-                interface: r.driveInterface ?? null,
-                interfaceSpeed: r.driveInterfaceSpeed ?? null,
-                serialNumber: r.driveSerial ?? null,
-                slot: r.driveSlot ?? null,
+                driveManufacturer: r.driveManufacturer ?? null,
+                driveModelNumber: r.driveModelNumber ?? null,
+                driveCapacityGB: r.driveCapacityGB != null ? Number(r.driveCapacityGB) : null,
+                driveType: r.driveType ?? null,
+                driveFormFactor: r.driveFormFactor ?? null,
+                driveInterface: r.driveInterface ?? null,
+                driveInterfaceSpeed: r.driveInterfaceSpeed ?? null,
+                driveSerial: r.driveSerial ?? null,
+                driveSlot: r.driveSlot ?? null,
+                raidConfigured: r.raidConfigured ?? null,
+                encryptionEnabled: r.encryptionEnabled ?? null,
               })),
               totalNoOfStorage: storageSec.rows.filter(
                 (r) =>
@@ -453,6 +456,7 @@ const AddItemPage = () => {
 
       const payload = {
         itemType,
+        // @ts-ignore
         itemCategory: category || form.itemCategory || null,
         // Ensure required basicInfo fields are mapped if missing
         // @ts-ignore

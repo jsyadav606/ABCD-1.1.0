@@ -148,7 +148,7 @@ export const genericConfig = {
         sectionTitle: "Network Details",
         fields: [
           { name: "hostname", label: "Hostname", type: "text", maxLength: 120 },
-          { name: "nicType", label: "NIC", type: "select", options: common.nicTypes, required: true },
+          { name: "nicType", label: "NIC", type: "select", options: common.nicTypes },
           { name: "ipv4Address", label: "IPv4 Address", type: "text", maxLength: 40 },
           { name: "ipv6Address", label: "IPv6 Address", type: "text", maxLength: 80 },
           { name: "macAddress", label: "MAC Address", type: "text", maxLength: 40 },

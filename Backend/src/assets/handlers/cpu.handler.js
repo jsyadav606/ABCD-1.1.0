@@ -2,47 +2,93 @@ import { CPU } from "../../models/cpu.model.js";
 
 const norm = (val) => (val == null ? "" : String(val).trim());
 
-const findSection = (sections, name, kind) => {
-  const list = Array.isArray(sections) ? sections : [];
-  const nm = norm(name).toLowerCase();
-  return list.find((s) => {
-    if (!s || typeof s !== "object") return false;
-    if (norm(s.name).toLowerCase() !== nm) return false;
-    if (!kind) return true;
-    return norm(s.kind).toLowerCase() === norm(kind).toLowerCase();
-  });
-};
-
-const extractBranchId = (payload, sections) => {
-  const direct =
-    payload?.branchId ??
-    payload?.branch ??
-    payload?.location?.branchId ??
-    payload?.location?.branch ??
-    payload?.locationInformation?.branch ??
-    null;
-  if (direct) return direct;
-  const loc = findSection(sections, "Location Information", "group") || findSection(sections, "Location", "group");
-  const b = loc?.data?.branch ?? loc?.data?.branchId ?? null;
-  return b || null;
-};
-
 const create = async (req) => {
-  const itemType = norm(req.body?.itemType).toLowerCase();
-  const itemCategory = norm(req.body?.itemCategory || req.body?.assetCategory || req.body?.category).toLowerCase();
-  const sections = Array.isArray(req.body?.sections) ? req.body.sections : [];
-  const { sections: _omit, ...flat } = req.body || {};
+  const body = req.body || {};
+  const itemType = norm(body.itemType).toLowerCase();
+  const itemCategory = norm(body.itemCategory || body.assetCategory || body.category).toLowerCase();
+  
+  // Extract tables from payload prepared by AddItem.jsx
+  const memoryModules = body.memory?.ramModules || [];
+  const storageDevices = body.storage?.storageDevices || [];
+  
+  // Extract Network Details from sections if present (since it's a table in frontend)
+  const sections = Array.isArray(body.sections) ? body.sections : [];
+  const networkSection = sections.find(s => norm(s.name).toLowerCase() === "network details" && s.kind === "rows");
+  const networkDetails = networkSection?.rows || [];
+
+  // Map branch from form to branchId
+  const branchId = body.branch || body.branchId || null;
+
+  // Calculate Memory Aggregation
+  const validMemoryModules = memoryModules.filter(m => m && (m.ramCapacityGB || m.ramManufacturer || m.ramModelNumber));
+  const memory = {
+    modules: validMemoryModules,
+    totalQty: validMemoryModules.length,
+    totalCapacityGB: validMemoryModules.reduce((sum, m) => sum + (Number(m.ramCapacityGB) || 0), 0)
+  };
+
+  // Calculate Storage Aggregation
+  const validStorageDevices = storageDevices.filter(d => d && (d.driveCapacityGB || d.driveManufacturer || d.driveType));
+  const storage = {
+    devices: validStorageDevices,
+    totalQty: validStorageDevices.length,
+    totalCapacityGB: validStorageDevices.reduce((sum, d) => sum + (Number(d.driveCapacityGB) || 0), 0),
+    typeBreakdown: []
+  };
+
+  // Build Storage Type Breakdown
+  const typeMap = new Map();
+  validStorageDevices.forEach(d => {
+    const type = norm(d.driveType) || "Unknown";
+    const capacity = Number(d.driveCapacityGB) || 0;
+    if (!typeMap.has(type)) {
+      typeMap.set(type, { type, qty: 0, capacityGB: 0 });
+    }
+    const entry = typeMap.get(type);
+    entry.qty += 1;
+    entry.capacityGB += capacity;
+  });
+  storage.typeBreakdown = Array.from(typeMap.values());
+
+  // Calculate Network Aggregation
+  const validInterfaces = networkDetails.filter(i => i && (i.nicType || i.macAddress || i.ipv4Address));
+  const network = {
+    interfaces: validInterfaces,
+    totalQty: validInterfaces.length,
+    typeBreakdown: []
+  };
+
+  // Build Network Type Breakdown
+  const netTypeMap = new Map();
+  validInterfaces.forEach(i => {
+    const type = norm(i.nicType) || "Unknown";
+    if (!netTypeMap.has(type)) {
+      netTypeMap.set(type, { nicType: type, qty: 0 });
+    }
+    const entry = netTypeMap.get(type);
+    entry.qty += 1;
+  });
+  network.typeBreakdown = Array.from(netTypeMap.values());
 
   const payload = {
+    ...body, // Includes all flat fields from 'form' spread in AddItem.jsx
     itemCategory,
     itemType,
-    sections,
-    flat,
+    branchId,
+    memory,
+    storage,
+    network,
     organizationId: req.user?.organizationId || null,
-    branchId: extractBranchId(req.body, sections),
     createdBy: req.user?._id || req.user?.id,
     updatedBy: null,
   };
+
+  // Remove fields that shouldn't be saved directly or are handled specifically
+  delete payload.sections;
+  delete payload.flat;
+  delete payload.memoryModules;
+  delete payload.storageDevices;
+  delete payload.networkDetails;
 
   const doc = await CPU.create(payload);
   return { doc, message: "Asset created successfully" };
@@ -58,13 +104,15 @@ const list = async (req) => {
   if (req.user?.organizationId) filter.organizationId = req.user.organizationId;
 
   const items = await CPU.find(filter).sort({ createdAt: -1 }).lean();
+  
+  // Map fields for UI consistency
   const flattenedItems = items.map((item) => ({
     ...item,
-    itemName: item.summary?.itemName || item.flat?.itemName || null,
-    manufacturer: item.summary?.manufacturer || item.flat?.manufacturer || item.flat?.cpuManufacturer || null,
-    model: item.summary?.model || item.flat?.model || item.flat?.cpuModel || null,
-    serialNumber: item.summary?.serialNumber || item.flat?.serialNumber || null,
-    itemTag: item.summary?.itemTag || item.flat?.itemTag || item.flat?.assetTag || null,
+    itemName: item.itemId || item.summary?.itemName || "N/A",
+    manufacturer: item.manufacturer || item.cpuManufacturer || item.summary?.manufacturer || "N/A",
+    model: item.model || item.cpuModel || item.summary?.model || "N/A",
+    serialNumber: item.serialNumber || item.summary?.serialNumber || "N/A",
+    itemTag: item.itemId || item.summary?.itemTag || "N/A",
   }));
   return { items: flattenedItems, message: "Assets retrieved" };
 };
@@ -82,16 +130,8 @@ const getById = async (req) => {
     e.statusCode = 403;
     throw e;
   }
-  const flattenedDoc = {
-    ...doc,
-    itemName: doc.summary?.itemName || doc.flat?.itemName || null,
-    manufacturer: doc.summary?.manufacturer || doc.flat?.manufacturer || doc.flat?.cpuManufacturer || null,
-    model: doc.summary?.model || doc.flat?.model || doc.flat?.cpuModel || null,
-    serialNumber: doc.summary?.serialNumber || doc.flat?.serialNumber || null,
-    itemTag: doc.summary?.itemTag || doc.flat?.itemTag || doc.flat?.assetTag || null,
-  };
-  return { doc: flattenedDoc, message: "Asset retrieved" };
+  
+  return { doc, message: "Asset retrieved" };
 };
 
 export default { create, list, getById };
-
