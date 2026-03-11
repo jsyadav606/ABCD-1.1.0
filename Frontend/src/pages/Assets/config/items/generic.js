@@ -7,16 +7,16 @@ export const genericConfig = {
     {
       sectionTitle: "Basic Information",
       fields: [
-        { name: "assetId", label: "Asset ID", type: "text", readOnly: false },
-        { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
+        { name: "itemId", label: "Item ID", type: "text", readOnly: false },
+        { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 80 },
         { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
 
-        { name: "assetName", label: "Asset Name", type: "text", required: true, maxLength: 120 },
-        { name: "assetDescription", label: "Description", type: "textarea", maxLength: 500 },
+        { name: "itemName", label: "Item Name", type: "text", required: true, maxLength: 120 },
+        { name: "itemDescription", label: "Description", type: "textarea", maxLength: 500 },
 
-        { name: "assetCategory", label: "Category", type: "select", options: common.assetCategories },
-        { name: "assetType", label: "Asset Type", type: "select", options: common.assetTypes },
-        { name: "assetSubType", label: "Sub Type", type: "text", maxLength: 80 },
+        { name: "itemCategory", label: "Category", type: "select", options: common.assetCategories },
+        { name: "itemType", label: "Item Type", type: "select", options: common.assetTypes },
+        { name: "itemSubType", label: "Sub Type", type: "text", maxLength: 80 },
 
         { name: "manufacturer", label: "Manufacturer", type: "text", maxLength: 100 },
         { name: "brand", label: "Brand", type: "text", maxLength: 100 },
@@ -25,12 +25,11 @@ export const genericConfig = {
         { name: "partNumber", label: "Part Number", type: "text", maxLength: 100 },
         { name: "serialNumber", label: "Serial Number", type: "text", maxLength: 120 },
 
-        { name: "assetCondition", label: "Condition", type: "select", options: common.assetCondition },
+        { name: "itemCondition", label: "Condition", type: "select", options: common.assetCondition },
         { name: "ownershipType", label: "Ownership Type", type: "select", options: [{name:"Owned", value:"Owned"}, {name:"Leased", value:"Leased"}, {name:"Rented", value:"Rented"}] },
 
         { name: "manufacturingDate", label: "Manufacturing Date", type: "date" },
-        { name: "installationDate", label: "Installation Date", type: "date" },
-        // { name: "endOfLifeDate", label: "End Of Life Date", type: "date" },
+       
       ],
     },
 
@@ -95,12 +94,14 @@ export const genericConfig = {
       ],
     },
     {
-      sectionTitle: "Asset State",
+      sectionTitle: "Item State",
       fields: [
-        { name: "assetStatus", label: "Asset Status", type: "select", options: [{name:"Active", value:"active", default:true}, {name:"Inactive", value:"inactive"}, {name:"Retired", value:"retired"}, ] },
-        { name: "assetIsCurrently", label: "Asset is Currently", type: "select", options: [{name:"In Store", value:"inStore", default:true}, {name:"In Repair", value:"inRepair"}, {name:"Disposed", value:"disposed"}, {name:"In Use", value:"inUse"}, {name:"Lost", value:"lost"}, ] },
+        { name: "itemStatus", label: "Item Status", type: "select", options: [{name:"Active", value:"active", default:true}, {name:"Inactive", value:"inactive"}, {name:"Retired", value:"retired"}, ] },
+        { name: "itemIsCurrently", label: "Item is Currently", type: "select", options: [{name:"In Store", value:"inStore", default:true}, {name:"In Repair", value:"inRepair"}, {name:"Disposed", value:"disposed"}, {name:"In Use", value:"inUse"}, {name:"Lost", value:"lost"}, ] },
 
-        { name: "user", label: "User", type: "select", options: common.user, showIf: { assetIsCurrently: "inUse" }},
+        { name: "itemUser", label: "Item User", type: "select", options: common.user, showIf: { itemIsCurrently: "inUse" }},
+         { name: "AssignDate", label: "Assignment Date", type: "date", showIf: { itemIsCurrently: "inUse" }},
+        // { name: "endOfLifeDate", label: "End Of Life Date", type: "date" },
       ],
   
     },
@@ -147,12 +148,35 @@ export const genericConfig = {
         sectionTitle: "Network Details",
         fields: [
           { name: "hostname", label: "Hostname", type: "text", maxLength: 120 },
-          { name: "ipAddress", label: "IP Address", type: "text", maxLength: 40 },
+          { name: "nicType", label: "NIC", type: "select", options: common.nicTypes, required: true },
+          { name: "ipv4Address", label: "IPv4 Address", type: "text", maxLength: 40 },
+          { name: "ipv6Address", label: "IPv6 Address", type: "text", maxLength: 80 },
           { name: "macAddress", label: "MAC Address", type: "text", maxLength: 40 },
-          { name: "nicType", label: "NIC Type", type: "select", options: common.nicTypes },
-          { name: "vlan", label: "VLAN", type: "text", maxLength: 40 },
+          { name: "subnet", label: "Subnet / Mask", type: "text", maxLength: 40 },
+          { name: "defaultGateway", label: "Default Gateway", type: "text", maxLength: 40 },
           { name: "dhcpEnabled", label: "DHCP Enabled", type: "select", options: common.booleanOptions },
+          { name: "dhcpServer", label: "DHCP Server", type: "text", maxLength: 120, showIf: { dhcpEnabled: "Yes" } },
           { name: "dnsHostname", label: "DNS Hostname", type: "text", maxLength: 120 },
+
+          { name: "ethernetPort", label: "Ethernet Port", type: "text", maxLength: 80, showIf: { nicType: "Ethernet" } },
+          { name: "switchPort", label: "Switch Port", type: "text", maxLength: 80, showIf: { nicType: "Ethernet" } },
+          { name: "linkSpeedMbps", label: "Link Speed (Mbps)", type: "number", min: 0, max: 100000, showIf: { nicType: "Ethernet" } },
+
+          { name: "wifiSSID", label: "Wi-Fi SSID", type: "text", maxLength: 120, showIf: { nicType: "Wi-Fi" } },
+          {
+            name: "wifiSecurity",
+            label: "Wi-Fi Security",
+            type: "select",
+            options: ["Open", "WPA2", "WPA3", "WPA2/WPA3"],
+            showIf: { nicType: "Wi-Fi" },
+          },
+          {
+            name: "wifiBand",
+            label: "Wi-Fi Band",
+            type: "select",
+            options: ["2.4 GHz", "5 GHz", "Dual"],
+            showIf: { nicType: "Wi-Fi" },
+          },
         ],
       },
 

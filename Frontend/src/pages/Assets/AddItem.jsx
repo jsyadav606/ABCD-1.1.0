@@ -23,6 +23,15 @@ const AddItemPage = () => {
   const navigate = useNavigate();
   const { type } = useParams();
   const allItems = useMemo(() => Object.values(CATEGORY_ITEMS || {}).flat(), []);
+  const getCategoryForItemType = useMemo(() => {
+    return (t) => {
+      const tt = String(t || "").toLowerCase();
+      for (const [cat, items] of Object.entries(CATEGORY_ITEMS || {})) {
+        if ((items || []).some((i) => String(i.value || "").toLowerCase() === tt)) return cat;
+      }
+      return "";
+    };
+  }, []);
   const resolveType = (raw) => {
     const t = String(raw || "");
     const lc = t.toLowerCase();
@@ -131,6 +140,12 @@ const AddItemPage = () => {
       cancelled = true;
     };
   }, [itemType]);
+
+  useEffect(() => {
+    if (category) return;
+    const inferred = getCategoryForItemType(itemType);
+    if (inferred) setCategory(inferred);
+  }, [category, getCategoryForItemType, itemType]);
 
   // Load vendor dropdown
   useEffect(() => {
@@ -297,7 +312,7 @@ const AddItemPage = () => {
 
 
   const validate = () => {
-    const tableSections = ["Processors", "Storage", "Memory"];
+    const tableSections = ["Processors", "Storage", "Memory", "Network Details"];
     const reqKeys = [];
     sections.forEach((sec) => {
       const isTable = tableSections.includes(String(sec.sectionTitle));
@@ -362,7 +377,7 @@ const AddItemPage = () => {
     setSubmitting(true);
     try {
       // Build section-based and section-objects payload mirroring UI
-      const tableSections = ["Processors", "Storage", "Memory"];
+      const tableSections = ["Processors", "Storage", "Memory", "Network Details"];
       const sectionsPayload = (sections || []).map((sec) => {
         const isTable = tableSections.includes(String(sec.sectionTitle));
         if (!isTable) {
@@ -438,8 +453,7 @@ const AddItemPage = () => {
 
       const payload = {
         itemType,
-        // @ts-ignore
-        assetCategory: category || form.assetCategory || null,
+        itemCategory: category || form.itemCategory || null,
         // Ensure required basicInfo fields are mapped if missing
         // @ts-ignore
         manufacturer: form.manufacturer || form.cpuManufacturer,

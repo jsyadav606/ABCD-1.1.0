@@ -174,7 +174,7 @@ const Input = ({
       mm = digits.slice(2, 4);
       yyyy = digits.slice(4, 8);
     } else {
-      const m = s.match(/^(\d{2})[\/\-\.](\d{2})[\/\-\.](\d{4})$/);
+      const m = s.match(/^(\d{2})[/.-](\d{2})[/.-](\d{4})$/);
       if (m) {
         dd = m[1]; mm = m[2]; yyyy = m[3];
       }

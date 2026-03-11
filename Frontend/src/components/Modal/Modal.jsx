@@ -10,6 +10,7 @@
  *   Header with optional close button, body for children, optional footer area.
  */
 import { useRef } from 'react';
+import { createPortal } from 'react-dom';
 import './Modal.css';
 
 const Modal = ({
@@ -44,7 +45,7 @@ const Modal = ({
     e.stopPropagation();
   };
 
-  return (
+  return createPortal(
     <div
       className="modal-overlay"
       ref={overlayRef}
@@ -72,7 +73,7 @@ const Modal = ({
         {footer && <div className="modal-footer">{footer}</div>}
       </div>
     </div>
-  );
+  , document.body);
 };
 
 export default Modal;

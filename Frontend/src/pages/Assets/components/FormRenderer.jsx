@@ -152,7 +152,7 @@ const TableField = ({ def, value, onChange, error, formData, rowIndex }) => {
 
 const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onSubmit, onReset, onCancel, submitting }) => {
   const list = Array.isArray(sections) ? sections : [];
-  const tableSections = ["Processors", "Storage", "Memory"];
+  const tableSections = ["Processors", "Storage", "Memory", "Network Details"];
   const [rowCounts, setRowCounts] = useState({});
   const { openScan } = useScanning();
   const getValue = useMemo(() => (k) => formData?.[k], [formData]);
@@ -161,27 +161,54 @@ const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onS
     const v = rowCounts[title];
     return typeof v === "number" && v > 0 ? v : 1;
   };
-  const addRow = (title) => {
+
+  const insertRowAfter = (title, rowIndex, fields) => {
     const c = getCount(title);
+    const insertAt = Math.min(Math.max(Number(rowIndex) + 1, 0), c);
+
+    for (let i = c - 1; i >= insertAt; i -= 1) {
+      fields.forEach((f) => {
+        const fromKey = `${f.name}_${i}`;
+        const toKey = `${f.name}_${i + 1}`;
+        const val = formData?.[fromKey] ?? "";
+        onChange(toKey, val);
+        onChange(fromKey, "");
+      });
+    }
+
+    fields.forEach((f) => {
+      onChange(`${f.name}_${insertAt}`, "");
+    });
+
     setRowCounts((prev) => ({ ...prev, [title]: c + 1 }));
   };
-  const removeRow = (title, fields) => {
+  const removeRowAt = (title, rowIndex, fields) => {
     const c = getCount(title);
     if (c <= 1) return;
-    const idx = c - 1;
+    const removeAt = Math.min(Math.max(Number(rowIndex), 0), c - 1);
+
+    for (let i = removeAt; i < c - 1; i += 1) {
+      fields.forEach((f) => {
+        const fromKey = `${f.name}_${i + 1}`;
+        const toKey = `${f.name}_${i}`;
+        const val = formData?.[fromKey] ?? "";
+        onChange(toKey, val);
+      });
+    }
+
     fields.forEach((f) => {
-      const key = `${f.name}_${idx}`;
-      onChange(key, "");
+      onChange(`${f.name}_${c - 1}`, "");
     });
+
     setRowCounts((prev) => ({ ...prev, [title]: c - 1 }));
   };
   return (
     <div className="fr-container">
       {list.map((sec) => (
         (() => {
-          const filtered = (sec.fields || []).filter((f) => shouldShow(f, getValue));
           const isTable = tableSections.includes(String(sec.sectionTitle));
           if (!isTable) {
+            const filtered = (sec.fields || []).filter((f) => shouldShow(f, getValue));
             return (
               <section key={sec.sectionTitle} className="fr-card" aria-labelledby={`sec-${sec.sectionTitle}`}>
                 <div id={`sec-${sec.sectionTitle}`} className="fr-title">{sec.sectionTitle}</div>
@@ -201,16 +228,29 @@ const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onS
               </section>
             );
           }
-          const cols = Math.max(filtered.length, 1);
+
           const count = getCount(sec.sectionTitle);
+          const allFields = Array.isArray(sec.fields) ? sec.fields : [];
+
+          const getRowValue = (rowIndex) => (k) => formData?.[`${k}_${rowIndex}`] ?? formData?.[k];
+
+          const headerFields = allFields.filter((f) => {
+            if (!f?.showIf) return true;
+            for (let i = 0; i < count; i += 1) {
+              if (shouldShow(f, getRowValue(i))) return true;
+            }
+            return false;
+          });
+
+          const cols = Math.max(headerFields.length, 1);
           return (
             <section key={sec.sectionTitle} className="fr-card fr-table-section" aria-labelledby={`sec-${sec.sectionTitle}`}>
               <div id={`sec-${sec.sectionTitle}`} className="fr-title">{sec.sectionTitle}</div>
               <div
                 className="fr-table-head"
-                style={{ gridTemplateColumns: `repeat(${cols}, minmax(180px, 1fr)) 80px` }}
+                style={{ gridTemplateColumns: `repeat(${cols}, 320px) 80px` }}
               >
-                {filtered.map((f) => (
+                {headerFields.map((f) => (
                   <div key={`${f.name}-h`} className="fr-table-head-cell">{f.label}</div>
                 ))}
                 <div className="fr-table-head-cell"></div>
@@ -219,27 +259,42 @@ const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onS
                 <div
                   key={`row-${sec.sectionTitle}-${idx}`}
                   className="fr-table-row"
-                  style={{ gridTemplateColumns: `repeat(${cols}, minmax(180px, 1fr)) 80px` }}
+                  style={{ gridTemplateColumns: `repeat(${cols}, 320px) 80px` }}
                 >
-                  {filtered.map((f) => (
-                    <div key={`${f.name}-c-${idx}`} className="fr-table-row-cell">
-                      <TableField
-                        def={f}
-                        value={formData[`${f.name}_${idx}`]}
-                        error={errors?.[`${f.name}_${idx}`]}
-                        onChange={(name, val) => onChange(`${name}_${idx}`, val)}
-                        formData={formData}
-                        rowIndex={idx}
-                      />
-                    </div>
-                  ))}
+                  {headerFields.map((f) => {
+                    const visible = shouldShow(f, getRowValue(idx));
+                    if (!visible) {
+                      return <div key={`${f.name}-c-${idx}`} className="fr-table-row-cell" />;
+                    }
+                    return (
+                      <div key={`${f.name}-c-${idx}`} className="fr-table-row-cell">
+                        <TableField
+                          def={f}
+                          value={formData[`${f.name}_${idx}`]}
+                          error={errors?.[`${f.name}_${idx}`]}
+                          onChange={(name, val) => onChange(`${name}_${idx}`, val)}
+                          formData={formData}
+                          rowIndex={idx}
+                        />
+                      </div>
+                    );
+                  })}
                   <div className="fr-table-actions">
-                    {idx === count - 1 && (
-                      <>
-                        <Button variant="outline" onClick={() => addRow(sec.sectionTitle)} aria-label="Add row">+</Button>
-                        <Button variant="outline" onClick={() => removeRow(sec.sectionTitle, filtered)} aria-label="Remove row">−</Button>
-                      </>
-                    )}
+                    <Button
+                      variant="outline"
+                      onClick={() => insertRowAfter(sec.sectionTitle, idx, headerFields)}
+                      aria-label="Add row"
+                    >
+                      +
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => removeRowAt(sec.sectionTitle, idx, headerFields)}
+                      aria-label="Remove row"
+                      disabled={count <= 1}
+                    >
+                      −
+                    </Button>
                   </div>
                 </div>
               ))}
