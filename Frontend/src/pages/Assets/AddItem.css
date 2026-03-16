@@ -2,63 +2,95 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
   background: #f9fafb;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
+.add-item-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+  padding-top: env(safe-area-inset-top);
   border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.add-item-topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 10px calc(16px + env(safe-area-inset-left)) 10px calc(16px + env(safe-area-inset-right));
   background: #ffffff;
 }
 
-.page-header .page-title {
-  font-size: 1.8rem;
+.topbar-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.add-item-topbar .select-wrapper {
+  margin-bottom: 0;
+  width: clamp(128px, 18vw, 180px);
+}
+
+.add-item-topbar .select-field {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border-color: rgba(203, 213, 225, 1);
+}
+
+.topbar-title {
+  justify-self: center;
+  text-align: center;
+  font-size: clamp(16px, 2.2vw, 28px);
   font-weight: 700;
-  color: var(--page-title-color)
+  color: var(--page-title-color);
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-right {
+  justify-self: end;
 }
 
 .back-btn {
   background: #ffffff;
   color: #1e3a8a;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.sticky-header {
-  position: sticky;
-  top: var(--header-height);
-  z-index: 10;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-}
-
-.sticky-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 12px 22px;
-  gap: 12px;
-}
-
-.sticky-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .control {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
+}
+
+.control > span {
+  font-weight: 650;
+  color: #0f172a;
+  white-space: nowrap;
 }
 
 .control select {
@@ -72,6 +104,108 @@
   padding: 18px 12px 0 12px;
   overflow-y: auto;
   background: linear-gradient(180deg, #f9fafb 0%, #ffffff 40%);
+}
+
+@media (max-width: 980px) {
+  .add-item-topbar {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .topbar-left {
+    gap: 10px;
+  }
+
+  .add-item-topbar .select-wrapper {
+    width: clamp(120px, 22vw, 170px);
+  }
+
+  .topbar-title {
+    max-width: 36vw;
+  }
+}
+
+@media (max-width: 720px) {
+  .add-item-topbar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .topbar-right {
+    display: none;
+  }
+
+  .topbar-left {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .topbar-controls {
+    width: 100%;
+  }
+
+  .add-item-topbar .select-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .topbar-title {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .topbar-left {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-controls {
+    flex: 1;
+    width: auto;
+    flex-wrap: nowrap;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .control {
+    flex: 1;
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .control > span {
+    display: none;
+  }
+
+  .add-item-topbar .select-wrapper {
+    width: 100%;
+  }
+
+  .topbar-title {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .back-btn {
+    padding: 8px 10px;
+  }
+
+  .control > span {
+    font-size: 11px;
+  }
 }
 
 .form-body .fr-container {

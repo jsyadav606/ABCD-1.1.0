@@ -8,6 +8,7 @@ const toBoolEnabledDisabled = () => [
 ];
 
 export const fixedConfigs = {
+  //TODO  CPU Configuration
   cpu: {
     sections: [
       //! Basic Information
@@ -18,7 +19,7 @@ export const fixedConfigs = {
         // addFields: [{},{},{}],
       }),
       //! Location Information
-      fromGeneric("Location Information",{
+      fromGeneric("Location & Other Information",{
          omitFields: ["organization","rackNumber","rackUnit", "location", "floor", "room", "locationType", "building"],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -27,12 +28,12 @@ export const fixedConfigs = {
       {
         sectionTitle: "Operating System",
         fields: [
-          { name: "osName", label: "OS Name", type: "text", maxLength: 100 },
-          { name: "osEdition", label: "OS Edition", type: "text", maxLength: 80 },
-          { name: "osVersion", label: "OS Version", type: "text", maxLength: 40 },
-          { name: "buildNumber", label: "Build Number", type: "text", maxLength: 40 },
-          { name: "osLicenseKey", label: "OS License Key", type: "text", maxLength: 120 },
-          { name: "activationStatus", label: "Activation Status", type: "select", options: common.activationStatus },
+          { name: "osName", label: "OS Name", placeholder: "e.g. Windows 10", type: "text", maxLength: 100 },
+          { name: "osEdition", label: "OS Edition", placeholder: "e.g. Professional", type: "text", maxLength: 80 },
+          { name: "osVersion", label: "OS Version", placeholder: "e.g. 10.0.19041", type: "text", maxLength: 40 },
+          { name: "buildNumber", label: "Build Number", placeholder: "e.g. 19041", type: "text", maxLength: 40 },
+          { name: "osLicenseKey", label: "OS License Key", placeholder: "e.g. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX", type: "text", maxLength: 120 },
+          { name: "activationStatus", label: "Activation Status", placeholder: "e.g. Licensed", type: "select", options: common.activationStatus },
           { name: "domain", label: "Domain / Workgroup", type: "select", options: common.domains },
         ],
       },
@@ -40,20 +41,20 @@ export const fixedConfigs = {
       {
         sectionTitle: "Memory",
         fields: [
-          { name: "ramManufacturer", label: "Memory Manufacturer", type: "text", maxLength: 80 },
-          { name: "ramModelNumber", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
-          { name: "ramSerialNumber", label: "Memory Serial Number", type: "text", maxLength: 100 },
-          { name: "ramCapacityGB", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
+          { name: "ramManufacturer", placeholder: "e.g. Corsair", label: "Memory Manufacturer", type: "text", maxLength: 80 },
+          { name: "ramModelNumber", placeholder: "e.g. Vengeance LPX", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
+          { name: "ramSerialNumber", placeholder: "e.g. 1234567890", label: "Memory Serial Number", type: "text", maxLength: 100 },
+          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
           {
             name: "ramType",
             label: "RAM Type",
             type: "select",
             options: [],
           },
-          { name: "ramSpeedMHz", label: "Speed (MHz)", type: "number", min: 400, max: 1000000 },
-          { name: "ramFormFactor", label: "Form Factor", type: "text", maxLength: 40 },
-          { name: "ramSlot", label: "Memory Slot", type: "text", maxLength: 40 },
-          { name: "ramChannel", label: "Channel", type: "text", maxLength: 40 },
+          { name: "ramSpeedMHz", placeholder: "e.g. 3200", label: "Speed (MHz)", type: "number", min: 400, max: 1000000 },
+          { name: "ramFormFactor", placeholder: "e.g. DIMM", label: "Form Factor", type: "text", maxLength: 40 },
+          { name: "ramSlot", placeholder: "e.g. DIMM Slot 1", label: "Memory Slot", type: "text", maxLength: 40 },
+          { name: "ramChannel", placeholder: "e.g. Channel 1", label: "Channel", type: "text", maxLength: 40 },
           
         ],
       },
@@ -64,7 +65,7 @@ export const fixedConfigs = {
           
           { 
             name: "cpuManufacturer", 
-            label: "Processor Manufacturer", 
+            label: "Processor Manufacturer",
             type: "select", 
             required: true, 
             options: [
@@ -97,10 +98,10 @@ export const fixedConfigs = {
             ] 
           
           },
-          { name: "processorGeneration", label: "Processor Generation", type: "number", min: 0, max: 10 },
-          { name: "processorModel", label: "Processor Model", type: "number", maxLength: 40 },
-          { name: "cores", label: "Number of Cores", type: "number", min: 1, max: 256 },
-          { name: "threads", label: "Number of Threads", type: "number", min: 1, max: 512 },
+          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 10 },
+          { name: "processorModel", placeholder: "e.g. i7-11800H", label: "Processor Model", type: "number", maxLength: 40 },
+          { name: "cores", placeholder: "e.g. 8", label: "Number of Cores", type: "number", min: 1, max: 256 },
+          { name: "threads", placeholder: "e.g. 16", label: "Number of Threads",  type: "number", min: 1, max: 512 },
           { name: "virtualizationEnabled", label: "Virtualization Enabled", type: "select", options: common.booleanOptions },
         ],
       },
@@ -108,17 +109,17 @@ export const fixedConfigs = {
       {
         sectionTitle: "Storage",
         fields: [
-          { name: "driveManufacturer", label: "Drive Manufacturer", type: "text", maxLength: 80 },
-          { name: "driveModelNumber", label: "Drive Model Number", type: "text", maxLength: 120 },
-          { name: "driveSerial", label: "Serial Number", type: "text", maxLength: 120 },
-          { name: "driveCapacityGB", label: "Capacity (GB)", type: "number", min: 1, max: 200000 },
+          { name: "driveManufacturer", label: "Drive Manufacturer", placeholder: "e.g. Samsung", type: "text", maxLength: 80 },
+          { name: "driveModelNumber", label: "Drive Model Number", placeholder: "e.g. M.2 SSD", type: "text", maxLength: 120 },
+          { name: "driveSerial", label: "Serial Number", placeholder: "e.g. 1234567890", type: "text", maxLength: 120 },
+          { name: "driveCapacityGB", label: "Capacity (GB)", placeholder: "e.g. 1000", type: "number", min: 1, max: 200000 },
           {
             name: "driveType",
             label: "Drive Type",
             type: "select",
             options: [],
           },
-          { name: "driveInterfaceSpeed", label: "Interface Speed", type: "text", maxLength: 40 },
+          { name: "driveInterfaceSpeed", label: "Interface Speed", placeholder: "e.g. PCIe 4.0", type: "text", maxLength: 40 },
           // { name: "driveSlot", label: "Slot Label", type: "text", maxLength: 40 },
           { name: "raidConfigured", label: "RAID Configured", type: "select", options: common.booleanOptions },
           { name: "encryptionEnabled", label: "Disk Encryption Enabled", type: "select", options: common.booleanOptions },
@@ -128,28 +129,31 @@ export const fixedConfigs = {
       {
         sectionTitle: "BIOS & Hardware",
         fields: [
-          { name: "biosVersion", label: "BIOS Version", type: "text", placeholder:"Enter BIOS Version", maxLength: 80 },
-          { name: "biosDate", label: "BIOS Release Date", type: "date" },
-          { name: "motherboardSerial", label: "Motherboard Serial Number", type: "text", maxLength: 120 },
-          { name: "hardwareUUID", label: "Hardware UUID", type: "text", maxLength: 120 },
-          { name: "tpmVersion", label: "TPM Version", type: "text", maxLength: 40 },
+          { name: "biosVersion", label: "BIOS Version", placeholder: "e.g. 1.00", type: "text", maxLength: 80 },
+          { name: "biosDate", label: "BIOS Release Date", placeholder: "e.g. 2023-01-01", type: "date" },
+          { name: "motherboardSerial", label: "Motherboard Serial Number", placeholder: "e.g. MB1234567890", type: "text", maxLength: 120 },
+          { name: "hardwareUUID", label: "Hardware UUID", placeholder: "e.g. 12345678-1234-1234-1234-1234567890AB", type: "text", maxLength: 120 },
+          { name: "tpmVersion", label: "TPM Version", placeholder: "e.g. 2.0", type: "text", maxLength: 40 },
           { name: "secureBootEnabled", label: "Secure Boot Enabled", type: "select", options: common.booleanOptions },
         ],
       },
+
+      //! Graphics Card
       {
         sectionTitle: "Graphics Card",
+         showIf: { graphicCard: "Yes" },
         fields: [
-          { name: "gpuManufacturer", label: "Graphics Card Manufacturer", type: "text", maxLength: 80 },
-          { name: "gpuModelNumber", label: "Graphics Card Model Number", type: "text", maxLength: 120 },
-          { name: "gpuSerialNumber", label: "Serial Number", type: "text", maxLength: 120 },
-          { name: "gpuCapacityGB", label: "Capacity (GB)", type: "number", min: 1, max: 200000 },
+          { name: "gpuManufacturer", placeholder: "e.g. NVIDIA", label: "Graphics Card Manufacturer", type: "text", maxLength: 80 },
+          { name: "gpuModelNumber", placeholder: "e.g. RTX 3060", label: "Graphics Card Model Number", type: "text", maxLength: 120 },
+          { name: "gpuSerialNumber", placeholder: "e.g. 1234567890", label: "Serial Number", type: "text", maxLength: 120 },
+          { name: "gpuCapacityGB", placeholder: "e.g. 6", label: "Capacity (GB)", type: "number", min: 1, max: 200000 },
           {
             name: "gpuType",
             label: "Graphics Card Type",
             type: "select",
             options: [],
           },
-          { name: "gpuInterfaceSpeed", label: "Interface Speed", type: "text", maxLength: 40 },
+          { name: "gpuInterfaceSpeed", placeholder: "e.g. PCIe 4.0", label: "Interface Speed", type: "text", maxLength: 40 },
         ],
       },
 
@@ -180,6 +184,7 @@ export const fixedConfigs = {
       }),
     ],
   },
+  //TODO  Monitor Configuration
   monitor: {
     sections: [
        //! Basic Information
@@ -190,8 +195,8 @@ export const fixedConfigs = {
         // addFields: [{},{},{}],
       }),
       //! Location Information
-      fromGeneric("Location Information",{
-         omitFields: ["organization","rackNumber","rackUnit", "location", "floor", "room", "locationType", "building"],
+      fromGeneric("Location & Other Information",{
+         omitFields: ["graphicCard","organization","rackNumber","rackUnit", "location", "floor", "room", "locationType", "building"],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
         }),
@@ -199,13 +204,13 @@ export const fixedConfigs = {
       {
         sectionTitle: "Display Specifications",
         fields: [
-          { name: "screenSizeInches", label: "Screen Size (Inches)", type: "number", min: 10, max: 150 },
-          { name: "resolution", label: "Resolution", type: "text", maxLength: 40 },
-          { name: "panelType", label: "Panel Type (IPS/TN/VA/OLED)", type: "text", maxLength: 40 },
-          { name: "refreshRateHz", label: "Refresh Rate (Hz)", type: "number", min: 30, max: 500 },
-          { name: "aspectRatio", label: "Aspect Ratio", type: "text", maxLength: 20 },
-          { name: "brightnessNits", label: "Brightness (Nits)", type: "number", min: 100, max: 5000 },
-          { name: "responseTimeMs", label: "Response Time (ms)", type: "number", min: 1, max: 50 },
+          { name: "screenSizeInches", placeholder: "e.g. 15.6", label: "Screen Size (Inches)", type: "number", min: 10, max: 150 },
+          { name: "resolution", placeholder: "e.g. 1920x1080", label: "Resolution", type: "text", maxLength: 40 },
+          { name: "panelType", placeholder: "e.g. IPS", label: "Panel Type (IPS/TN/VA/OLED)", type: "text", maxLength: 40 },
+          { name: "refreshRateHz", placeholder: "e.g. 60", label: "Refresh Rate (Hz)", type: "number", min: 30, max: 500 },
+          { name: "aspectRatio", placeholder: "e.g. 16:9", label: "Aspect Ratio", type: "text", maxLength: 20 },
+          { name: "brightnessNits", placeholder: "e.g. 300", label: "Brightness (Nits)", type: "number", min: 100, max: 5000 },
+          { name: "responseTimeMs", placeholder: "e.g. 1", label: "Response Time (ms)", type: "number", min: 1, max: 50 },
           { name: "curved", label: "Curved Display", type: "select", options: common.booleanOptions },
         ],
       },
@@ -213,10 +218,10 @@ export const fixedConfigs = {
       {
         sectionTitle: "Ports & Connectivity",
         fields: [
-          { name: "hdmiPorts", label: "HDMI Ports", type: "number", min: 0, max: 10 },
-          { name: "displayPort", label: "DisplayPort Ports", type: "number", min: 0, max: 10 },
+          { name: "hdmiPorts", placeholder: "e.g. 2", label: "HDMI Ports", type: "number", min: 0, max: 10 },
+          { name: "displayPort", placeholder: "e.g. 1", label: "DisplayPort Ports", type: "number", min: 0, max: 10 },
           { name: "vgaPort", label: "VGA Port Available", type: "select", options: common.booleanOptions },
-          { name: "usbPorts", label: "USB Ports", type: "number", min: 0, max: 20 },
+          { name: "usbPorts", placeholder: "e.g. 4", label: "USB Ports", type: "number", min: 0, max: 20 },
           { name: "audioOut", label: "Audio Out Port", type: "select", options: common.booleanOptions },
           { name: "builtInSpeakers", label: "Built-in Speakers", type: "select", options: common.booleanOptions },
         ],
@@ -225,9 +230,9 @@ export const fixedConfigs = {
       {
         sectionTitle: "Power & Energy",
         fields: [
-          { name: "powerConsumptionWatt", label: "Power Consumption (Watts)", type: "number", min: 1, max: 2000 },
-          { name: "energyRating", label: "Energy Rating", type: "text", maxLength: 20 },
-          { name: "voltageRange", label: "Voltage Range", type: "text", maxLength: 40 },
+          { name: "powerConsumptionWatt", placeholder: "e.g. 150", label: "Power Consumption (Watts)", type: "number", min: 1, max: 2000 },
+          { name: "energyRating", placeholder: "e.g. A+", label: "Energy Rating", type: "text", maxLength: 20 },
+          { name: "voltageRange", placeholder: "e.g. 12V", label: "Voltage Range", type: "text", maxLength: 40 },
         ],
       },
       
@@ -255,7 +260,7 @@ export const fixedConfigs = {
     ],
   },
 
-  //  Printer Configuration
+  //TODO  Printer Configuration
   printer: {
     sections: [
       //! Basic Information
@@ -278,10 +283,10 @@ export const fixedConfigs = {
         fields: [
           { name: "printTechnology", label: "Print Technology", type: "select", options: common.printTechnologies },
           { name: "colorSupport", label: "Color Printing Supported", type: "select", options: common.booleanOptions },
-          { name: "printSpeedPPM", label: "Print Speed (PPM)", type: "number", min: 1, max: 500 },
-          { name: "maxResolutionDPI", label: "Max Resolution (DPI)", type: "number", min: 300, max: 9600 },
-          { name: "monthlyDutyCycle", label: "Monthly Duty Cycle (Pages)", type: "number", min: 1000, max: 1000000 },
-          { name: "recommendedMonthlyVolume", label: "Recommended Monthly Volume", type: "number", min: 1000, max: 500000 },
+          { name: "printSpeedPPM", placeholder: "e.g. 300", label: "Print Speed (PPM)", type: "number", min: 1, max: 500 },
+          { name: "maxResolutionDPI", placeholder: "e.g. 600", label: "Max Resolution (DPI)", type: "number", min: 300, max: 9600 },
+          { name: "monthlyDutyCycle", placeholder: "e.g. 5000", label: "Monthly Duty Cycle (Pages)", type: "number", min: 1000, max: 1000000 },
+          { name: "recommendedMonthlyVolume", placeholder: "e.g. 10000", label: "Recommended Monthly Volume", type: "number", min: 1000, max: 500000 },
           { name: "duplexPrinting", label: "Duplex Printing Supported", type: "select", options: common.booleanOptions },
           { name: "networkSupport", label: "Network Support", type: "select", options: common.booleanOptions, defaultValue: "No" },
         ],
@@ -293,7 +298,7 @@ export const fixedConfigs = {
         fields: [
           { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
           { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
-          { name: "totalPrintCount", label: "Total Print Count", type: "number", min: 0, max: 100000000 },
+          { name: "totalPrintCount", placeholder: "e.g. 1000000", label: "Total Print Count", type: "number", min: 0, max: 100000000 },
           { name: "lastServiceDate", label: "Last Service Date", type: "date" },
           { name: "condition", label: "Physical Condition", type: "select", options: common.conditionStatus },
           
@@ -303,19 +308,19 @@ export const fixedConfigs = {
       {
         sectionTitle: "Scanner & Copier (If MFP)",
         fields: [
-          { name: "scannerAvailable", label: "Scanner Available", type: "select", options: common.booleanOptions },
-          { name: "scanResolutionDPI", label: "Scan Resolution (DPI)", type: "number", min: 300, max: 4800 },
+          { name: "scannerAvailable",  label: "Scanner Available", type: "select", options: common.booleanOptions },
+          { name: "scanResolutionDPI", placeholder: "e.g. 4800", label: "Scan Resolution (DPI)", type: "number", min: 300, max: 4800 },
           { name: "adfAvailable", label: "ADF Available", type: "select", options: common.booleanOptions },
-          { name: "copySpeedCPM", label: "Copy Speed (CPM)", type: "number", min: 1, max: 500 },
+          { name: "copySpeedCPM", placeholder: "e.g. 300", label: "Copy Speed (CPM)", type: "number", min: 1, max: 500 },
         ],
       },
       //! Cartridge / Toner Details
       {
         sectionTitle: "Cartridge / Toner Details",
         fields: [
-          { name: "cartridgeModel", label: "Cartridge / Toner Model", type: "text", maxLength: 120 },
-          { name: "cartridgeType", label: "Cartridge Type (Black/Color)", type: "text", maxLength: 80 },
-          { name: "yieldPages", label: "Cartridge Yield (Pages)", type: "number", min: 100, max: 100000 },
+          { name: "cartridgeModel", placeholder: "e.g. HP LaserJet", label: "Cartridge / Toner Model", type: "text", maxLength: 120 },
+          { name: "cartridgeType", placeholder: "e.g. Black", label: "Cartridge Type (Black/Color)", type: "text", maxLength: 80 },
+          { name: "yieldPages", placeholder: "e.g. 10000", label: "Cartridge Yield (Pages)", type: "number", min: 100, max: 100000 },
           { name: "lastCartridgeChangeDate", label: "Last Cartridge Change Date", type: "date" },
         ],
       },
@@ -331,10 +336,10 @@ export const fixedConfigs = {
       {
         sectionTitle: "Physical & Power",
         fields: [
-          { name: "color", label: "Color", type: "text", maxLength: 40 },
-          { name: "weightKg", label: "Weight (Kg)", type: "number", min: 0, max: 200 },
-          { name: "powerConsumptionWatt", label: "Power Consumption (Watts)", type: "number", min: 10, max: 5000 },
-          { name: "voltageRange", label: "Voltage Range", type: "text", maxLength: 40 },
+          { name: "color", placeholder: "e.g. Black", label: "Color", type: "text", maxLength: 40 },
+          { name: "weightKg", placeholder: "e.g. 1.5", label: "Weight (Kg)", type: "number", min: 0, max: 200 },
+          { name: "powerConsumptionWatt", placeholder: "e.g. 200", label: "Power Consumption (Watts)", type: "number", min: 10, max: 5000 },
+          { name: "voltageRange", placeholder: "e.g. 220V", label: "Voltage Range", type: "text", maxLength: 40 },
         ],
       },
        //! Purchase Information
@@ -359,6 +364,8 @@ export const fixedConfigs = {
      
     ],
   },
+  
+  //TODO  Laptop Configuration
   laptop: {
     sections: [
       //! Basic Information
@@ -377,11 +384,11 @@ export const fixedConfigs = {
       {
         sectionTitle: "Operating System",
         fields: [
-          { name: "osName", label: "OS Name", type: "text", maxLength: 100 },
-          { name: "osEdition", label: "OS Edition", type: "text", maxLength: 80 },
-          { name: "osVersion", label: "OS Version", type: "text", maxLength: 40 },
-          { name: "buildNumber", label: "Build Number", type: "text", maxLength: 40 },
-          { name: "osLicenseKey", label: "OS License Key", type: "text", maxLength: 120 },
+          { name: "osName", placeholder: "e.g. Windows 10", label: "OS Name", type: "text", maxLength: 100 },
+          { name: "osEdition", placeholder: "e.g. Professional", label: "OS Edition", type: "text", maxLength: 80 },
+          { name: "osVersion", placeholder: "e.g. 10.0.19045", label: "OS Version", type: "text", maxLength: 40 },
+          { name: "buildNumber", placeholder: "e.g. 19045", label: "Build Number", type: "text", maxLength: 40 },
+          { name: "osLicenseKey", placeholder: "e.g. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX", label: "OS License Key", type: "text", maxLength: 120 },
           { name: "activationStatus", label: "Activation Status", type: "select", options: common.activationStatus },
         ],
       },
@@ -389,20 +396,20 @@ export const fixedConfigs = {
       {
         sectionTitle: "Memory",
         fields: [
-          { name: "ramManufacturer", label: "Memory Manufacturer", type: "text", maxLength: 80 },
-          { name: "ramModelNumber", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
-          { name: "ramSerialNumber", label: "Memory Serial Number", type: "text", maxLength: 100 },
-          { name: "ramCapacityGB", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
+          { name: "ramManufacturer", placeholder: "e.g. Corsair", label: "Memory Manufacturer", type: "text", maxLength: 80 },
+          { name: "ramModelNumber", placeholder: "e.g. Vengeance LPX", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
+          { name: "ramSerialNumber", placeholder: "e.g. 1234567890", label: "Memory Serial Number", type: "text", maxLength: 100 },
+          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
           {
             name: "ramType",
             label: "RAM Type",
             type: "select",
             options: [],
           },
-          { name: "ramSpeedMHz", label: "Speed (MHz)", type: "number", min: 400, max: 1000000 },
-          { name: "ramFormFactor", label: "Form Factor", type: "text", maxLength: 40 },
-          { name: "ramSlot", label: "Memory Slot", type: "text", maxLength: 40 },
-          { name: "ramChannel", label: "Channel", type: "text", maxLength: 40 },
+          { name: "ramSpeedMHz", placeholder: "e.g. 3200", label: "Speed (MHz)", type: "number", min: 400, max: 1000000 },
+          { name: "ramFormFactor", placeholder: "e.g. DIMM", label: "Form Factor", type: "text", maxLength: 40 },
+          { name: "ramSlot", placeholder: "e.g. DIMM Slot 1", label: "Memory Slot", type: "text", maxLength: 40 },
+          { name: "ramChannel", placeholder: "e.g. Channel 1", label: "Channel", type: "text", maxLength: 40 },
           
         ],
       },
@@ -413,7 +420,7 @@ export const fixedConfigs = {
           
           { 
             name: "cpuManufacturer", 
-            label: "Processor Manufacturer", 
+            label: "Processor Manufacturer",
             type: "select", 
             required: true, 
             options: [
@@ -446,10 +453,10 @@ export const fixedConfigs = {
             ] 
           
           },
-          { name: "processorGeneration", label: "Processor Generation", type: "number", min: 0, max: 10 },
-          { name: "processorModel", label: "Processor Model", type: "number", maxLength: 40 },
-          { name: "cores", label: "Number of Cores", type: "number", min: 1, max: 256 },
-          { name: "threads", label: "Number of Threads", type: "number", min: 1, max: 512 },
+          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 10 },
+          { name: "processorModel", placeholder: "e.g. i7-11800H", label: "Processor Model", type: "number", maxLength: 40 },
+          { name: "cores", placeholder: "e.g. 8", label: "Number of Cores", type: "number", min: 1, max: 256 },
+          { name: "threads", placeholder: "e.g. 16", label: "Number of Threads",  type: "number", min: 1, max: 512 },
           { name: "virtualizationEnabled", label: "Virtualization Enabled", type: "select", options: common.booleanOptions },
         ],
       },
@@ -457,22 +464,24 @@ export const fixedConfigs = {
       {
         sectionTitle: "Storage",
         fields: [
-          { name: "driveManufacturer", label: "Drive Manufacturer", type: "text", maxLength: 80 },
-          { name: "driveModelNumber", label: "Drive Model Number", type: "text", maxLength: 120 },
-          { name: "driveSerial", label: "Serial Number", type: "text", maxLength: 120 },
-          { name: "driveCapacityGB", label: "Capacity (GB)", type: "number", min: 1, max: 200000 },
+          { name: "driveManufacturer", label: "Drive Manufacturer", placeholder: "e.g. Samsung", type: "text", maxLength: 80 },
+          { name: "driveModelNumber", label: "Drive Model Number", placeholder: "e.g. M.2 SSD", type: "text", maxLength: 120 },
+          { name: "driveSerial", label: "Serial Number", placeholder: "e.g. 1234567890", type: "text", maxLength: 120 },
+          { name: "driveCapacityGB", label: "Capacity (GB)", placeholder: "e.g. 1000", type: "number", min: 1, max: 200000 },
           {
             name: "driveType",
             label: "Drive Type",
             type: "select",
             options: [],
           },
-          { name: "driveInterfaceSpeed", label: "Interface Speed", type: "text", maxLength: 40 },
+          { name: "driveInterfaceSpeed", label: "Interface Speed", placeholder: "e.g. PCIe 4.0", type: "text", maxLength: 40 },
           // { name: "driveSlot", label: "Slot Label", type: "text", maxLength: 40 },
           { name: "raidConfigured", label: "RAID Configured", type: "select", options: common.booleanOptions },
           { name: "encryptionEnabled", label: "Disk Encryption Enabled", type: "select", options: common.booleanOptions },
         ],
       },
+
+      //! Display & Graphics
       {
         sectionTitle: "Display & Graphics",
         fields: [
@@ -648,6 +657,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Tablet Configuration
   tablet: {
     sections: [
       {
@@ -770,6 +780,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Projector Configuration
   projector: {
     sections: [
       {
@@ -886,6 +897,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Network Switch Configuration
   networkSwitch: {
     sections: [
       {
@@ -997,6 +1009,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Router Configuration
   router: {
     sections: [
       {
@@ -1125,6 +1138,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Barcode Printer Configuration
   barcodePrinter: {
     sections: [
       {
@@ -1224,6 +1238,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Barcode Scanner Configuration
   barcodeScanner: {
     sections: [
       {
@@ -1340,6 +1355,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Scanner Configuration
   scanner: {
     sections: [
       {
@@ -1412,6 +1428,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Firewall Configuration
   firewall: {
     sections: [
       {
@@ -1541,6 +1558,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  Biometric Device Configuration
   biometricDevice: {
     sections: [
       {
@@ -1670,6 +1688,7 @@ export const fixedConfigs = {
       },
     ],
   },
+  //TODO  NAS Storage Configuration
   nasStorage: {
     sections: [
       {

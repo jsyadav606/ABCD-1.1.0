@@ -7,7 +7,7 @@
  * - Dynamic sections render + table sections (Memory/Storage/Network) ke rows manage karna
  * - Frontend form ko backend payload me convert karke /assets par submit karna
  */
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./AddItem.css";
 // @ts-ignore
@@ -230,7 +230,7 @@ const AddItemPage = () => {
     };
 
     return baseSections.map((sec) => {
-      if (sec.sectionTitle === "Location Information") {
+      if (sec.sectionTitle === "Location & Other Information") {
         return updateSectionFields(sec, {
           branch: { options: branchOptions, required: true, readOnly: false },
         });
@@ -270,10 +270,55 @@ const AddItemPage = () => {
     }
   }, [sections, form]);
 
+  const purchaseDateAutoRef = useRef({ value: "", receivedOn: "" });
+  const lastItemReceivedOnRef = useRef("");
+
+  const itemReceivedOn = form.itemReceivedOn;
+  const invoiceDate = form.invoiceDate;
+  const receiptDate = form.receiptDate;
+  const poDate = form.poDate;
+  const deliveryChallanDate = form.deliveryChallanDate;
+  const purchaseDate = form.purchaseDate;
+
   const updateField = (name, value) => {
+    if (name === "purchaseDate") {
+      purchaseDateAutoRef.current = { value: "", receivedOn: "" };
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
+  useEffect(() => {
+    const cur = String(itemReceivedOn || "");
+    const prev = lastItemReceivedOnRef.current;
+    if (prev && cur && prev !== cur) {
+      if (purchaseDateAutoRef.current.value && purchaseDate === purchaseDateAutoRef.current.value) {
+        setForm((p) => ({ ...p, purchaseDate: "" }));
+        setErrors((e) => (e.purchaseDate ? { ...e, purchaseDate: "" } : e));
+        purchaseDateAutoRef.current = { value: "", receivedOn: "" };
+      }
+    }
+    lastItemReceivedOnRef.current = cur;
+  }, [itemReceivedOn, purchaseDate]);
+
+  useEffect(() => {
+    const receivedOn = String(itemReceivedOn || "").toLowerCase();
+    let suggested = "";
+    if (receivedOn === "invoice") suggested = String(invoiceDate || "");
+    else if (receivedOn === "challan") suggested = String(deliveryChallanDate || "");
+    else suggested = String(receiptDate || poDate || invoiceDate || deliveryChallanDate || "");
+
+    if (!suggested) return;
+
+    const cur = purchaseDate;
+    const isEmpty = cur === undefined || cur === null || String(cur).trim() === "";
+    const isAuto = purchaseDateAutoRef.current.value && cur === purchaseDateAutoRef.current.value;
+    if (!isEmpty && !isAuto) return;
+
+    setForm((prev) => ({ ...prev, purchaseDate: suggested }));
+    setErrors((prev) => (prev.purchaseDate ? { ...prev, purchaseDate: "" } : prev));
+    purchaseDateAutoRef.current = { value: suggested, receivedOn };
+  }, [deliveryChallanDate, invoiceDate, itemReceivedOn, poDate, purchaseDate, receiptDate]);
 
   const validate = () => {
     const newErr = {};
@@ -478,55 +523,62 @@ const AddItemPage = () => {
     return `Add ${itemType}`;
   })();
 
+  const isFormReady = !!category && !!itemType && !loadingItemConfig && Array.isArray(sections) && sections.length > 0;
+
   return (
     <div className="add-item-page">
-      <div className="page-header">
-        <button aria-label="Back" className="back-btn" onClick={() => navigate(-1)}>←</button>
-        <span className="page-title">{itemTitle}</span>
-      </div>
-      <div className="sticky-header" role="toolbar">
-        <div className="sticky-row">
-          <div className="sticky-controls">
-            <label className="control">
-              <span>Category</span>
-              <
-// @ts-ignore
-              Select
-                name="category"
-                value={category}
-                onChange={onCategoryChange}
-                options={CATEGORIES}
-                placeholder="Select Category"
-              />
-            </label>
-            <label className="control">
-              <span>Select Item</span>
-              <
-// @ts-ignore
-              Select
-                name="itemType"
-                value={itemType}
-                onChange={onItemTypeChange}
-                options={itemsForCategory}
-                disabled={!category}
-                placeholder="Select item"
-              />
-            </label>
+      <div className="add-item-sticky">
+        <div className="add-item-topbar" role="toolbar">
+          <div className="topbar-left">
+            <button aria-label="Back" className="back-btn" onClick={() => navigate(-1)}>
+              ←
+            </button>
+            <div className="topbar-controls">
+              <div className="control">
+                <span>Category</span>
+                <
+  // @ts-ignore
+                Select
+                  name="category"
+                  value={category}
+                  onChange={onCategoryChange}
+                  options={CATEGORIES}
+                  placeholder="Select Category"
+                />
+              </div>
+              <div className="control">
+                <span>Select Item</span>
+                <
+  // @ts-ignore
+                Select
+                  name="itemType"
+                  value={itemType}
+                  onChange={onItemTypeChange}
+                  options={itemsForCategory}
+                  disabled={!category}
+                  placeholder="Select item"
+                />
+              </div>
+            </div>
           </div>
+          {category && itemType ? <div className="topbar-title">{itemTitle}</div> : null}
+          <div className="topbar-right" />
         </div>
       </div>
-      <div className="form-body">
-        <FormRenderer
-          sections={sections}
-          formData={form}
-          errors={errors}
-          onChange={updateField}
-          onSubmit={submit}
-          onReset={() => setForm({})}
-          onCancel={onCancel}
-          submitting={submitting || loadingItemConfig}
-        />
-      </div>
+      {isFormReady ? (
+        <div className="form-body">
+          <FormRenderer
+            sections={sections}
+            formData={form}
+            errors={errors}
+            onChange={updateField}
+            onSubmit={submit}
+            onReset={() => setForm({})}
+            onCancel={onCancel}
+            submitting={submitting || loadingItemConfig}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };
