@@ -273,11 +273,17 @@ const AddItemPage = () => {
   const purchaseDateAutoRef = useRef({ value: "", receivedOn: "" });
   const lastItemReceivedOnRef = useRef("");
 
+  // @ts-ignore
   const itemReceivedOn = form.itemReceivedOn;
+  // @ts-ignore
   const invoiceDate = form.invoiceDate;
+  // @ts-ignore
   const receiptDate = form.receiptDate;
+  // @ts-ignore
   const poDate = form.poDate;
+  // @ts-ignore
   const deliveryChallanDate = form.deliveryChallanDate;
+  // @ts-ignore
   const purchaseDate = form.purchaseDate;
 
   const updateField = (name, value) => {
@@ -294,6 +300,7 @@ const AddItemPage = () => {
     if (prev && cur && prev !== cur) {
       if (purchaseDateAutoRef.current.value && purchaseDate === purchaseDateAutoRef.current.value) {
         setForm((p) => ({ ...p, purchaseDate: "" }));
+        // @ts-ignore
         setErrors((e) => (e.purchaseDate ? { ...e, purchaseDate: "" } : e));
         purchaseDateAutoRef.current = { value: "", receivedOn: "" };
       }
@@ -316,9 +323,10 @@ const AddItemPage = () => {
     if (!isEmpty && !isAuto) return;
 
     setForm((prev) => ({ ...prev, purchaseDate: suggested }));
+    // @ts-ignore
     setErrors((prev) => (prev.purchaseDate ? { ...prev, purchaseDate: "" } : prev));
     purchaseDateAutoRef.current = { value: suggested, receivedOn };
-  }, [deliveryChallanDate, invoiceDate, itemReceivedOn, poDate, purchaseDate, receiptDate]);
+  }, [deliveryChallanDate, invoiceDate, purchaseDate, receiptDate]);
 
   const validate = () => {
     const newErr = {};
@@ -478,7 +486,69 @@ const AddItemPage = () => {
         sections: sectionsPayload,
         ...form,
       };
-      await apiService.createAsset(payload);
+
+      const PURCHASE_KEYS = [
+        "purchaseType",
+        "poNumber",
+        "poDate",
+        "receiptNumber",
+        "receiptDate",
+        "purchaseDate",
+        "vendorId",
+        "itemReceivedOn",
+        "invoiceNumber",
+        "invoiceDate",
+        "deliveryChallanNumber",
+        "deliveryChallanDate",
+        "purchaseCost",
+        "taxAmount",
+        "totalAmount",
+        "currency",
+        "deliveryDate",
+        "receivedBy",
+      ];
+      const WARRANTY_KEYS = [
+        "warrantyAvailable",
+        "warrantyMode",
+        "inYear",
+        "inMonth",
+        "warrantyStartDate",
+        "warrantyEndDate",
+        "warrantyProvider",
+        "supportVendor",
+        "supportPhone",
+        "supportEmail",
+        "amcAvailable",
+        "amcVendor",
+        "amcStartDate",
+        "amcEndDate",
+      ];
+
+      const purchase = {};
+      PURCHASE_KEYS.forEach((k) => {
+        if (Object.prototype.hasOwnProperty.call(form, k)) purchase[k] = form[k];
+      });
+      const warranty = {};
+      WARRANTY_KEYS.forEach((k) => {
+        if (Object.prototype.hasOwnProperty.call(form, k)) warranty[k] = form[k];
+      });
+
+      PURCHASE_KEYS.forEach((k) => delete payload[k]);
+      WARRANTY_KEYS.forEach((k) => delete payload[k]);
+
+      const created = await apiService.createAsset(payload);
+      const createdAsset = created?._id ? created : created?.doc?._id ? created.doc : created?.data?._id ? created.data : created;
+      const assetId = createdAsset?._id || createdAsset?.id;
+      if (!assetId) {
+        throw new Error("Asset created but assetId missing in response");
+      }
+
+      await Promise.all([
+        // @ts-ignore
+        apiService.upsertPurchase(assetId, { ...purchase, itemType, itemCategory: category || form.itemCategory || null, branchId: form.branch }),
+        // @ts-ignore
+        apiService.upsertWarranty(assetId, { ...warranty, itemType, itemCategory: category || form.itemCategory || null, branchId: form.branch }),
+      ]);
       alert("Item saved successfully.");
       navigate("/assets");
     } catch (err) {

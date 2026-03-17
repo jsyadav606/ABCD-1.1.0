@@ -25,7 +25,6 @@ const create = async (req) => {
     displayPort: toNumberOrNull(body.displayPort),
     usbPorts: toNumberOrNull(body.usbPorts),
     powerConsumptionWatt: toNumberOrNull(body.powerConsumptionWatt),
-    purchaseCost: toNumberOrNull(body.purchaseCost),
     ...ensureOrgAndAudit(req),
   };
 
@@ -33,6 +32,40 @@ const create = async (req) => {
   delete payload.flat;
   delete payload.memory;
   delete payload.storage;
+  [
+    "purchaseType",
+    "poNumber",
+    "poDate",
+    "receiptNumber",
+    "receiptDate",
+    "purchaseDate",
+    "vendorId",
+    "itemReceivedOn",
+    "invoiceNumber",
+    "invoiceDate",
+    "deliveryChallanNumber",
+    "deliveryChallanDate",
+    "purchaseCost",
+    "taxAmount",
+    "totalAmount",
+    "currency",
+    "deliveryDate",
+    "receivedBy",
+    "warrantyAvailable",
+    "warrantyMode",
+    "inYear",
+    "inMonth",
+    "warrantyStartDate",
+    "warrantyEndDate",
+    "warrantyProvider",
+    "supportVendor",
+    "supportPhone",
+    "supportEmail",
+    "amcAvailable",
+    "amcVendor",
+    "amcStartDate",
+    "amcEndDate",
+  ].forEach((k) => delete payload[k]);
 
   const doc = await Monitor.create(payload);
   return { doc, message: "Asset created successfully" };

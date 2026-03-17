@@ -92,6 +92,41 @@ const create = async (req) => {
   delete payload.storageDevices;
   delete payload.networkDetails;
 
+  [
+    "purchaseType",
+    "poNumber",
+    "poDate",
+    "receiptNumber",
+    "receiptDate",
+    "purchaseDate",
+    "vendorId",
+    "itemReceivedOn",
+    "invoiceNumber",
+    "invoiceDate",
+    "deliveryChallanNumber",
+    "deliveryChallanDate",
+    "purchaseCost",
+    "taxAmount",
+    "totalAmount",
+    "currency",
+    "deliveryDate",
+    "receivedBy",
+    "warrantyAvailable",
+    "warrantyMode",
+    "inYear",
+    "inMonth",
+    "warrantyStartDate",
+    "warrantyEndDate",
+    "warrantyProvider",
+    "supportVendor",
+    "supportPhone",
+    "supportEmail",
+    "amcAvailable",
+    "amcVendor",
+    "amcStartDate",
+    "amcEndDate",
+  ].forEach((k) => delete payload[k]);
+
   const doc = await CPU.create(payload);
   return { doc, message: "Asset created successfully" };
 };

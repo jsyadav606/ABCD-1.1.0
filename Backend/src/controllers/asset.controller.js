@@ -9,6 +9,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { handlers } from "../assets/handlers/index.js";
+import { Purchase } from "../models/purchase.model.js";
+import { Warranty } from "../models/warranty.model.js";
 
 const normKey = (val) => String(val || "").trim().toLowerCase();
 
@@ -56,7 +58,11 @@ export const getAssetById = asyncHandler(async (req, res) => {
   if (itemType) {
     const handler = getHandler(itemType);
     const { doc, message } = await handler.getById(req);
-    return res.status(200).json(new apiResponse(200, doc, message || "Asset retrieved"));
+    const [purchase, warranty] = await Promise.all([
+      Purchase.findOne({ assetId: doc?._id, organizationId: req.user?.organizationId, isDeleted: false }).lean(),
+      Warranty.findOne({ assetId: doc?._id, organizationId: req.user?.organizationId, isDeleted: false }).lean(),
+    ]);
+    return res.status(200).json(new apiResponse(200, { ...doc, purchase: purchase || null, warranty: warranty || null }, message || "Asset retrieved"));
   }
 
   // Try-all lookup: har handler se try karo jab tak mil na jaye (404 skip)
@@ -67,7 +73,11 @@ export const getAssetById = asyncHandler(async (req, res) => {
   for (const h of orderedHandlers) {
     try {
       const { doc, message } = await h.getById(req);
-      return res.status(200).json(new apiResponse(200, doc, message || "Asset retrieved"));
+      const [purchase, warranty] = await Promise.all([
+        Purchase.findOne({ assetId: doc?._id, organizationId: req.user?.organizationId, isDeleted: false }).lean(),
+        Warranty.findOne({ assetId: doc?._id, organizationId: req.user?.organizationId, isDeleted: false }).lean(),
+      ]);
+      return res.status(200).json(new apiResponse(200, { ...doc, purchase: purchase || null, warranty: warranty || null }, message || "Asset retrieved"));
     } catch (err) {
       if (err?.statusCode === 404) continue;
       throw err;

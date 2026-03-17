@@ -101,23 +101,6 @@ const assetSchema = new mongoose.Schema(
     gpuType: { type: String, trim: true },
     gpuInterfaceSpeed: { type: String, trim: true },
 
-    // Purchase Information
-    purchaseType: { type: String, trim: true },
-    poNumber: { type: String, trim: true },
-    poDate: { type: Date, default: null },
-    receiptNumber: { type: String, trim: true },
-    receiptDate: { type: Date, default: null },
-    purchaseDate: { type: Date, default: null },
-    vendorId: { type: String, trim: true },
-    itemReceivedOn: { type: String, trim: true },
-    invoiceNumber: { type: String, trim: true },
-    invoiceDate: { type: Date, default: null },
-    deliveryChallanNumber: { type: String, trim: true },
-    deliveryChallanDate: { type: Date, default: null },
-    purchaseCost: { type: Number, default: null },
-    deliveryDate: { type: Date, default: null },
-    receivedBy: { type: String, trim: true },
-
     // Item State
     itemStatus: { type: String, trim: true, default: "active" },
     itemIsCurrently: { type: String, trim: true, default: "inStore" },
