@@ -86,6 +86,9 @@ export const genericConfig = {
         { name: "supportPhone", label: "Support Phone", placeholder: "Enter Support Phone", type: "text", showIf: { warrantyAvailable: "Yes", warrantyProvider: "Extended" } },
         { name: "supportEmail", label: "Support Email", placeholder: "Enter Support Email", type: "text", showIf: { warrantyAvailable: "Yes", warrantyProvider: "Extended" } },
 
+        { name: "warrantyTillDate", label: "Warranty Till Date", placeholder: "Auto calculated", type: "date", readOnly: true, showIf: { warrantyAvailable: "Yes" } },
+        { name: "warrantyStatus", label: "Warranty Status", placeholder: "Auto calculated", type: "text", readOnly: true, showIf: { warrantyAvailable: "Yes" } },
+
         { name: "amcAvailable", label: "AMC Available", placeholder: "Select AMC Available", defaultValue: "No", type: "select", options: ["Yes", "No"], showIf: { warrantyAvailable: "No" } },
 
         { name: "amcVendor", label: "AMC Vendor", placeholder: "Enter AMC Vendor", type: "text", showIf: { warrantyAvailable: "No", amcAvailable: "Yes" } },
@@ -147,7 +150,7 @@ export const genericConfig = {
         { name: "rackUnit", label: "Rack Unit", placeholder: "Enter Rack Unit", type: "text" },
 
         //* other information
-        {name: "graphicCard", label: "Graphic Card", type: "select", options: common.booleanOptions},
+        
       ],
     },
 
@@ -157,14 +160,14 @@ export const genericConfig = {
         fields: [
           
           { name: "nicType", label: "NIC", placeholder: "Select NIC", type: "select", options: common.nicTypes },
+          { name: "dhcpEnabled", label: "DHCP Enabled", placeholder: "Select DHCP Enabled", type: "select", options: common.booleanOptions },
+          { name: "dhcpServer", label: "DHCP Server", placeholder: "Enter DHCP Server", type: "text", maxLength: 120, showIf: { dhcpEnabled: "Yes" } },
           { name: "ipv4Address", label: "IPv4 Address", placeholder: "Enter IPv4 Address", type: "text", maxLength: 40 },
-          { name: "ipv6Address", label: "IPv6 Address", placeholder: "Enter IPv6 Address", type: "text", maxLength: 80 },
           { name: "subnet", label: "Subnet / Mask", placeholder: "Enter Subnet / Mask", type: "text", maxLength: 40 },
           { name: "defaultGateway", label: "Default Gateway", placeholder: "Enter Default Gateway", type: "text", maxLength: 40 },
-          { name: "dhcpEnabled", label: "DHCP Enabled", placeholder: "Select DHCP Enabled", type: "select", options: common.booleanOptions },
-          { name: "macAddress", label: "MAC Address", placeholder: "Enter MAC Address", type: "text", maxLength: 40 },
-          { name: "dhcpServer", label: "DHCP Server", placeholder: "Enter DHCP Server", type: "text", maxLength: 120, showIf: { dhcpEnabled: "Yes" } },
           { name: "dnsHostname", label: "DNS Hostname", placeholder: "Enter DNS Hostname", type: "text", maxLength: 120 },
+          { name: "macAddress", label: "MAC Address", placeholder: "Enter MAC Address", type: "text", maxLength: 40 },
+          { name: "ipv6Address", label: "IPv6 Address", placeholder: "Enter IPv6 Address", type: "text", maxLength: 80 },
           { name: "switchPort", label: "Switch Port", placeholder: "Enter Switch Port", type: "text", maxLength: 80, showIf: { nicType: "Ethernet" } },
           { name: "linkSpeedMbps", label: "Link Speed (Mbps)", placeholder: "Enter Link Speed (Mbps)", type: "number", min: 0, max: 100000, showIf: { nicType: "Ethernet" } },
 

@@ -22,6 +22,8 @@ import { CATEGORY_ITEMS, getItemFieldConfig } from "./config/itemFieldConfig.js"
 import { vendorAPI, lookupAPI } from "../../services/api.js";
 import { TABLE_SECTION_TITLES } from "./config/common.js";
 import Select from "../../components/Select/Select.jsx";
+// @ts-ignore
+import { calculateWarrantyTillDate, calculateWarrantyStatus } from "./utils/warrantyCalculations.js";
 
 const CATEGORIES = [
   { value: "fixed", label: "Fixed" },
@@ -216,6 +218,54 @@ const AddItemPage = () => {
       cancelled = true;
     };
   }, [itemType]);
+
+  // Calculate warranty till date and status whenever relevant fields change
+  useEffect(() => {
+    // @ts-ignore
+    const warrantyAvailable = String(form.warrantyAvailable || "").toLowerCase();
+    
+    if (warrantyAvailable !== "yes") {
+      // Clear warranty calculation fields if warranty not available
+      // @ts-ignore
+      if (form.warrantyTillDate || form.warrantyStatus) {
+        setForm((prev) => ({
+          ...prev,
+          warrantyTillDate: null,
+          warrantyStatus: null,
+        }));
+      }
+      return;
+    }
+
+    // @ts-ignore
+    const invoiceDate = form.invoiceDate;
+    const warrantyTillDate = calculateWarrantyTillDate(form, invoiceDate);
+
+    if (warrantyTillDate) {
+      const warrantyStatus = calculateWarrantyStatus(warrantyTillDate);
+      
+      // Only update if values actually changed to avoid unnecessary re-renders
+      // @ts-ignore
+      if (form.warrantyTillDate !== warrantyTillDate || form.warrantyStatus !== warrantyStatus) {
+        setForm((prev) => ({
+          ...prev,
+          warrantyTillDate,
+          warrantyStatus,
+        }));
+      }
+    } else {
+      // Clear if we can't calculate
+      // @ts-ignore
+      if (form.warrantyTillDate || form.warrantyStatus) {
+        setForm((prev) => ({
+          ...prev,
+          warrantyTillDate: null,
+          warrantyStatus: null,
+        }));
+      }
+    }
+  // @ts-ignore
+  }, [form.warrantyAvailable, form.warrantyMode, form.inYear, form.inMonth, form.warrantyEndDate, form.invoiceDate]);
 
   const sections = useMemo(() => {
     if (!category || !itemType) return [];
@@ -522,6 +572,8 @@ const AddItemPage = () => {
         "amcVendor",
         "amcStartDate",
         "amcEndDate",
+        "warrantyTillDate",
+        "warrantyStatus",
       ];
 
       const purchase = {};

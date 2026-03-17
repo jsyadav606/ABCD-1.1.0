@@ -24,6 +24,9 @@ const normalizeWarranty = (raw) => {
     out.supportVendor = null;
     out.supportPhone = null;
     out.supportEmail = null;
+    // Clear calculated fields when warranty not available
+    out.warrantyTillDate = null;
+    out.warrantyStatus = null;
   } else {
     out.amcAvailable = null;
     out.amcVendor = null;
@@ -50,6 +53,39 @@ const normalizeWarranty = (raw) => {
       out.supportPhone = null;
       out.supportEmail = null;
     }
+
+    // Frontend already calculated warrantyTillDate, backend just validates it
+    // Ensure warrantyTillDate is a valid date if present
+    if (out.warrantyTillDate) {
+      try {
+        const dateObj = new Date(out.warrantyTillDate);
+        if (isNaN(dateObj.getTime())) {
+          out.warrantyTillDate = null;
+          out.warrantyStatus = null;
+        } else {
+          // Convert to ISO string for consistent storage
+          out.warrantyTillDate = dateObj;
+          
+          // Calculate warranty status based on warranty till date
+          // Industrial Standard: If today > warrantyTillDate, warranty is expired
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const tillDate = new Date(dateObj);
+          tillDate.setHours(0, 0, 0, 0);
+          
+          if (today > tillDate) {
+            out.warrantyStatus = "Expired";
+          } else {
+            out.warrantyStatus = "Under Warranty";
+          }
+        }
+      } catch (e) {
+        out.warrantyTillDate = null;
+        out.warrantyStatus = null;
+      }
+    } else {
+      out.warrantyStatus = null;
+    }
   }
 
   if (warrantyAvailable === "no") {
@@ -71,12 +107,15 @@ export const upsertWarrantyByAsset = asyncHandler(async (req, res) => {
     throw new apiError(400, "Invalid assetId");
   }
 
-  const base = normalizeWarranty(req.body || {});
   const orgId = req.user?.organizationId || null;
   if (!orgId) {
     throw new apiError(400, "organizationId missing in user context");
   }
 
+  // Normalize and validate warranty data
+  // Frontend already calculated warrantyTillDate and remainingWarranty
+  const base = normalizeWarranty(req.body || {});
+  
   const filter = { assetId, organizationId: orgId, isDeleted: false };
   const update = {
     ...base,

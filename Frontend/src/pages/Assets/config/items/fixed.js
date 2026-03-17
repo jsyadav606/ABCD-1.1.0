@@ -141,19 +141,20 @@ export const fixedConfigs = {
       //! Graphics Card
       {
         sectionTitle: "Graphics Card",
-         showIf: { graphicCard: "Yes" },
         fields: [
-          { name: "gpuManufacturer", placeholder: "e.g. NVIDIA", label: "Graphics Card Manufacturer", type: "text", maxLength: 80 },
-          { name: "gpuModelNumber", placeholder: "e.g. RTX 3060", label: "Graphics Card Model Number", type: "text", maxLength: 120 },
-          { name: "gpuSerialNumber", placeholder: "e.g. 1234567890", label: "Serial Number", type: "text", maxLength: 120 },
-          { name: "gpuCapacityGB", placeholder: "e.g. 6", label: "Capacity (GB)", type: "number", min: 1, max: 200000 },
+          {name: "graphicCard", label: "Graphic Card", type: "select", options: common.booleanOptions, defaultValue: "No" },
+          { name: "gpuManufacturer", placeholder: "e.g. NVIDIA", label: "Graphics Card Manufacturer", type: "text", maxLength: 80, showIf: { graphicCard: "Yes" } },
+          { name: "gpuModelNumber", placeholder: "e.g. RTX 3060", label: "Graphics Card Model Number", type: "text", maxLength: 120, showIf: { graphicCard: "Yes" } },
+          { name: "gpuSerialNumber", placeholder: "e.g. 1234567890", label: "Serial Number", type: "text", maxLength: 120, showIf: { graphicCard: "Yes" } },
+          { name: "gpuCapacityGB", placeholder: "e.g. 6", label: "Capacity (GB)", type: "number", min: 1, max: 200000, showIf: { graphicCard: "Yes" } },
           {
             name: "gpuType",
             label: "Graphics Card Type",
             type: "select",
             options: [],
+            showIf: { graphicCard: "Yes" },
           },
-          { name: "gpuInterfaceSpeed", placeholder: "e.g. PCIe 4.0", label: "Interface Speed", type: "text", maxLength: 40 },
+          { name: "gpuInterfaceSpeed", placeholder: "e.g. PCIe 4.0", label: "Interface Speed", type: "text", maxLength: 40, showIf: { graphicCard: "Yes" } },
         ],
       },
 
@@ -178,7 +179,7 @@ export const fixedConfigs = {
       }),
       //! Network Details
       fromGeneric("Network Details",{
-        //  omitFields: ["","",""],
+         omitFields: ["linkSpeedMbps",],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
       }),

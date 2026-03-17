@@ -20,6 +20,10 @@ const warrantySchema = new mongoose.Schema(
     supportPhone: { type: String, trim: true },
     supportEmail: { type: String, trim: true },
 
+    // Calculated warranty till date and status
+    warrantyTillDate: { type: Date, default: null },
+    warrantyStatus: { type: String, enum: ["Under Warranty", "Expired"], default: null },
+
     amcAvailable: { type: String, trim: true },
     amcVendor: { type: String, trim: true },
     amcStartDate: { type: Date, default: null },
