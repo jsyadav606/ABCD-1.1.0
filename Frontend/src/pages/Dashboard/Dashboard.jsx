@@ -27,6 +27,7 @@ const Dashboard = () => {
   });
   const [branchOptions, setBranchOptions] = useState([]);
   const [totalUsers, setTotalUsers] = useState(null);
+  const [totalFixedAssets, setTotalFixedAssets] = useState(null);
 
   // Compute users count based on selected branch (all or single)
   async function computeUsersCount(selected) {
@@ -49,6 +50,17 @@ const Dashboard = () => {
       setTotalUsers(null);
     }
   }
+
+  async function computeFixedAssetsCount() {
+    try {
+      // For simplicity, using users count API as a placeholder. Replace with actual fixed assets count API.
+      const count = await fetchUsersCount(); // Replace with actual fixed assets count API
+      setTotalFixedAssets(count);
+    } catch {
+      setTotalFixedAssets(null);
+    }
+  }
+
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -191,8 +203,8 @@ const Dashboard = () => {
           <div className="stat-value">{totalUsers ?? "—"}</div>
         </div>
         <div className="stat-tile">
-          <div className="stat-title">Networking Devices</div>
-          <div className="stat-value">68</div>
+          <div className="stat-title">Total Fixed Asset</div>
+          <div className="stat-value">{totalFixedAssets ?? "—"}</div>
         </div>
         <div className="stat-tile">
           <div className="stat-title">Computers</div>

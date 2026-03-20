@@ -69,7 +69,7 @@ const monitorSchema = new mongoose.Schema(
       model: { type: String, trim: true },
     },
   },
-  { timestamps: true, collection: "asset_monitor" }
+  { timestamps: true, collection: "asset_fixed" }
 );
 
 monitorSchema.index({ organizationId: 1, branchId: 1, itemCategory: 1, itemType: 1, isDeleted: 1, createdAt: -1 });

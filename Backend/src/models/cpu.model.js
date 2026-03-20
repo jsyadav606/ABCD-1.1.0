@@ -157,7 +157,7 @@ const assetSchema = new mongoose.Schema(
       model: { type: String, trim: true },
     }
   },
-  { timestamps: true, collection: "asset_cpu" }
+  { timestamps: true, collection: "asset_fixed" }
 );
 
 // Indices for performance
