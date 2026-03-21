@@ -69,6 +69,8 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+    /* margin: 2px 0;
+    width: 100%; */
 }
 
 .ud-menu-item:hover {
@@ -240,6 +242,8 @@ td {
     padding: 40px;
   }
 
+  
+
   .section {
     padding: 32px;
   }
@@ -256,6 +260,11 @@ td {
     padding: 35px;
   }
 
+  .sidebar {
+    position: fixed;
+    width: 240px;
+    height: 100vh;
+  }
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
@@ -294,11 +303,21 @@ td {
   }
 }
 
+@media (min-width: 992px){
+.ud-menu-item {
+ 
+    margin:  2px 0;
+    width: 100%;
+    display: block;
+}
+}
+
 /* Tablet Landscape (992px - 1023px) */
 @media (min-width: 992px) and (max-width: 1023px) {
   .wrapper {
     flex-direction: row;
   }
+   
 
   .sidebar {
     position: fixed;

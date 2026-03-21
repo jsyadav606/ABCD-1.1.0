@@ -6,17 +6,29 @@
  * - "All branches" option manage + users count compute
  * - Auto sync timer + manual "Sync Now"
  */
-import React, { useEffect, useState } from "react";
+// @ts-ignore
+import React, { useEffect, useState, useRef } from "react";
 import { Button, Card, Badge, Table, Select } from "../../components";
 import { authAPI } from "../../services/api";
 import { fetchBranchesForDropdown, fetchUsersCount, fetchAllUsers } from "../../services/userApi";
+import { fetchAssetsCount } from "../../services/assetApi";
 import { getSelectedBranch, setSelectedBranch } from "../../utils/scope";
 import "./Dashboard.css";
 
 const Dashboard = () => {
+  const statsRef = useRef(null);
+
+  const [isDown, setIsDown] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const wheelTimeoutRef = useRef(null);
+  const [isMarqueeEnabled, setIsMarqueeEnabled] = useState(false);
+
   const [branch, setBranch] = useState("");
   const [syncIn, setSyncIn] = useState(59);
   const [lastSync, setLastSync] = useState(new Date());
+
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -25,11 +37,11 @@ const Dashboard = () => {
     organizationId: null,
     branchIds: [],
   });
+
   const [branchOptions, setBranchOptions] = useState([]);
   const [totalUsers, setTotalUsers] = useState(null);
   const [totalFixedAssets, setTotalFixedAssets] = useState(null);
 
-  // Compute users count based on selected branch (all or single)
   async function computeUsersCount(selected) {
     try {
       if (selected === "__ALL__" || !selected) {
@@ -51,16 +63,15 @@ const Dashboard = () => {
     }
   }
 
-  async function computeFixedAssetsCount() {
+  async function computeFixedAssetsCount(selected) {
     try {
-      // For simplicity, using users count API as a placeholder. Replace with actual fixed assets count API.
-      const count = await fetchUsersCount(); // Replace with actual fixed assets count API
+      const count = await fetchAssetsCount(selected);
       setTotalFixedAssets(count);
-    } catch {
+    } catch (error) {
+      console.error("Error fetching fixed assets count:", error);
       setTotalFixedAssets(null);
     }
   }
-
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -77,6 +88,7 @@ const Dashboard = () => {
         const data = resp.data?.data || {};
         const u = data.user || {};
         if (!isMounted) return;
+
         const userInfo = {
           name: u.name || "",
           email: u.email || "",
@@ -85,49 +97,150 @@ const Dashboard = () => {
           organizationId: u.organizationId || null,
           branchIds: Array.isArray(u.branchId) ? u.branchId.map(b => String(b)) : [],
         };
+
         setProfile(userInfo);
-        if (userInfo.organizationId) {
-          const branches = await fetchBranchesForDropdown(userInfo.organizationId);
-          if (!isMounted) return;
-          const opts = branches.map(b => ({ value: String(b._id), label: b.name }));
-          setBranchOptions(opts);
-          const saved = getSelectedBranch();
-          let selectedValue = "";
-          if (saved && (saved === "__ALL__" || opts.some(o => o.value === saved))) {
-            selectedValue = saved;
-          } else {
-            selectedValue = opts.length > 1 ? "__ALL__" : (opts[0]?.value || "");
-          }
-          setBranch(selectedValue);
-          await computeUsersCount(selectedValue);
+
+        const branches = await fetchBranchesForDropdown(userInfo.organizationId);
+        if (!isMounted) return;
+
+        const opts = branches.map(b => ({ value: String(b._id), label: b.name }));
+        setBranchOptions(opts);
+
+        const saved = getSelectedBranch();
+        let selectedValue = "";
+
+        if (saved && (saved === "__ALL__" || opts.some(o => o.value === saved))) {
+          selectedValue = saved;
+        } else {
+          selectedValue = opts.length > 1 ? "__ALL__" : (opts[0]?.value || "");
         }
-      } catch {
-        // Silent fail for dashboard
-      }
+
+        setBranch(selectedValue);
+
+        await computeUsersCount(selectedValue);
+        await computeFixedAssetsCount(selectedValue);
+      } catch {}
     };
+
     init();
     return () => { isMounted = false; };
   }, []);
 
-  
-
   const applyFilters = async () => {
     try {
       if (branch) setSelectedBranch(branch);
-      // If All branches selected, use server-side total (already scoped by visibility on backend)
       await computeUsersCount(branch);
+      await computeFixedAssetsCount(branch);
     } catch {
       setTotalUsers(null);
+      setTotalFixedAssets(null);
     }
   };
 
-  const handleSyncNow = async () => {
-    try {
-      await applyFilters();
-      setLastSync(new Date());
-      setSyncIn(60);
-    } catch {
-      setLastSync(new Date());
+  // Check if marquee should be enabled based on overflow
+  useEffect(() => {
+    const checkOverflow = () => {
+      const el = statsRef.current;
+      if (el) {
+        // Force reflow to ensure accurate measurements
+        el.offsetHeight;
+        const grid = el.querySelector('.stats-grid');
+        if (grid) {
+          const containerWidth = el.clientWidth;
+          const contentWidth = grid.scrollWidth;
+          const hasOverflow = contentWidth > containerWidth;
+          console.log('Overflow check:', { contentWidth, containerWidth, hasOverflow });
+          setIsMarqueeEnabled(hasOverflow);
+          if (!hasOverflow) {
+            setIsAutoScrolling(false);
+            el.scrollLeft = 0; // Reset scroll position
+          } else {
+            setIsAutoScrolling(true);
+          }
+        }
+      }
+    };
+
+    const handleResize = () => {
+      checkOverflow();
+    };
+
+    // Check multiple times to ensure DOM is fully rendered
+    const timeout1 = setTimeout(checkOverflow, 100);
+    const timeout2 = setTimeout(checkOverflow, 500);
+    const timeout3 = setTimeout(checkOverflow, 1000);
+
+    // Listen for window resize
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [totalUsers, totalFixedAssets]);
+
+  // Auto-scroll loop (for continuous marquee effect)
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el || !isAutoScrolling || isDown || !isMarqueeEnabled) return;
+
+    const interval = setInterval(() => {
+      const third = el.scrollWidth / 3;
+      let next = el.scrollLeft + 1.3;
+      if (next >= third) next -= third;
+      el.scrollLeft = next;
+    }, 16);
+
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, isDown, isMarqueeEnabled]);
+
+  const resetAutoScrollDelay = () => {
+    setIsAutoScrolling(false);
+    if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
+    wheelTimeoutRef.current = setTimeout(() => setIsAutoScrolling(true), 1500);
+  };
+
+  // 🔥 Drag Scroll Logic
+  const handleMouseDown = (e) => {
+    if (!isMarqueeEnabled) return;
+    setIsDown(true);
+    setIsAutoScrolling(false);
+    setStartX(e.pageX - statsRef.current.offsetLeft);
+    setScrollLeft(statsRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMarqueeEnabled) return;
+    setIsDown(false);
+    setIsAutoScrolling(true);
+  };
+  const handleMouseUp = () => {
+    if (!isMarqueeEnabled) return;
+    setIsDown(false);
+    setIsAutoScrolling(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDown || !isMarqueeEnabled) return;
+    e.preventDefault();
+    const x = e.pageX - statsRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    statsRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleWheel = (e) => {
+    if (!isMarqueeEnabled) return;
+    e.preventDefault();
+    setIsAutoScrolling(false);
+    resetAutoScrollDelay();
+    statsRef.current.scrollLeft += e.deltaY; // touchpad/wheel control
+    const third = statsRef.current.scrollWidth / 3;
+    if (statsRef.current.scrollLeft >= third) {
+      statsRef.current.scrollLeft -= third;
+    } else if (statsRef.current.scrollLeft < 0) {
+      statsRef.current.scrollLeft += third;
     }
   };
 
@@ -146,6 +259,22 @@ const Dashboard = () => {
       render: (row) => <Badge variant={row.statusVariant}>{row.status}</Badge>,
     },
   ];
+
+  const statsTiles = [
+    { title: "Total Users", value: totalUsers ?? "—" },
+    { title: "Total Fixed Asset", value: totalFixedAssets ?? "—" },
+    { title: "Computers", value: 110 },
+    { title: "Faulty Items", value: 6, danger: true },
+    { title: "Total Desktop", value: 110 }, 
+    // { title: "Total CPU", value: 110 },
+    // { title: "Total Monitor", value: 110 },
+    // { title: "Total Printers", value: 20 },
+    // { title: "Total Servers", value: 6 },
+    // { title: "Total Laptops", value: 10 },
+    // { title: "Total Keyboard", value: 200 },
+    // { title: "Total Faulty", value: 70, danger: true },
+  ];
+  const animatedTiles = isMarqueeEnabled ? [...statsTiles, ...statsTiles, ...statsTiles] : statsTiles;
 
   const alertsData = [
     {
@@ -192,27 +321,30 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
+
       <div className="dash-header">
         <h1>IT Asset Overview</h1>
         <p>School-wide visibility of assets, issues, and maintenance</p>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-tile">
-          <div className="stat-title">Total Users</div>
-          <div className="stat-value">{totalUsers ?? "—"}</div>
-        </div>
-        <div className="stat-tile">
-          <div className="stat-title">Total Fixed Asset</div>
-          <div className="stat-value">{totalFixedAssets ?? "—"}</div>
-        </div>
-        <div className="stat-tile">
-          <div className="stat-title">Computers</div>
-          <div className="stat-value">110</div>
-        </div>
-        <div className="stat-tile">
-          <div className="stat-title">Faulty Items</div>
-          <div className="stat-value danger">6</div>
+      <div
+        className="stats-wrapper"
+        ref={statsRef}
+        onMouseDown={isMarqueeEnabled ? handleMouseDown : undefined}
+        onMouseUp={isMarqueeEnabled ? handleMouseUp : undefined}
+        onMouseLeave={isMarqueeEnabled ? handleMouseLeave : undefined}
+        onMouseMove={isMarqueeEnabled ? handleMouseMove : undefined}
+        onWheel={isMarqueeEnabled ? handleWheel : undefined}
+        onMouseEnter={isMarqueeEnabled ? () => setIsAutoScrolling(false) : undefined}
+        onMouseLeave={isMarqueeEnabled ? () => setIsAutoScrolling(true) : undefined}
+      >
+        <div className="stats-grid">
+          {animatedTiles.map((stat, idx) => (
+            <div key={`${stat.title}-${idx}`} className="stat-tile">
+              <div className="stat-title">{stat.title}</div>
+              <div className={`stat-value ${stat.danger ? "danger" : ""}`}>{stat.value}</div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -220,7 +352,7 @@ const Dashboard = () => {
         <div className="profile-row">
           <div className="user-meta">
             <div className="avatar">
-              {profile?.name ? (profile.name.split(" ").map(s => s[0]).slice(0,2).join("").toUpperCase()) : "U"}
+              {profile?.name ? profile.name.split(" ").map(s => s[0]).slice(0,2).join("").toUpperCase() : "U"}
             </div>
             <div>
               <div className="user-name">{profile?.name || "--"}</div>
@@ -252,14 +384,6 @@ const Dashboard = () => {
               <Button variant="primary" size="md" onClick={applyFilters}>Apply</Button>
             </div>
           </div>
-
-          <div className="sync-box">
-            <div className="sync-times">
-              <div className="next-sync">Next Auto Sync in: <strong>{syncIn}s</strong></div>
-              <div className="last-sync">Last Synced: {new Date(lastSync).toLocaleString()}</div>
-            </div>
-            <Button variant="success" size="md" onClick={handleSyncNow}>Sync Now</Button>
-          </div>
         </div>
       </Card>
 
@@ -272,18 +396,9 @@ const Dashboard = () => {
       <div className="mini-grid">
         <Card title="Recently Added Items">
           <ul className="list">
-            <li>
-              <span>HP Laptop</span>
-              <Badge variant="success">Available</Badge>
-            </li>
-            <li>
-              <span>Dell Monitor</span>
-              <Badge variant="info">Assigned</Badge>
-            </li>
-            <li>
-              <span>Cisco Switch</span>
-              <Badge variant="danger">Faulty</Badge>
-            </li>
+            <li><span>HP Laptop</span><Badge variant="success">Available</Badge></li>
+            <li><span>Dell Monitor</span><Badge variant="info">Assigned</Badge></li>
+            <li><span>Cisco Switch</span><Badge variant="danger">Faulty</Badge></li>
           </ul>
           <div className="card-link">View All</div>
         </Card>
@@ -323,6 +438,8 @@ const Dashboard = () => {
           data={alertsData}
           pageSize={5}
           showPagination={false}
+          onSelectionChange={() => {}}
+          isRowSelectable={() => false}
         />
       </Card>
     </div>

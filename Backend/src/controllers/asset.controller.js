@@ -8,6 +8,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import { CPU } from "../models/cpu.model.js";
+import { Monitor } from "../models/monitor.model.js";
 import { handlers } from "../assets/handlers/index.js";
 import { Purchase } from "../models/purchase.model.js";
 import { Warranty } from "../models/warranty.model.js";
@@ -85,4 +87,22 @@ export const getAssetById = asyncHandler(async (req, res) => {
   }
 
   throw new apiError(404, "Asset not found");
+});
+
+export const countAssets = asyncHandler(async (req, res) => {
+  const branchId = req.query.branchId;
+  const roleName = String(req.user?.role || "").toLowerCase();
+  const isSuper = roleName === "super_admin" || roleName === "super admin";
+  const filter = { isDeleted: false };
+  if (!isSuper && req.user?.organizationId) {
+    filter.organizationId = req.user.organizationId;
+  }
+  if (branchId && branchId !== "__ALL__") {
+    filter.branchId = branchId;
+  }
+  console.log('Count filter:', filter);
+  const cpuCount = await CPU.countDocuments(filter);
+  // Assuming fixed assets are only CPUs, not monitors
+  const total = cpuCount;
+  return res.status(200).json(new apiResponse(200, { total }, "Assets count retrieved"));
 });
