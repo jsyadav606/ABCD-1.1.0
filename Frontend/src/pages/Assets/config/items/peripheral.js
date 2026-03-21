@@ -251,23 +251,59 @@ export const peripheralConfigs = {
   },
   keyboard: {
     sections: [
+
+
+       //! Basic Information
+      fromGeneric("Basic Information", {
+        // Example: hide description field coming from generic
+        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        // overrideFields: [{},{},{}  ],
+        // addFields: [{},{},{}],
+      }),
+      //! Location Information
+      fromGeneric("Location & Other Information",{
+         omitFields: ["organization","rackNumber","rackUnit", "location", "floor", "room", "locationType", "building"],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+        }),
+
+
       {
         sectionTitle: "Keyboard Details",
         fields: [
-          { name: "modelNumber", label: "Model Number", type: "text", required: true },
-          { name: "serialNumber", label: "Serial Number", type: "text" },
-          { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
+         
           {
             name: "keyboardType",
             label: "Type",
             type: "select",
+            defaultValue: "usb",
             options: [
-              { value: "Mechanical", label: "Mechanical" },
-              { value: "Membrane", label: "Membrane" },
+              { value: "usb", label: "USB"},
+              { value: "ps2", label: "PS/2" },
             ],
           },
         ],
       },
+
+      //! Purchase Information
+      fromGeneric("Purchase Information",{
+         omitFields: ["taxAmount","totalAmount","currency"],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+      }),
+      //! Warranty Information
+      fromGeneric("Warranty Information",{
+        //  omitFields: ["","",""],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+      }),
+
+      //! Item State
+      fromGeneric("Item State",{
+        //  omitFields: ["","",""],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+      }),
     ],
   },
 };

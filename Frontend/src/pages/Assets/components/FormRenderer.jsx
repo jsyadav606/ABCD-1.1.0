@@ -21,10 +21,17 @@ const evaluateShowIf = (cond, getValue) => {
   if (typeof cond === "object" && "field" in cond) {
     return String(getValue(cond.field) ?? "") === String(cond.equals ?? "");
   }
-  // Support shorthand form: { purchaseType: 'PO', other: 'X' }
+  // Support shorthand form: { purchaseType: 'PO', other: 'X' } or { purchaseType: ['PO', 'Direct'] }
   if (typeof cond === "object") {
     return Object.entries(cond).every(
-      ([k, v]) => String(getValue(k) ?? "") === String(v ?? "")
+      ([k, v]) => {
+        const fieldValue = String(getValue(k) ?? "");
+        // Support array values for multiple conditions
+        if (Array.isArray(v)) {
+          return v.map(String).includes(fieldValue);
+        }
+        return fieldValue === String(v ?? "");
+      }
     );
   }
   return true;

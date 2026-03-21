@@ -27,6 +27,8 @@ export const common = {
   types: toOptions(["Static", "DHCP"]),
   status: toOptions(["In Stock", "Assigned", "Under Repair", "Retired"]),
   branches: [],
+  keyboardTypes: toOptions(["USB", "PS/2", "Wireless"]),
+  mouseTypes: toOptions(["USB", "PS/2", "Wireless"]),
 };
 
 export const TABLE_SECTION_TITLES = ["Processors", "Storage", "Memory", "Network Details"];

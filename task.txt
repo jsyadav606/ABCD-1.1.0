@@ -1,100 +1,58 @@
-IT Asset Management – Common Sections & Fields
+/**
+ * Page: Assets List (placeholder)
+ * Description: Is page par category tabs aur "Add Item" CTA diya gaya hai.
+ * Abhi data listing empty state dikhata hai; future me yahin inventory list integrate ki ja sakti hai.
+ */
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./asset.css";
+import Button from "../../components/Button/Button.jsx";
 
-1.  BASIC INFORMATION
+const tabs = ["ALL", "FIXED", "PERIPHERAL", "CONSUMABLE", "INTANGIBLE"];
 
-Asset Identity - assetId (system generated) - assetTag - barcode /
-qrCode - assetName - assetDescription
+const AssetPage = () => {
+  const navigate = useNavigate();
+  const [active, setActive] = useState("ALL");
 
-Asset Classification - assetCategory (Hardware / Network / Peripheral) -
-assetType (Desktop / Laptop / Printer / Router etc.) - assetSubType
+  const handleTab = (key) => {
+    setActive(key);
+  };
 
-Manufacturer Details - brand - manufacturer - modelName - modelNumber -
-partNumber - serialNumber
+  const goAddItem = () => {
+    navigate("/assets/add");
+  };
 
-Asset Status - assetStatus - In Stock - In Use - Under Repair -
-Disposed - Lost
+  return (
+    <div className="asset-page">
+      <div className="asset-header">
+        <h1>Assets</h1>
+        <Button variant="primary" aria-label="Add Item" onClick={goAddItem}>
+          Add Item
+        </Button>
+      </div>
+      <div className="asset-tabs" role="tablist" aria-label="Asset Categories">
+        {tabs.map((t) => (
+          <button
+            key={t}
+            role="tab"
+            aria-selected={active === t}
+            className={`tab-btn ${active === t ? "active" : ""}`}
+            onClick={() => handleTab(t)}
+          >
+            {t === "ALL" ? "All" : t.charAt(0) + t.slice(1).toLowerCase()}
+          </button>
+        ))}
+      </div>
+      <div className="asset-content" role="region" aria-live="polite">
+        <div className="empty-state">
+          <div className="empty-icon">📦</div>
+          <div className="empty-text">
+            {active === "ALL" ? "No items. Click Add Item to create one." : `No ${active.toLowerCase()} items here.`}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-Condition - assetCondition - New - Good - Fair - Damaged
-
-Ownership - ownershipType - Owned - Leased - Rented
-
-Dates - manufacturingDate - installationDate - endOfLifeDate
-
-System Metadata - createdBy - createdAt - updatedBy - updatedAt
-
-2.  PURCHASE INFORMATION
-
-Purchase Type - purchaseType - PO - Direct
-
-If Purchase Type = PO - poNumber - poDate - poAmount - poApprovedBy
-
-Purchase Details - purchaseDate - vendorId - vendorName -
-vendorContactPerson - vendorPhone - vendorEmail
-
-Invoice Details - invoiceNumber - invoiceDate - invoiceAmount -
-taxAmount - totalAmount - currency
-
-Delivery Details - deliveryDate - deliveryChallanNumber - receivedBy
-
-Documents - poDocument - invoiceDocument - deliveryChallanDocument
-
-3.  WARRANTY INFORMATION
-
-Warranty Available - warrantyAvailable - Yes - No
-
-If Warranty = Yes
-
-Warranty Mode - warrantyMode - Duration - End Date
-
-If Mode = Duration - warrantyDuration - durationUnit - Year - Month
-
-Warranty Dates - warrantyStartDate - warrantyEndDate
-
-Warranty Provider - warrantyProvider - Manufacturer - Vendor - Extended
-Warranty
-
-Support Details - supportVendor - supportPhone - supportEmail
-
-AMC / Maintenance Contract - amcAvailable - Yes - No
-
-If AMC = Yes - amcVendor - amcStartDate - amcEndDate - amcCost
-
-4.  ASSIGNMENT INFORMATION
-
-Assignment Type - assignmentType - User - Location - Department
-
-If Assignment Type = User - assignedUserId - assignedUserName -
-assignedUserEmail - assignedUserDepartment
-
-If Assignment Type = Department - assignedDepartment - departmentHead
-
-Assignment Details - assignmentDate - expectedReturnDate -
-assignmentStatus - Assigned - Returned - Lost
-
-Asset Handover Details - handoverBy - receivedBy - handoverNotes
-
-5.  LOCATION INFORMATION
-
-Organization Location - organization - site / school - building -
-floor - room
-
-Asset Placement - locationType - Lab - Office - Server Room - Classroom
-
-Rack / Network Location (optional) - rackNumber - rackUnit
-
-6.  REPAIR & MAINTENANCE
-
-Repair Status - repairStatus - None - Under Repair - Repaired
-
-Repair Details - issueTitle - issueDescription - reportedDate -
-reportedBy
-
-Repair Vendor - repairVendor - vendorContact - vendorPhone
-
-Repair Process - repairStartDate - repairEndDate - repairCost -
-repairStatus
-
-Replacement Details - partsReplaced - replacementCost
-
-Maintenance History - lastMaintenanceDate - nextMaintenanceDate -
-maintenanceNotes
+export default AssetPage;

@@ -31,6 +31,84 @@
 .btn-primary:hover {
   background: #1e3a8a;
 }
+.asset-summary {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 16px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+
+.asset-summary::-webkit-scrollbar {
+  height: 6px;
+}
+
+.asset-summary::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.5);
+  border-radius: 3px;
+}
+
+.asset-summary::-webkit-scrollbar-thumb {
+  background: rgba(29, 78, 216, 0.5);
+  border-radius: 3px;
+}
+
+.asset-summary::-webkit-scrollbar-thumb:hover {
+  background: rgba(29, 78, 216, 0.8);
+}
+
+.summary-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+  flex: 0 0 200px;
+  min-width: 200px;
+}
+
+.summary-card .card-header {
+  padding: 12px !important;
+  border-bottom: none !important;
+  border-right: 1px solid #ddd !important;
+  flex: 0 0 50%;
+  background-color: #0C3C78 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  order: 2;
+}
+
+.summary-card .card-body {
+  padding: 12px !important;
+  flex: 0 0 50%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  order: 1;
+  background-color: #fff !important;
+  border-bottom: none !important;
+}
+
+.summary-card .card-title {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  color: #fff;
+  text-align: center;
+}
+
+.summary-card .card-subtitle {
+  display: none !important;
+}
+
+.summary-card .count {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1d4ed8;
+  margin: 0;
+}
 .asset-tabs {
   display: flex;
   gap: 8px;
@@ -53,8 +131,7 @@
 }
 .asset-content {
   flex: 1;
-  display: grid;
-  place-items: center;
+  overflow: auto;
 }
 .empty-state {
   display: flex;
@@ -73,7 +150,14 @@
   font-size: 14px;
   color: #334155;
 }
+.asset-actions {
+  display: flex;
+  gap: 4px;
+}
 @media (max-width: 768px) {
   .asset-header h1 { font-size: 18px; }
   .tab-btn { font-size: 12px; padding: 6px 10px; }
+  .asset-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

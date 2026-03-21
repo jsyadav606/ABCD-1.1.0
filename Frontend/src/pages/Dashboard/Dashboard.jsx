@@ -149,7 +149,7 @@ const Dashboard = () => {
           const containerWidth = el.clientWidth;
           const contentWidth = grid.scrollWidth;
           const hasOverflow = contentWidth > containerWidth;
-          console.log('Overflow check:', { contentWidth, containerWidth, hasOverflow });
+         
           setIsMarqueeEnabled(hasOverflow);
           if (!hasOverflow) {
             setIsAutoScrolling(false);
@@ -266,13 +266,13 @@ const Dashboard = () => {
     { title: "Computers", value: 110 },
     { title: "Faulty Items", value: 6, danger: true },
     { title: "Total Desktop", value: 110 }, 
-    // { title: "Total CPU", value: 110 },
-    // { title: "Total Monitor", value: 110 },
-    // { title: "Total Printers", value: 20 },
-    // { title: "Total Servers", value: 6 },
-    // { title: "Total Laptops", value: 10 },
-    // { title: "Total Keyboard", value: 200 },
-    // { title: "Total Faulty", value: 70, danger: true },
+    { title: "Total CPU", value: 110 },
+    { title: "Total Monitor", value: 110 },
+    { title: "Total Printers", value: 20 },
+    { title: "Total Servers", value: 6 },
+    { title: "Total Laptops", value: 10 },
+    { title: "Total Keyboard", value: 200 },
+    { title: "Total Faulty", value: 70, danger: true },
   ];
   const animatedTiles = isMarqueeEnabled ? [...statsTiles, ...statsTiles, ...statsTiles] : statsTiles;
 

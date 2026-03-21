@@ -101,8 +101,8 @@ export const genericConfig = {
     {
       sectionTitle: "Item State",
       fields: [
-        { name: "itemStatus", label: "Item Status", placeholder: "Select Item Status", type: "select", options: [{name:"Active", value:"active", default:true}, {name:"Inactive", value:"inactive"}, {name:"Retired", value:"retired"}, ] },
-        { name: "itemIsCurrently", label: "Item is Currently", placeholder: "Select Item is Currently", type: "select", options: [{name:"In Store", value:"inStore", default:true}, {name:"In Repair", value:"inRepair"}, {name:"Disposed", value:"disposed"}, {name:"In Use", value:"inUse"}, {name:"Lost", value:"lost"}, ] },
+        { name: "itemStatus", label: "Item Status", placeholder: "Select Item Status", type: "select", options: [{name:"Active", value:"active"}, {name:"Inactive", value:"inactive"}], defaultValue: "active" },
+        { name: "itemIsCurrently", label: "Item is Currently", placeholder: "Select Item is Currently", type: "select", options: [{name:"In Store", value:"inStore"}, {name:"In Use", value:"inUse" }], defaultValue: "inStore" },
 
         { name: "itemUser", label: "Item User", placeholder: "Select Item User", type: "select", options: common.user, showIf: { itemIsCurrently: "inUse" }},
          { name: "AssignDate", label: "Assignment Date", placeholder: "Select Assignment Date", type: "date", showIf: { itemIsCurrently: "inUse" }},
