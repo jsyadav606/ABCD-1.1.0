@@ -122,9 +122,14 @@ const AssetPage = () => {
       const totalRam = Number(row.memory?.totalCapacityGB) || (row.memory?.modules?.reduce((sum, module) => sum + (Number(module.ramCapacityGB) || 0), 0) || 0);
       const totalStorage = Number(row.storage?.totalCapacityGB) || (row.storage?.devices?.reduce((sum, device) => sum + (Number(device.driveCapacityGB) || 0), 0) || 0);
       
-      return `Processor: ${row.cpuModel || row.processorModel || 'N/A'}, RAM: ${totalRam || 'N/A'}GB, Storage: ${totalStorage || 'N/A'}GB`;
+      return `Model: ${row.model || 'N/A'}, CPU: ${row.processorModel || 'N/A'}, RAM: ${totalRam || 'N/A'}GB, Storage: ${totalStorage || 'N/A'}GB`;
     } else if (itemType === 'MONITOR') {
       return `Size: ${row.screenSizeInches || 'N/A'}" , Resolution: ${row.resolution || 'N/A'}, Panel: ${row.panelType || 'N/A'}, Refresh Rate: ${row.refreshRateHz || 'N/A'}Hz`;
+    }
+    else if (itemType === 'LAPTOP') {
+      const totalRam = Number(row.memory?.totalCapacityGB) || (row.memory?.modules?.reduce((sum, module) => sum + (Number(module.ramCapacityGB) || 0), 0) || 0);
+      const totalStorage = Number(row.storage?.totalCapacityGB) || (row.storage?.devices?.reduce((sum, device) => sum + (Number(device.driveCapacityGB) || 0), 0) || 0);  
+      return `Model: ${row.model || 'N/A'}, CPU: ${row.processorModel || 'N/A'}, RAM: ${totalRam || 'N/A'}GB, Storage: ${totalStorage || 'N/A'}GB`;
     }
     
     // Default fallback

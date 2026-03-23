@@ -1,0 +1,371 @@
+{
+  "info": {
+    "name": "CPU Asset API Test - Multi-Collection Saving",
+    "description": "Postman template for creating CPU assets. Single request saves to 3 collections: asset_fixed, asset_purchases, asset_warranties",
+    "created": "2026-03-23",
+    "flowExplanation": "1. Frontend sends 1 request with all fields → 2. Backend saves fixed asset → 3. Backend extracts & saves purchase → 4. Backend extracts & saves warranty → 5. Response returns all 3 docs"
+  },
+  "endpoint": "POST /api/v1/assets",
+  "baseUrl": "http://localhost:4000",
+  "notes": [
+    "Replace REPLACE_WITH_ACTUAL_BRANCH_ID with actual branch ObjectId from database",
+    "Change itemType to 'laptop' or 'monitor' to test other asset types",
+    "Purchase and Warranty docs are created only if fields have values",
+    "All Purchase/Warranty fields shown below are optional - include only needed fields",
+    "Response includes: fixedAsset (_id needed for later queries), purchase (with assetId link), warranty (with assetId link)",
+    "Send Authorization header: Bearer <token>"
+  ],
+  "payload": {
+    "itemType": "cpu",
+    "itemCategory": "fixed",
+    "branch": "<branch_id>",
+    "itemId": "CPU-DELL-001",
+    "itemTag": "DL-CPU-DEL-2024-001",
+    "serialNumber": "SN123456789",
+    "manufacturer": "Dell",
+    "model": "PowerEdge R750",
+    "modelNumber": "R750-001",
+    "partNumber": "PART-DEL-R750",
+    "ownershipType": "Owned",
+    "manufacturingDate": "2024-01-15",
+    "processorManufacturer": "intel",
+    "processorModel": "i7",
+    "processorGeneration": 13,
+    "processorModelNumber": "i7-13700K",
+    "cores": 8,
+    "threads": 16,
+    "virtualizationEnabled": "Yes",
+    "osName": "Windows 10",
+    "osEdition": "Professional",
+    "osVersion": "10.0.19045",
+    "buildNumber": "19045",
+    "osLicenseKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
+    "activationStatus": "Activated",
+    "domain": "corp.local",
+    "biosVersion": "2.1.0",
+    "biosDate": "2024-01-10",
+    "motherboardSerial": "MB-12345678",
+    "hardwareUUID": "12345678-1234-1234-1234-1234567890AB",
+    "tpmVersion": "2.0",
+    "secureBootEnabled": "Yes",
+    "graphicCard": "Yes",
+    "gpuManufacturer": "NVIDIA",
+    "gpuModelNumber": "RTX 3060",
+    "gpuSerialNumber": "GPU-SN-123456",
+    "gpuCapacityGB": 12,
+    "gpuType": "Dedicated",
+    "gpuInterfaceSpeed": "PCIe 4.0",
+    "purchaseType": "PO",
+    "poNumber": "PO-2024-001",
+    "poDate": "2024-01-01",
+    "vendorId": "vendor-001",
+    "itemReceivedOn": "invoice",
+    "invoiceNumber": "INV-2024-001",
+    "invoiceDate": "2024-01-05",
+    "purchaseDate": "2024-01-05",
+    "purchaseCost": 150000,
+    "deliveryDate": "2024-01-15",
+    "receivedBy": "John Doe",
+    "warrantyAvailable": "Yes",
+    "warrantyMode": "Duration",
+    "inYear": 3,
+    "inMonth": 0,
+    "warrantyProvider": "Manufacturer",
+    "supportVendor": "Dell Support",
+    "supportPhone": "+1-800-123-4567",
+    "supportEmail": "support@dell.com",
+    "itemStatus": "active",
+    "itemIsCurrently": "inStore",
+    "itemUser": "",
+    "AssignDate": null,
+    "nicType": "Ethernet",
+    "dhcpEnabled": "No",
+    "dhcpServer": "",
+    "ipv4Address": "192.168.1.100",
+    "subnet": "255.255.255.0",
+    "defaultGateway": "192.168.1.1",
+    "dnsHostname": "cpu-dell-001",
+    "macAddress": "00:11:22:33:44:55",
+    "ipv6Address": "fe80::1",
+    "switchPort": "Port 1",
+    "memory": {
+      "ramModules": [
+        {
+          "ramManufacturer": "Corsair",
+          "ramModelNumber": "Vengeance LPX",
+          "ramSerialNumber": "RAM-SN-001",
+          "ramCapacityGB": 32,
+          "ramType": "DDR5",
+          "ramSpeedMHz": 4800,
+          "ramFormFactor": "DIMM",
+          "ramSlot": "DIMM Slot 1",
+          "ramChannel": "Channel A"
+        },
+        {
+          "ramManufacturer": "Corsair",
+          "ramModelNumber": "Vengeance LPX",
+          "ramSerialNumber": "RAM-SN-002",
+          "ramCapacityGB": 32,
+          "ramType": "DDR5",
+          "ramSpeedMHz": 4800,
+          "ramFormFactor": "DIMM",
+          "ramSlot": "DIMM Slot 2",
+          "ramChannel": "Channel B"
+        }
+      ]
+    },
+    "storage": {
+      "storageDevices": [
+        {
+          "driveManufacturer": "Samsung",
+          "driveModelNumber": "970 EVO Plus",
+          "driveSerial": "DRIVE-SN-001",
+          "driveCapacityGB": 1000,
+          "driveType": "SSD NVMe",
+          "driveInterfaceSpeed": "PCIe 4.0",
+          "driveSlot": "M.2 Slot 1",
+          "raidConfigured": "No",
+          "encryptionEnabled": "Yes"
+        },
+        {
+          "driveManufacturer": "Seagate",
+          "driveModelNumber": "Barracuda Pro",
+          "driveSerial": "DRIVE-SN-002",
+          "driveCapacityGB": 2000,
+          "driveType": "HDD",
+          "driveInterfaceSpeed": "SATA 6.0Gb/s",
+          "driveSlot": "Slot 2",
+          "raidConfigured": "No",
+          "encryptionEnabled": "No"
+        }
+      ]
+    },
+    "sections": [
+      {
+        "name": "Memory",
+        "kind": "rows",
+        "rows": [
+          {
+            "ramManufacturer": "Corsair",
+            "ramModelNumber": "Vengeance LPX",
+            "ramSerialNumber": "RAM-SN-001",
+            "ramCapacityGB": 32,
+            "ramType": "DDR5",
+            "ramSpeedMHz": 4800,
+            "ramFormFactor": "DIMM",
+            "ramSlot": "DIMM Slot 1",
+            "ramChannel": "Channel A"
+          }
+        ]
+      },
+      {
+        "name": "Storage",
+        "kind": "rows",
+        "rows": [
+          {
+            "driveManufacturer": "Samsung",
+            "driveModelNumber": "970 EVO Plus",
+            "driveSerial": "DRIVE-SN-001",
+            "driveCapacityGB": 1000,
+            "driveType": "SSD NVMe",
+            "driveInterfaceSpeed": "PCIe 4.0",
+            "driveSlot": "M.2 Slot 1",
+            "raidConfigured": "No",
+            "encryptionEnabled": "Yes"
+          }
+        ]
+      },
+      {
+        "name": "Network Details",
+        "kind": "rows",
+        "rows": [
+          {
+            "nicType": "Ethernet",
+            "ipv4Address": "192.168.1.100",
+            "macAddress": "00:11:22:33:44:55"
+          }
+        ]
+      }
+    ]
+  },
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your_jwt_token>",
+    "Accept": "application/json"
+  },
+  "examples": [
+    {
+      "name": "Minimal CPU (Only required fields)",
+      "itemType": "cpu",
+      "itemCategory": "fixed",
+      "itemId": "CPU-MIN-001",
+      "itemTag": "CPU-MIN-001",
+      "processorManufacturer": "intel",
+      "processorModel": "i5",
+      "branch": "<branch_id>"
+    },
+    {
+      "name": "Laptop Asset (Change itemType)",
+      "note": "Use this as base and change itemType to 'laptop' to test laptop creation"
+    },
+    {
+      "name": "Monitor Asset (Change itemType)",
+      "note": "Use this as base and change itemType to 'monitor' to test monitor creation"
+    }
+  ],
+  "rawPostmanData": {
+    "instructions": [
+      "Copy the JSON below (from 'readyToSend' section)",
+      "Open Postman → Create New Request",
+      "Set method to POST",
+      "Paste URL: http://localhost:4000/api/v1/assets",
+      "Go to Body tab → Select 'raw' → Set to JSON",
+      "Paste the JSON below",
+      "Go to Headers tab → Add: Authorization: Bearer <your_token>",
+      "Click Send"
+    ],
+    "readyToSend": {
+      "itemType": "cpu",
+      "itemCategory": "fixed",
+      "branch": "REPLACE_WITH_ACTUAL_BRANCH_ID",
+      "itemId": "CPU-DELL-001",
+      "itemTag": "DL-CPU-DEL-2024-001",
+      "serialNumber": "SN123456789",
+      "manufacturer": "Dell",
+      "model": "PowerEdge R750",
+      "modelNumber": "R750-001",
+      "partNumber": "PART-DEL-R750",
+      "ownershipType": "Owned",
+      "manufacturingDate": "2024-01-15",
+      "processorManufacturer": "intel",
+      "processorModel": "i7",
+      "processorGeneration": 13,
+      "processorModelNumber": "i7-13700K",
+      "cores": 8,
+      "threads": 16,
+      "virtualizationEnabled": "Yes",
+      "osName": "Windows 10",
+      "osEdition": "Professional",
+      "osVersion": "10.0.19045",
+      "buildNumber": "19045",
+      "osLicenseKey": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
+      "activationStatus": "Activated",
+      "domain": "corp.local",
+      "biosVersion": "2.1.0",
+      "biosDate": "2024-01-10",
+      "motherboardSerial": "MB-12345678",
+      "hardwareUUID": "12345678-1234-1234-1234-1234567890AB",
+      "tpmVersion": "2.0",
+      "secureBootEnabled": "Yes",
+      "graphicCard": "Yes",
+      "gpuManufacturer": "NVIDIA",
+      "gpuModelNumber": "RTX 3060",
+      "gpuSerialNumber": "GPU-SN-123456",
+      "gpuCapacityGB": 12,
+      "gpuType": "Dedicated",
+      "gpuInterfaceSpeed": "PCIe 4.0",
+      "purchaseType": "PO",
+      "poNumber": "PO-2024-001",
+      "poDate": "2024-01-01",
+      "vendorId": "vendor-001",
+      "itemReceivedOn": "invoice",
+      "invoiceNumber": "INV-2024-001",
+      "invoiceDate": "2024-01-05",
+      "purchaseDate": "2024-01-05",
+      "purchaseCost": 150000,
+      "deliveryDate": "2024-01-15",
+      "receivedBy": "John Doe",
+      "warrantyAvailable": "Yes",
+      "warrantyMode": "Duration",
+      "inYear": 3,
+      "inMonth": 0,
+      "warrantyProvider": "Manufacturer",
+      "supportVendor": "Dell Support",
+      "supportPhone": "+1-800-123-4567",
+      "supportEmail": "support@dell.com",
+      "itemStatus": "active",
+      "itemIsCurrently": "inStore",
+      "itemUser": "",
+      "AssignDate": null,
+      "nicType": "Ethernet",
+      "dhcpEnabled": "No",
+      "dhcpServer": "",
+      "ipv4Address": "192.168.1.100",
+      "subnet": "255.255.255.0",
+      "defaultGateway": "192.168.1.1",
+      "dnsHostname": "cpu-dell-001",
+      "macAddress": "00:11:22:33:44:55",
+      "ipv6Address": "fe80::1",
+      "switchPort": "Port 1",
+      "memory": {
+        "ramModules": [
+          {
+            "ramManufacturer": "Corsair",
+            "ramModelNumber": "Vengeance LPX",
+            "ramSerialNumber": "RAM-SN-001",
+            "ramCapacityGB": 32,
+            "ramType": "DDR5",
+            "ramSpeedMHz": 4800,
+            "ramFormFactor": "DIMM",
+            "ramSlot": "DIMM Slot 1",
+            "ramChannel": "Channel A"
+          }
+        ]
+      },
+      "storage": {
+        "storageDevices": [
+          {
+            "driveManufacturer": "Samsung",
+            "driveModelNumber": "970 EVO Plus",
+            "driveSerial": "DRIVE-SN-001",
+            "driveCapacityGB": 1000,
+            "driveType": "SSD NVMe",
+            "driveInterfaceSpeed": "PCIe 4.0",
+            "driveSlot": "M.2 Slot 1",
+            "raidConfigured": "No",
+            "encryptionEnabled": "Yes"
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "info": "After sending the request, you will receive a 201 response with 3 linked documents",
+    "exampleStructure": {
+      "success": true,
+      "statusCode": 201,
+      "data": {
+        "fixedAsset": {
+          "_id": "507f1f77bcf86cd799439011",
+          "itemType": "cpu",
+          "itemId": "CPU-DELL-001",
+          "manufacturer": "Dell",
+          "model": "PowerEdge R750"
+        },
+        "purchase": {
+          "_id": "607f1f77bcf86cd799439022",
+          "assetId": "507f1f77bcf86cd799439011",
+          "poNumber": "PO-2024-001",
+          "purchaseCost": 150000
+        },
+        "warranty": {
+          "_id": "707f1f77bcf86cd799439033",
+          "assetId": "507f1f77bcf86cd799439011",
+          "warrantyAvailable": "Yes",
+          "inYear": 3
+        }
+      },
+      "message": "Asset created successfully with purchase and warranty records"
+    },
+    "keyPoints": [
+      "fixedAsset._id is the main asset identifier (use for future updates)",
+      "purchase & warranty both reference fixedAsset._id as 'assetId'",
+      "purchase will be null if no purchase fields were provided",
+      "warranty will be null if no warranty fields were provided",
+      "All 3 collections are separate and independently queryable",
+      "From now on, you can GET /assets/:id with fixedAsset._id to retrieve full asset with purchase/warranty"
+    ]
+  }
+}
+
+

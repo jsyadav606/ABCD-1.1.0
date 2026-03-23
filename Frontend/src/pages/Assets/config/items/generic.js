@@ -8,7 +8,7 @@ export const genericConfig = {
     {
       sectionTitle: "Basic Information",
       fields: [
-        { name: "itemId", label: "Asset ID", placeholder: "Enter Asset ID", type: "text", readOnly: false },
+        { name: "itemId", label: "Asset ID", placeholder: "Enter Asset ID", type: "text", readOnly: false, required: true,},
         { name: "itemTag", label: "Item Tag", placeholder: "Enter Item Tag", type: "text", required: true, maxLength: 80 },
         { name: "barcode", label: "Barcode / QR Code", placeholder: "Enter Barcode / QR Code", type: "text", maxLength: 120 },
 

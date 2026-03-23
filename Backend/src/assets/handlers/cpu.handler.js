@@ -2,8 +2,11 @@
  * CPU Asset Handler
  * Description: CPU-specific create/list/get logics. Frontend AddItem.jsx ke payload ko normalize karke
  * memory/storage/network summaries banata hai taa ki queries fast aur UI mapping simple rahe.
+ * Creates 3 documents: Fixed Asset (asset_fixed), Purchase (asset_purchases), Warranty (asset_warranties)
  */
 import { CPU } from "../../models/cpu.model.js";
+import { Purchase } from "../../models/purchase.model.js";
+import { Warranty } from "../../models/warranty.model.js";
 import { norm, buildAssetListFilter, extractBranchIdFromBody, ensureOrgAndAudit } from "../../utils/assetUtils.js";
 
 const create = async (req) => {
@@ -74,8 +77,9 @@ const create = async (req) => {
   });
   network.typeBreakdown = Array.from(netTypeMap.values());
 
-  const payload = {
-    ...body, // Includes all flat fields from 'form' spread in AddItem.jsx
+  // Build Fixed Asset Payload (no purchase/warranty fields)
+  const fixedPayload = {
+    ...body,
     itemCategory,
     itemType,
     branchId,
@@ -85,50 +89,86 @@ const create = async (req) => {
     ...ensureOrgAndAudit(req),
   };
 
-  // Remove fields that shouldn't be saved directly or are handled specifically
-  delete payload.sections;
-  delete payload.flat;
-  delete payload.memoryModules;
-  delete payload.storageDevices;
-  delete payload.networkDetails;
+  // Remove fields that shouldn't be in fixed asset
+  delete fixedPayload.sections;
+  delete fixedPayload.flat;
+  delete fixedPayload.memoryModules;
+  delete fixedPayload.storageDevices;
+  delete fixedPayload.networkDetails;
 
-  [
-    "purchaseType",
-    "poNumber",
-    "poDate",
-    "receiptNumber",
-    "receiptDate",
-    "purchaseDate",
-    "vendorId",
-    "itemReceivedOn",
-    "invoiceNumber",
-    "invoiceDate",
-    "deliveryChallanNumber",
-    "deliveryChallanDate",
-    "purchaseCost",
-    "taxAmount",
-    "totalAmount",
-    "currency",
-    "deliveryDate",
-    "receivedBy",
-    "warrantyAvailable",
-    "warrantyMode",
-    "inYear",
-    "inMonth",
-    "warrantyStartDate",
-    "warrantyEndDate",
-    "warrantyProvider",
-    "supportVendor",
-    "supportPhone",
-    "supportEmail",
-    "amcAvailable",
-    "amcVendor",
-    "amcStartDate",
-    "amcEndDate",
-  ].forEach((k) => delete payload[k]);
+  // Purchase & Warranty field names to extract
+  const purchaseFields = [
+    "purchaseType", "poNumber", "poDate", "receiptNumber", "receiptDate", "purchaseDate",
+    "vendorId", "itemReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
+    "deliveryChallanDate", "purchaseCost", "taxAmount", "totalAmount", "currency",
+    "deliveryDate", "receivedBy"
+  ];
+  
+  const warrantyFields = [
+    "warrantyAvailable", "warrantyMode", "inYear", "inMonth", "warrantyStartDate",
+    "warrantyEndDate", "warrantyProvider", "supportVendor", "supportPhone", "supportEmail",
+    "amcAvailable", "amcVendor", "amcStartDate", "amcEndDate"
+  ];
 
-  const doc = await CPU.create(payload);
-  return { doc, message: "Asset created successfully" };
+  // Extract purchase data
+  const purchaseData = {};
+  purchaseFields.forEach(field => {
+    if (body[field] !== undefined) {
+      purchaseData[field] = body[field];
+    }
+  });
+
+  // Extract warranty data
+  const warrantyData = {};
+  warrantyFields.forEach(field => {
+    if (body[field] !== undefined) {
+      warrantyData[field] = body[field];
+    }
+  });
+
+  // Delete fields from fixedPayload
+  [...purchaseFields, ...warrantyFields].forEach((k) => delete fixedPayload[k]);
+
+  // 1️⃣ Save Fixed Asset first
+  const fixedDoc = await CPU.create(fixedPayload);
+  const assetId = fixedDoc._id;
+
+  // 2️⃣ Create Purchase Document if any purchase field exists
+  let purchaseDoc = null;
+  if (Object.keys(purchaseData).length > 0) {
+    purchaseDoc = await Purchase.create({
+      assetId,
+      itemCategory,
+      itemType,
+      organizationId: fixedPayload.organizationId,
+      branchId,
+      ...purchaseData,
+      createdBy: fixedPayload.createdBy,
+    });
+  }
+
+  // 3️⃣ Create Warranty Document if any warranty field exists
+  let warrantyDoc = null;
+  if (Object.keys(warrantyData).length > 0) {
+    warrantyDoc = await Warranty.create({
+      assetId,
+      itemCategory,
+      itemType,
+      organizationId: fixedPayload.organizationId,
+      branchId,
+      ...warrantyData,
+      createdBy: fixedPayload.createdBy,
+    });
+  }
+
+  return {
+    doc: {
+      fixedAsset: fixedDoc,
+      purchase: purchaseDoc,
+      warranty: warrantyDoc
+    },
+    message: "Asset created successfully."
+  };
 };
 
 const list = async (req) => {
@@ -138,7 +178,7 @@ const list = async (req) => {
   const limit = Math.min(Math.max(Number(req.query?.limit) || 20, 1), 100);
   const page = Math.max(Number(req.query?.page) || 1, 1);
   const items = await CPU.find(filter)
-    .select("itemId summary manufacturer cpuManufacturer model cpuModel serialNumber itemCategory itemType isActive createdAt branchId organizationId isDeleted memory storage")
+    .select("itemId summary manufacturer processorManufacturer model processorModel serialNumber itemCategory itemType isActive createdAt branchId organizationId isDeleted memory storage")
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit)
@@ -148,8 +188,8 @@ const list = async (req) => {
   const flattenedItems = items.map((item) => ({
     ...item,
     itemName: item.itemId || item.summary?.itemName || "N/A",
-    manufacturer: item.manufacturer || item.cpuManufacturer || item.summary?.manufacturer || "N/A",
-    model: item.model || item.cpuModel || item.summary?.model || "N/A",
+    manufacturer: item.manufacturer || item.summary?.manufacturer || "N/A",
+    model: item.model ||item.summary?.model || "N/A",
     serialNumber: item.serialNumber || item.summary?.serialNumber || "N/A",
     itemTag: item.itemId || item.summary?.itemTag || "N/A",
   }));

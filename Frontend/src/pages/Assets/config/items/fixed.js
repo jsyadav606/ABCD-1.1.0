@@ -44,7 +44,7 @@ export const fixedConfigs = {
           { name: "ramManufacturer", placeholder: "e.g. Corsair", label: "Memory Manufacturer", type: "text", maxLength: 80 },
           { name: "ramModelNumber", placeholder: "e.g. Vengeance LPX", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
           { name: "ramSerialNumber", placeholder: "e.g. 1234567890", label: "Memory Serial Number", type: "text", maxLength: 100 },
-          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
+          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512,},
           {
             name: "ramType",
             label: "RAM Type",
@@ -64,7 +64,7 @@ export const fixedConfigs = {
         fields: [
           
           { 
-            name: "cpuManufacturer", 
+            name: "processorManufacturer", 
             label: "Processor Manufacturer",
             type: "select", 
             required: true, 
@@ -76,30 +76,30 @@ export const fixedConfigs = {
             ] },
 
             { 
-            name: "cpuModel", 
+            name: "processorModel", 
             label: "Processor Series", 
             type: "select", 
             required: true, 
             options:[
-              { value: "i9", label: "Intel Core i9", showIf: { cpuManufacturer: "intel" } },
-              { value: "i7", label: "Intel Core i7", showIf: { cpuManufacturer: "intel" } },
-              { value: "i5", label: "Intel Core i5", showIf: { cpuManufacturer: "intel" } },
-              { value: "i3", label: "Intel Core i3", showIf: { cpuManufacturer: "intel" } },
+              { value: "i9", label: "Intel Core i9", showIf: { processorManufacturer: "intel" } },
+              { value: "i7", label: "Intel Core i7", showIf: { processorManufacturer: "intel" } },
+              { value: "i5", label: "Intel Core i5", showIf: { processorManufacturer: "intel" } },
+              { value: "i3", label: "Intel Core i3", showIf: { processorManufacturer: "intel" } },
 
-              { value: "ryzen9", label: "AMD Ryzen 9", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen7", label: "AMD Ryzen 7", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen5", label: "AMD Ryzen 5", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen3", label: "AMD Ryzen 3", showIf: { cpuManufacturer: "amd" } },
+              { value: "ryzen9", label: "AMD Ryzen 9", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen7", label: "AMD Ryzen 7", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen5", label: "AMD Ryzen 5", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen3", label: "AMD Ryzen 3", showIf: { processorManufacturer: "amd" } },
 
-              { value: "m3", label: "Apple M3", showIf: { cpuManufacturer: "apple" } },
-              { value: "m2", label: "Apple M2", showIf: { cpuManufacturer: "apple" } },
-              { value: "m1", label: "Apple M1", showIf: { cpuManufacturer: "apple" } },
+              { value: "m3", label: "Apple M3", showIf: { processorManufacturer: "apple" } },
+              { value: "m2", label: "Apple M2", showIf: { processorManufacturer: "apple" } },
+              { value: "m1", label: "Apple M1", showIf: { processorManufacturer: "apple" } },
               
             ] 
           
           },
-          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 10 },
-          { name: "processorModel", placeholder: "e.g. i7-11800H", label: "Processor Model", type: "number", maxLength: 40 },
+          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 100 },
+          { name: "processorModelNumber", placeholder: "e.g. i7-11800H", label: "Processor Model Number", type: "text", maxLength: 40 },
           { name: "cores", placeholder: "e.g. 8", label: "Number of Cores", type: "number", min: 1, max: 256 },
           { name: "threads", placeholder: "e.g. 16", label: "Number of Threads",  type: "number", min: 1, max: 512 },
           { name: "virtualizationEnabled", label: "Virtualization Enabled", type: "select", options: common.booleanOptions },
@@ -377,20 +377,57 @@ export const fixedConfigs = {
         // addFields: [{},{},{}],
       }),
       //! Location Information
-      fromGeneric("Location Information",{
+      fromGeneric("Location & Other Information",{
          omitFields: ["organization","rackNumber","rackUnit", "location", "floor", "room", "locationType", "building"],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
         }),
+        
+        //! Processor
       {
-        sectionTitle: "Operating System",
+        sectionTitle: "Processor",
         fields: [
-          { name: "osName", placeholder: "e.g. Windows 10", label: "OS Name", type: "text", maxLength: 100 },
-          { name: "osEdition", placeholder: "e.g. Professional", label: "OS Edition", type: "text", maxLength: 80 },
-          { name: "osVersion", placeholder: "e.g. 10.0.19045", label: "OS Version", type: "text", maxLength: 40 },
-          { name: "buildNumber", placeholder: "e.g. 19045", label: "Build Number", type: "text", maxLength: 40 },
-          { name: "osLicenseKey", placeholder: "e.g. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX", label: "OS License Key", type: "text", maxLength: 120 },
-          { name: "activationStatus", label: "Activation Status", type: "select", options: common.activationStatus },
+          
+          { 
+            name: "processorManufacturer", 
+            label: "Processor Manufacturer",
+            type: "select", 
+            required: true, 
+            options: [
+              { value: "intel", label: "Intel" },
+              { value: "amd", label: "AMD" },
+              { value: "apple", label: "Apple" },
+
+            ] },
+
+            { 
+            name: "processorModel", 
+            label: "Processor Series", 
+            type: "select", 
+            required: true, 
+            options:[
+              { value: "i9", label: "Intel Core i9", showIf: { processorManufacturer: "intel" } },
+              { value: "i7", label: "Intel Core i7", showIf: { processorManufacturer: "intel" } },
+              { value: "i5", label: "Intel Core i5", showIf: { processorManufacturer: "intel" } },
+              { value: "i3", label: "Intel Core i3", showIf: { processorManufacturer: "intel" } },
+
+              { value: "ryzen9", label: "AMD Ryzen 9", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen7", label: "AMD Ryzen 7", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen5", label: "AMD Ryzen 5", showIf: { processorManufacturer: "amd" } },
+              { value: "ryzen3", label: "AMD Ryzen 3", showIf: { processorManufacturer: "amd" } },
+
+              { value: "m3", label: "Apple M3", showIf: { processorManufacturer: "apple" } },
+              { value: "m2", label: "Apple M2", showIf: { processorManufacturer: "apple" } },
+              { value: "m1", label: "Apple M1", showIf: { processorManufacturer: "apple" } },
+              
+            ] 
+          
+          },
+          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 100 },
+          { name: "processorModelNumber", placeholder: "e.g. i7-11800H", label: "Processor Model Number", type: "text", maxLength: 40 },
+          { name: "cores", placeholder: "e.g. 8", label: "Number of Cores", type: "number", min: 1, max: 256 },
+          { name: "threads", placeholder: "e.g. 16", label: "Number of Threads",  type: "number", min: 1, max: 512 },
+          { name: "virtualizationEnabled", label: "Virtualization Enabled", type: "select", options: common.booleanOptions },
         ],
       },
       //! Memory
@@ -400,7 +437,7 @@ export const fixedConfigs = {
           { name: "ramManufacturer", placeholder: "e.g. Corsair", label: "Memory Manufacturer", type: "text", maxLength: 80 },
           { name: "ramModelNumber", placeholder: "e.g. Vengeance LPX", label: "Memory Part/Model Number", type: "text", maxLength: 100 },
           { name: "ramSerialNumber", placeholder: "e.g. 1234567890", label: "Memory Serial Number", type: "text", maxLength: 100 },
-          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512, required: true },
+          { name: "ramCapacityGB", placeholder: "e.g. 16", label: "Memory Capacity (GB)", type: "number", min: 1, max: 512,},
           {
             name: "ramType",
             label: "RAM Type",
@@ -414,53 +451,7 @@ export const fixedConfigs = {
           
         ],
       },
-      //! Processor
-      {
-        sectionTitle: "Processor",
-        fields: [
-          
-          { 
-            name: "cpuManufacturer", 
-            label: "Processor Manufacturer",
-            type: "select", 
-            required: true, 
-            options: [
-              { value: "intel", label: "Intel" },
-              { value: "amd", label: "AMD" },
-              { value: "apple", label: "Apple" },
-
-            ] },
-
-            { 
-            name: "cpuModel", 
-            label: "Processor Series", 
-            type: "select", 
-            required: true, 
-            options:[
-              { value: "i9", label: "Intel Core i9", showIf: { cpuManufacturer: "intel" } },
-              { value: "i7", label: "Intel Core i7", showIf: { cpuManufacturer: "intel" } },
-              { value: "i5", label: "Intel Core i5", showIf: { cpuManufacturer: "intel" } },
-              { value: "i3", label: "Intel Core i3", showIf: { cpuManufacturer: "intel" } },
-
-              { value: "ryzen9", label: "AMD Ryzen 9", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen7", label: "AMD Ryzen 7", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen5", label: "AMD Ryzen 5", showIf: { cpuManufacturer: "amd" } },
-              { value: "ryzen3", label: "AMD Ryzen 3", showIf: { cpuManufacturer: "amd" } },
-
-              { value: "m3", label: "Apple M3", showIf: { cpuManufacturer: "apple" } },
-              { value: "m2", label: "Apple M2", showIf: { cpuManufacturer: "apple" } },
-              { value: "m1", label: "Apple M1", showIf: { cpuManufacturer: "apple" } },
-              
-            ] 
-          
-          },
-          { name: "processorGeneration", placeholder: "e.g. 11", label: "Processor Generation", type: "number", min: 0, max: 10 },
-          { name: "processorModel", placeholder: "e.g. i7-11800H", label: "Processor Model", type: "number", maxLength: 40 },
-          { name: "cores", placeholder: "e.g. 8", label: "Number of Cores", type: "number", min: 1, max: 256 },
-          { name: "threads", placeholder: "e.g. 16", label: "Number of Threads",  type: "number", min: 1, max: 512 },
-          { name: "virtualizationEnabled", label: "Virtualization Enabled", type: "select", options: common.booleanOptions },
-        ],
-      },
+      
       //! Storage
       {
         sectionTitle: "Storage",
@@ -482,59 +473,125 @@ export const fixedConfigs = {
         ],
       },
 
+      //! Operating System
+      {
+        sectionTitle: "Operating System",
+        fields: [
+          { name: "osName", placeholder: "e.g. Windows 10", label: "OS Name", type: "text", maxLength: 100 },
+          { name: "osEdition", placeholder: "e.g. Professional", label: "OS Edition", type: "text", maxLength: 80 },
+          { name: "osVersion", placeholder: "e.g. 10.0.19045", label: "OS Version", type: "text", maxLength: 40 },
+          { name: "buildNumber", placeholder: "e.g. 19045", label: "Build Number", type: "text", maxLength: 40 },
+          { name: "osLicenseKey", placeholder: "e.g. XXXXX-XXXXX-XXXXX-XXXXX-XXXXX", label: "OS License Key", type: "text", maxLength: 120 },
+          { name: "activationStatus", label: "Activation Status", type: "select", options: common.activationStatus },
+        ],
+      },
+
       //! Display & Graphics
       {
         sectionTitle: "Display & Graphics",
         fields: [
           { name: "screenSizeInches", label: "Screen Size (Inches)", type: "number", min: 10, max: 20 },
-          { name: "resolution", label: "Resolution", type: "text", maxLength: 40 },
-          { name: "panelType", label: "Panel Type (IPS/OLED)", type: "text", maxLength: 40 },
-          { name: "graphicsType", label: "Graphics Type (Integrated/Dedicated)", type: "text", maxLength: 80 },
-          { name: "graphicsModel", label: "Graphics Model", type: "text", maxLength: 100 },
+          { name: "resolution", placeholder: "e.g. 1920x1080", label: "Resolution", type: "text", maxLength: 40 },
+          { name: "panelType", placeholder: "e.g. IPS", label: "Panel Type (IPS/OLED)", type: "text", maxLength: 40 },
+          { name: "graphicsType", placeholder: "e.g. Integrated", label: "Graphics Type (Integrated/Dedicated)", type: "text", maxLength: 80 },
+          { name: "graphicsModel", placeholder: "e.g. Intel UHD Graphics", label: "Graphics Model", type: "text", maxLength: 100 },
         ],
       },
       {
         sectionTitle: "Battery & Power",
         fields: [
-          { name: "batteryCapacityWh", label: "Battery Capacity (Wh)", type: "number", min: 10, max: 200 },
-          { name: "batteryHealthPercent", label: "Battery Health (%)", type: "number", min: 0, max: 100 },
-          { name: "batteryCycleCount", label: "Battery Cycle Count", type: "number", min: 0, max: 5000 },
-          { name: "chargerSerial", label: "Charger Serial Number", type: "text", maxLength: 120 },
+          { name: "originalCapacitymAh", label: "Original Battery Capacity (mAh)", type: "number", min: 1000, max: 100000, placeholder: "e.g. 5000" },
+          // { name: "batteryHealthPercent", label: "Battery Health (%)", type: "number", min: 0, max: 100 },
+          // { name: "batteryCycleCount", label: "Battery Cycle Count", type: "number", min: 0, max: 5000 },
+          {name: "chargerCapacityWatt", label: "Charger Capacity (Watts)", type: "number", min: 10, max: 200, placeholder: "e.g. 65" },
+          { name: "chargerSerial", label: "Charger Serial Number", type: "text", maxLength: 120, placeholder: "e.g. 1234567890" },
+          { name: "chargerPinType", label: "Charger Pin Type", type: "select", options: common.chargerPinTypes,},
           { name: "fastChargingSupported", label: "Fast Charging Supported", type: "select", options: common.booleanOptions },
         ],
       },
+
+      // ! Audio & Camera
+      {
+        sectionTitle: "Audio & Camera",
+        fields: [
+          // Webcam Details
+          { name: "webcamAvailable", label: "Webcam Available", type: "select", options: common.booleanOptions, defaultValue: "Yes" },
+          { name: "webcamResolution", placeholder: "e.g. 720p", label: "Webcam Resolution", type: "text", maxLength: 40, showIf: { webcamAvailable: "Yes" }, },
+          { name: "webcamFrameRate", placeholder: "e.g. 30", label: "Webcam Frame Rate (FPS)", type: "number", min: 1, max: 120, showIf: { webcamAvailable: "Yes" } },
+          { name: "webcamType", label: "Webcam Type", type: "select", options: ["HD", "Full HD", "IR", "HD + IR"], showIf: { webcamAvailable: "Yes" } },
+          { name: "hasPrivacyShutter", label: "Privacy Shutter", type: "select", options: common.booleanOptions, showIf: { webcamAvailable: "Yes" } },
+          { name: "supportsFaceUnlock", label: "Face Unlock (IR)", type: "select", options: common.booleanOptions, showIf: { webcamType: "IR" } },
+          { name: "webcamStatus", label: "Webcam Status", type: "select", options: ["Working", "Not Working", "Damaged", "Disabled"], showIf: { webcamAvailable: "Yes" }, defaultValue: "Working"  },
+
+          // Microphone Details
+          { name: "microphoneAvailable", label: "Microphone Available", type: "select", options: common.booleanOptions, defaultValue: "Yes" },
+          { name: "microphoneCount", label: "Number of Microphones", type: "number", min: 0, max: 10, showIf: { microphoneAvailable: "Yes" } },
+          { name: "microphoneType", label: "Microphone Type", type: "select", options: ["Single", "Dual", "Array"], showIf: { microphoneAvailable: "Yes" } },
+          { name: "microphoneStatus", label: "Microphone Status", type: "select", options: ["Working", "Not Working", "Distorted"], showIf: { microphoneAvailable: "Yes" }, defaultValue: "Working" },
+
+          // Speaker Details
+          {name: "audioAvailable", label: "Audio Available", type: "select", options: common.booleanOptions, defaultValue: "Yes" },
+          {name:"numberOfSpeakers", label: "Number of Speakers", type: "number", min: 0, max: 10, showIf: { audioAvailable: "Yes" } },
+          {name: "speakerPowerWatt", label: "Speaker Power (Watts)", type: "number", min: 1, max: 100 },
+          {name: "speakerStatus", label: "Speaker Status", type: "select", options: ["Working", "Not Working", "Distorted"], showIf: { audioAvailable: "Yes" }, defaultValue: "Working" },
+
+        ],
+      },
+
+        //!Availability of Ports & Connectivity
+        {
+          sectionTitle: "Ports & Connectivity",
+          fields: [
+            { name: "hdmiPort", label: "HDMI Port Available", type: "select", options: common.booleanOptions },
+            { name: "vgaPort", label: "VGA Port Available", type: "select", options: common.booleanOptions },
+            { name: "usbPort", label: "USB Port Available", type: "select", options: common.booleanOptions, defaultValue: "Yes" },
+            { name: "noOfUSBPorts", placeholder: "e.g. 4", label: "Number of USB Ports", type: "number", min: 0, max: 20, showIf: { usbPort: "Yes" } },
+            { name: "usbTypeC", label: "USB Type-C Port Available", type: "select", options: common.booleanOptions, defaultValue: "Yes" },
+            { name: "noOfCPorts", placeholder: "e.g. 4", label: "Number of C Type Ports", type: "number", min: 0, max: 20, showIf: { usbTypeC: "Yes" } },
+            { name: "audioOut", label: "Audio Out Port Available", type: "select", options: common.booleanOptions },
+            { name: "networkPort", label: "Ethernet Port Available", type: "select", options: common.booleanOptions, required : true, defaultValue: "No" },
+          ],
+        },
+
+
+      // ! Security & Hardware
       {
         sectionTitle: "Security & Hardware",
         fields: [
-          { name: "tpmVersion", label: "TPM Version", type: "text", maxLength: 40 },
           { name: "secureBootEnabled", label: "Secure Boot Enabled", type: "select", options: common.booleanOptions },
           { name: "fingerprintScanner", label: "Fingerprint Scanner", type: "select", options: common.booleanOptions },
           { name: "faceRecognition", label: "Face Recognition", type: "select", options: common.booleanOptions },
-          { name: "hardwareUUID", label: "Hardware UUID", type: "text", maxLength: 120 },
+          { name: "hardwareUUID", label: "Hardware UUID", type: "text", maxLength: 120, placeholder: "e.g. 12345678-1234-1234-1234-1234567890AB" },
         ],
       },
+
+       //! Network Details
+       fromGeneric("Network Details",{
+        //  omitFields: ["","",""],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+      }), 
        //! Purchase Information
       fromGeneric("Purchase Information",{
          omitFields: ["taxAmount","totalAmount","currency"],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
       }),
-      //! Item State
+     
+      //! Warranty Information
+      fromGeneric("Warranty Information",{
+        //  omitFields: ["","",""],
+        //  overrideFields: [{},{},{},],
+        //  addFields:[{},{},{},]
+      }),
+
+       //! Item State
       fromGeneric("Item State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
       }),
-      {
-        sectionTitle: "Item Lifecycle Status",
-        fields: [
-          { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
-          { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
-          { name: "lastAuditDate", label: "Last Physical Audit Date", type: "date" },
-          { name: "condition", label: "Physical Condition", type: "select", options: common.conditionStatus },
-          { name: "remarks", label: "Remarks", type: "textarea", maxLength: 500 },
-        ],
-      },
+      
     ],
   },
 
@@ -558,10 +615,10 @@ export const fixedConfigs = {
       {
         sectionTitle: "Display Specifications",
         fields: [
-          { name: "resolution", label: "Resolution", type: "text", maxLength: 40 },
-          { name: "aspectRatio", label: "Aspect Ratio", type: "text", maxLength: 40 },
+          { name: "resolution", placeholder: "e.g. 1920x1080", label: "Resolution", type: "text", maxLength: 40 },
+          { name: "aspectRatio", placeholder: "e.g. 16:9", label: "Aspect Ratio", type: "text", maxLength: 40 },
           { name: "brightnessNits", label: "Brightness (Nits)", type: "number", min: 100, max: 1000 },
-          { name: "contrastRatio", label: "Contrast Ratio", type: "text", maxLength: 40 },
+          { name: "contrastRatio", placeholder: "e.g. 1000:1", label: "Contrast Ratio", type: "text", maxLength: 40 },
           { name: "refreshRateHz", label: "Refresh Rate (Hz)", type: "number", min: 30, max: 240 },
           { name: "displayTechnology", label: "Display Technology", type: "select", options: common.displayTechnologies },
     
@@ -582,11 +639,11 @@ export const fixedConfigs = {
       {
         sectionTitle: "Operating System",
         fields: [
-          { name: "osName", label: "Operating System", type: "text", maxLength: 100 },
-          { name: "osVersion", label: "OS Version", type: "text", maxLength: 40 },
+          { name: "osName", placeholder: "e.g. Android", label: "Operating System", type: "text", maxLength: 100 },
+          { name: "osVersion", placeholder: "e.g. 11.0", label: "OS Version", type: "text", maxLength: 40 },
           { name: "ramGB", label: "RAM (GB)", type: "number", min: 2, max: 64 },
           { name: "internalStorageGB", label: "Internal Storage (GB)", type: "number", min: 8, max: 1024 },
-          { name: "cpuModel", label: "Processor Model", type: "text", maxLength: 120 },
+          { name: "processorModel", placeholder: "e.g. Snapdragon 888", label: "Processor Model", type: "text", maxLength: 120 },
         ],
       },
         
@@ -595,7 +652,7 @@ export const fixedConfigs = {
         fields: [
           { name: "speakerPowerWatt", label: "Speaker Power (Watts)", type: "number", min: 5, max: 200 },
           { name: "builtInCamera", label: "Built-in Camera", type: "select", options: common.booleanOptions },
-          { name: "cameraResolution", label: "Camera Resolution", type: "text", maxLength: 40 },
+          { name: "cameraResolution", placeholder: "e.g. 12MP", label: "Camera Resolution", type: "text", maxLength: 40 },
           { name: "microphoneArray", label: "Microphone Array", type: "select", options: common.booleanOptions },
         ],
       },
@@ -615,17 +672,17 @@ export const fixedConfigs = {
         fields: [
           { name: "mountType", label: "Mount Type (Wall/Stand)", type: "select", options: common.mountTypes },
           { name: "weightKg", label: "Weight (Kg)", type: "number", min: 5, max: 200 },
-          { name: "color", label: "Color", type: "text", maxLength: 40 },
+          { name: "color", placeholder: "e.g. Black", label: "Color", type: "text", maxLength: 40 },
           { name: "powerConsumptionWatt", label: "Power Consumption (Watts)", type: "number", min: 50, max: 1000 },
         ],
       },
       {
         sectionTitle: "Item Financial Details",
         fields: [
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 80 },
-          { name: "serialNumber", label: "Serial Number", type: "text", required: true, maxLength: 120 },
+          { name: "itemTag", placeholder: "e.g. IP001", label: "Item Tag", type: "text", required: true, maxLength: 80 },
+          { name: "serialNumber", placeholder: "e.g. SN1234567890", label: "Serial Number", type: "text", required: true, maxLength: 120 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
-          { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
+          { name: "barcode", placeholder: "e.g. 123456789012", label: "Barcode / QR Code", type: "text", maxLength: 120 },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
           { name: "acquisitionDate", label: "Acquisition Date", type: "date" },
           { name: "warrantyExpiryDate", label: "Warranty Expiry Date", type: "date" },
@@ -639,10 +696,10 @@ export const fixedConfigs = {
         sectionTitle: "Item Location & Assignment",
         fields: [
           { name: "branch", label: "Branch", type: "select", options: common.branches },
-          { name: "building", label: "Building", type: "text", maxLength: 100 },
-          { name: "floor", label: "Floor", type: "text", maxLength: 40 },
-          { name: "room", label: "Room / Classroom", type: "text", maxLength: 80 },
-          { name: "assignedDepartment", label: "Assigned Department", type: "text", maxLength: 80 },
+          { name: "building", placeholder: "e.g. Main Building", label: "Building", type: "text", maxLength: 100 },
+          { name: "floor", placeholder: "e.g. 1st Floor", label: "Floor", type: "text", maxLength: 40 },
+          { name: "room", placeholder: "e.g. Room 101", label: "Room / Classroom", type: "text", maxLength: 80 },
+          { name: "assignedDepartment", placeholder: "e.g. IT Department", label: "Assigned Department", type: "text", maxLength: 80 },
           { name: "installationDate", label: "Installation Date", type: "date" },
         ],
       },
@@ -664,40 +721,40 @@ export const fixedConfigs = {
       {
         sectionTitle: "Item Basic Information",
         fields: [
-          { name: "itemName", label: "Item Name", type: "text", required: true, maxLength: 120 },
+          { name: "itemName", placeholder: "e.g. iPad Pro", label: "Item Name", type: "text", required: true, maxLength: 120 },
           { name: "itemCategory", label: "Item Category", type: "select", options: common.itemCategories, required: true },
-          { name: "manufacturer", label: "Manufacturer", type: "text", required: true, maxLength: 100 },
-          { name: "model", label: "Model", type: "text", required: true, maxLength: 100 },
+          { name: "manufacturer", placeholder: "e.g. Apple", label: "Manufacturer", type: "text", required: true, maxLength: 100 },
+          { name: "model", placeholder: "e.g. iPad Pro 12.9", label: "Model", type: "text", required: true, maxLength: 100 },
           { name: "deviceType", label: "Device Type", type: "select", options: common.deviceTypes },
-          { name: "formFactor", label: "Form Factor", type: "text", maxLength: 80 },
+          { name: "formFactor", placeholder: "e.g. Tablet", label: "Form Factor", type: "text", maxLength: 80 },
         ],
       },
       {
         sectionTitle: "Item Operating System",
         fields: [
-          { name: "osName", label: "OS Name", type: "text", maxLength: 80 },
-          { name: "osVersion", label: "OS Version", type: "text", maxLength: 40 },
-          { name: "buildNumber", label: "Build Number", type: "text", maxLength: 40 },
-          { name: "securityPatchLevel", label: "Security Patch Level", type: "text", maxLength: 40 },
+          { name: "osName", placeholder: "e.g. iOS", label: "OS Name", type: "text", maxLength: 80 },
+          { name: "osVersion", placeholder: "e.g. 15.0", label: "OS Version", type: "text", maxLength: 40 },
+          { name: "buildNumber", placeholder: "e.g. 19A346", label: "Build Number", type: "text", maxLength: 40 },
+          { name: "securityPatchLevel", placeholder: "e.g. 2023-01-01", label: "Security Patch Level", type: "text", maxLength: 40 },
           { name: "activationStatus", label: "Activation Status", type: "select", options: common.activationStatus },
         ],
       },
       {
         sectionTitle: "Hardware Specifications",
         fields: [
-          { name: "cpuModel", label: "Processor Model", type: "text", maxLength: 120 },
+          { name: "processorModel", placeholder: "e.g. M1", label: "Processor Model", type: "text", maxLength: 120 },
           { name: "ramGB", label: "RAM (GB)", type: "number", min: 1, max: 32 },
           { name: "storageCapacityGB", label: "Storage Capacity (GB)", type: "number", min: 16, max: 2000 },
           { name: "storageType", label: "Storage Type", type: "select", options: common.storageTypes },
-          { name: "gpuModel", label: "Graphics Processor", type: "text", maxLength: 100 },
+          { name: "gpuModel", placeholder: "e.g. Apple GPU", label: "Graphics Processor", type: "text", maxLength: 100 },
         ],
       },
       {
         sectionTitle: "Display",
         fields: [
           { name: "screenSizeInches", label: "Screen Size (Inches)", type: "number", min: 5, max: 20 },
-          { name: "resolution", label: "Resolution", type: "text", maxLength: 40 },
-          { name: "panelType", label: "Panel Type", type: "text", maxLength: 40 },
+          { name: "resolution", placeholder: "e.g. 2048x1536", label: "Resolution", type: "text", maxLength: 40 },
+          { name: "panelType", placeholder: "e.g. LCD", label: "Panel Type", type: "text", maxLength: 40 },
           { name: "touchSupport", label: "Touch Support", type: "select", options: common.booleanOptions },
           { name: "stylusSupport", label: "Stylus Support", type: "select", options: common.booleanOptions },
         ],
@@ -708,19 +765,19 @@ export const fixedConfigs = {
           { name: "batteryCapacityMah", label: "Battery Capacity (mAh)", type: "number", min: 1000, max: 20000 },
           { name: "batteryHealthPercent", label: "Battery Health (%)", type: "number", min: 0, max: 100 },
           { name: "fastChargingSupported", label: "Fast Charging Supported", type: "select", options: common.booleanOptions },
-          { name: "chargerType", label: "Charger Type", type: "text", maxLength: 80 },
-          { name: "chargerSerial", label: "Charger Serial Number", type: "text", maxLength: 120 },
+          { name: "chargerType", placeholder: "e.g. USB-C", label: "Charger Type", type: "text", maxLength: 80 },
+          { name: "chargerSerial", placeholder: "e.g. CHG1234567890", label: "Charger Serial Number", type: "text", maxLength: 120 },
         ],
       },
       {
         sectionTitle: "Connectivity",
         fields: [
           { name: "wifiSupported", label: "WiFi Supported", type: "select", options: common.booleanOptions },
-          { name: "bluetoothVersion", label: "Bluetooth Version", type: "text", maxLength: 40 },
+          { name: "bluetoothVersion", placeholder: "e.g. 5.0", label: "Bluetooth Version", type: "text", maxLength: 40 },
           { name: "cellularSupported", label: "Cellular Supported", type: "select", options: common.booleanOptions },
-          { name: "simNumber", label: "SIM Number", type: "text", maxLength: 40 },
-          { name: "imeiNumber", label: "IMEI Number", type: "text", maxLength: 40 },
-          { name: "macAddress", label: "MAC Address", type: "text", maxLength: 40 },
+          { name: "simNumber", placeholder: "e.g. 8901234567890123456", label: "SIM Number", type: "text", maxLength: 40 },
+          { name: "imeiNumber", placeholder: "e.g. 123456789012345", label: "IMEI Number", type: "text", maxLength: 40 },
+          { name: "macAddress", placeholder: "e.g. 00:11:22:33:44:55", label: "MAC Address", type: "text", maxLength: 40 },
         ],
       },
       {
@@ -729,7 +786,7 @@ export const fixedConfigs = {
           { name: "frontCameraMP", label: "Front Camera (MP)", type: "number", min: 0, max: 50 },
           { name: "rearCameraMP", label: "Rear Camera (MP)", type: "number", min: 0, max: 200 },
           { name: "microphoneAvailable", label: "Microphone Available", type: "select", options: common.booleanOptions },
-          { name: "speakerType", label: "Speaker Type", type: "text", maxLength: 80 },
+          { name: "speakerType", placeholder: "e.g. Stereo", label: "Speaker Type", type: "text", maxLength: 80 },
         ],
       },
       {
@@ -738,17 +795,17 @@ export const fixedConfigs = {
           { name: "deviceEncryption", label: "Device Encryption Enabled", type: "select", options: common.booleanOptions },
           { name: "biometricSupport", label: "Biometric Support", type: "select", options: common.booleanOptions },
           { name: "mdmEnrolled", label: "MDM Enrolled", type: "select", options: common.booleanOptions },
-          { name: "mdmPlatform", label: "MDM Platform", type: "text", maxLength: 80 },
-          { name: "deviceUUID", label: "Device UUID", type: "text", maxLength: 120 },
+          { name: "mdmPlatform", placeholder: "e.g. Jamf", label: "MDM Platform", type: "text", maxLength: 80 },
+          { name: "deviceUUID", placeholder: "e.g. 12345678-1234-1234-1234-1234567890AB", label: "Device UUID", type: "text", maxLength: 120 },
         ],
       },
       {
         sectionTitle: "Item Financial Details",
         fields: [
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 80 },
-          { name: "serialNumber", label: "Serial Number", type: "text", required: true, maxLength: 120 },
+          { name: "itemTag", placeholder: "e.g. TAB001", label: "Item Tag", type: "text", required: true, maxLength: 80 },
+          { name: "serialNumber", placeholder: "e.g. F1234567890", label: "Serial Number", type: "text", required: true, maxLength: 120 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
-          { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 120 },
+          { name: "barcode", placeholder: "e.g. 123456789012", label: "Barcode / QR Code", type: "text", maxLength: 120 },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 5000000 },
           { name: "acquisitionDate", label: "Acquisition Date", type: "date" },
           { name: "warrantyExpiryDate", label: "Warranty Expiry Date", type: "date" },
@@ -762,10 +819,10 @@ export const fixedConfigs = {
         sectionTitle: "Item Location & Assignment",     
         fields: [
           { name: "branch", label: "Branch", type: "select", options: common.branches },
-          { name: "building", label: "Building", type: "text", maxLength: 100 },
-          { name: "floor", label: "Floor", type: "text", maxLength: 40 },
-          { name: "room", label: "Room", type: "text", maxLength: 80 },
-          { name: "assignedTo", label: "Assigned To (User ID)", type: "text", maxLength: 80 },
+          { name: "building", placeholder: "e.g. Admin Building", label: "Building", type: "text", maxLength: 100 },
+          { name: "floor", placeholder: "e.g. Ground Floor", label: "Floor", type: "text", maxLength: 40 },
+          { name: "room", placeholder: "e.g. Conference Room", label: "Room", type: "text", maxLength: 80 },
+          { name: "assignedTo", placeholder: "e.g. user123", label: "Assigned To (User ID)", type: "text", maxLength: 80 },
           { name: "assignmentDate", label: "Assignment Date", type: "date" },
         ],
       },
@@ -1714,8 +1771,8 @@ export const fixedConfigs = {
       {
         sectionTitle: "Processor",
         fields: [
-          { name: "cpuModel", label: "CPU Model", type: "text", maxLength: 120 },
-          { name: "cpuManufacturer", label: "CPU Manufacturer", type: "text", maxLength: 80 },
+          { name: "processorModel", label: "CPU Model", type: "text", maxLength: 120 },
+          { name: "processorManufacturer", label: "CPU Manufacturer", type: "text", maxLength: 80 },
           { name: "cores", label: "CPU Cores", type: "number", min: 1, max: 64 },
           { name: "clockSpeedGHz", label: "Clock Speed (GHz)", type: "number", min: 0, max: 10 },
         ],

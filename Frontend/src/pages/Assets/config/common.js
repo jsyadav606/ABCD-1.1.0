@@ -29,6 +29,8 @@ export const common = {
   branches: [],
   keyboardTypes: toOptions(["USB", "PS/2", "Wireless"]),
   mouseTypes: toOptions(["USB", "PS/2", "Wireless"]),
+  microphoneTypes: toOptions(["USB", "3.5mm Jack", "Wireless"]),
+  chargerPinTypes: toOptions([ "Type C", "Small Barrel (Thin Pin)", "Standard Barrel (Medium)", "Big Barrel (Thick Pin)", "Blue Tip / Smart Pin", "Slim Tip (Rectangular)","Magnetic Connectors"]),
 };
 
 export const TABLE_SECTION_TITLES = ["Processors", "Storage", "Memory", "Network Details"];

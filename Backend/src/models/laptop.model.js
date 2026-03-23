@@ -1,16 +1,15 @@
 /**
- * Model: CPU Asset
- * Description: CPU specific fields + summary for fast list views. Collections: asset_cpu
+ * Model: Laptop Asset
+ * Description: Laptop-specific fields + summary for fast list views. Collection: asset_fixed
  */
 import mongoose from "mongoose";
 
-const assetSchema = new mongoose.Schema(
+const laptopSchema = new mongoose.Schema(
   {
-    // Mandatory first fields
     itemCategory: { type: String, required: true, trim: true },
     itemType: { type: String, required: true, trim: true },
 
-    // Basic Information (matching frontend fields after omit)
+    // Basic Information
     itemId: { type: String, trim: true },
     itemTag: { type: String, trim: true },
     barcode: { type: String, trim: true },
@@ -18,10 +17,19 @@ const assetSchema = new mongoose.Schema(
     manufacturer: { type: String, trim: true },
     model: { type: String, trim: true },
     modelNumber: { type: String, trim: true },
-    partNumber: { type: String, trim: true },
     serialNumber: { type: String, trim: true },
+    partNumber: { type: String, trim: true },
     ownershipType: { type: String, trim: true },
-    manufacturingDate: { type: Date, default: null }, 
+    manufacturingDate: { type: Date, default: null },
+
+    // CPU / Processor details
+    processorManufacturer: { type: String, trim: true },
+    processorModel: { type: String, trim: true },
+    processorGeneration: { type: Number, default: null },
+    processorModelNumber: { type: String, trim: true },
+    cores: { type: Number, default: null },
+    threads: { type: Number, default: null },
+    virtualizationEnabled: { type: String, trim: true },
 
     // Operating System
     osName: { type: String, trim: true },
@@ -32,7 +40,7 @@ const assetSchema = new mongoose.Schema(
     activationStatus: { type: String, trim: true },
     domain: { type: String, trim: true },
 
-    // Memory (Table in frontend - Multiple RAM sticks)
+    // Memory (table rows)
     memory: {
       modules: [
         {
@@ -48,19 +56,10 @@ const assetSchema = new mongoose.Schema(
         },
       ],
       totalQty: { type: Number, default: 0 },
-      totalCapacityGB: { type: Number, default: 0 }
+      totalCapacityGB: { type: Number, default: 0 },
     },
 
-    // Processor
-    processorManufacturer: { type: String, trim: true },
-    processorModel: { type: String, trim: true },
-    processorGeneration: { type: Number, default: null },
-    processorModelNumber: { type: String, trim: true },
-    cores: { type: Number, default: null },
-    threads: { type: Number, default: null },
-    virtualizationEnabled: { type: String, trim: true },
-
-    // Storage (Table in frontend - Multiple Drives)
+    // Storage (table rows)
     storage: {
       devices: [
         {
@@ -80,65 +79,46 @@ const assetSchema = new mongoose.Schema(
         {
           type: { type: String, trim: true },
           qty: { type: Number, default: 0 },
-          capacityGB: { type: Number, default: 0 }
-        }
-      ]
+          capacityGB: { type: Number, default: 0 },
+        },
+      ],
     },
 
-    // BIOS & Hardware
-    biosVersion: { type: String, trim: true },
-    biosDate: { type: Date, default: null },
-    motherboardSerial: { type: String, trim: true },
-    hardwareUUID: { type: String, trim: true },
+    // Display & graphics
+    screenSizeInches: { type: Number, default: null },
+    resolution: { type: String, trim: true },
+    panelType: { type: String, trim: true },
+    graphicsType: { type: String, trim: true },
+    graphicsModel: { type: String, trim: true },
+
+    // Battery & power
+    originalCapacitymAh: { type: Number, default: null },
+    chargerCapacityWatt: { type: Number, default: null },
+    chargerSerial: { type: String, trim: true },
+    chargerPinType: { type: String, trim: true },
+    fastChargingSupported: { type: String, trim: true },
+
+    // Security & hardware
     tpmVersion: { type: String, trim: true },
     secureBootEnabled: { type: String, trim: true },
+    fingerprintScanner: { type: String, trim: true },
+    faceRecognition: { type: String, trim: true },
+    hardwareUUID: { type: String, trim: true },
 
-    // Graphics Card
-    gpuManufacturer: { type: String, trim: true },
-    gpuModelNumber: { type: String, trim: true },
-    gpuSerialNumber: { type: String, trim: true },
-    gpuCapacityGB: { type: Number, default: null },
-    gpuType: { type: String, trim: true },
-    gpuInterfaceSpeed: { type: String, trim: true },
+    // Life-cycle status / item state
+    lifecycleStatus: { type: String, trim: true },
+    operationalStatus: { type: String, trim: true },
+    lastAuditDate: { type: Date, default: null },
+    condition: { type: String, trim: true },
+    remarks: { type: String, trim: true, maxlength: 500 },
 
-    // Item State
+    // Item state fields (common)
     itemStatus: { type: String, trim: true, default: "active" },
     itemIsCurrently: { type: String, trim: true, default: "inStore" },
     itemUser: { type: String, trim: true },
     AssignDate: { type: Date, default: null },
 
-    // Network (Table in frontend)
-    network: {
-      interfaces: [
-        {
-          hostname: { type: String, trim: true },
-          nicType: { type: String, trim: true },
-          ipv4Address: { type: String, trim: true },
-          ipv6Address: { type: String, trim: true },
-          macAddress: { type: String, trim: true },
-          subnet: { type: String, trim: true },
-          defaultGateway: { type: String, trim: true },
-          dhcpEnabled: { type: String, trim: true },
-          dhcpServer: { type: String, trim: true },
-          dnsHostname: { type: String, trim: true },
-          ethernetPort: { type: String, trim: true },
-          switchPort: { type: String, trim: true },
-          linkSpeedMbps: { type: Number, default: null },
-          wifiSSID: { type: String, trim: true },
-          wifiSecurity: { type: String, trim: true },
-          wifiBand: { type: String, trim: true },
-        },
-      ],
-      totalQty: { type: Number, default: 0 },
-      typeBreakdown: [
-        {
-          nicType: { type: String, trim: true },
-          qty: { type: Number, default: 0 }
-        }
-      ]
-    },
-
-    // Infrastructure fields
+    // auditing
     organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null },
     branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", default: null },
 
@@ -148,35 +128,30 @@ const assetSchema = new mongoose.Schema(
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
-    // Summary field for quick listing (Industrial standard to avoid deep object lookup)
     summary: {
       itemName: { type: String, trim: true },
       itemTag: { type: String, trim: true },
       serialNumber: { type: String, trim: true },
       manufacturer: { type: String, trim: true },
       model: { type: String, trim: true },
-    }
+    },
   },
   { timestamps: true, collection: "asset_fixed" }
 );
 
-// Indices for performance
-assetSchema.index({ organizationId: 1, branchId: 1, itemCategory: 1, itemType: 1, isDeleted: 1, createdAt: -1 });
-assetSchema.index({ itemId: 1 }, { sparse: true });
-assetSchema.index({ serialNumber: 1 }, { sparse: true });
+laptopSchema.index({ organizationId: 1, branchId: 1, itemCategory: 1, itemType: 1, isDeleted: 1, createdAt: -1 });
+laptopSchema.index({ itemId: 1 }, { sparse: true });
+laptopSchema.index({ serialNumber: 1 }, { sparse: true });
 
-// Pre-save hook to populate summary if needed
-assetSchema.pre("save", function () {
-  // Map identifying fields to summary for compatibility with list views
+laptopSchema.pre("save", function () {
   this.summary = {
-    itemName: this.itemId || "CPU",
+    itemName: this.itemId || "Laptop",
     itemTag: this.itemTag || this.itemId || "N/A",
-    barcode: this.barcode || "N/A",
     serialNumber: this.serialNumber || "N/A",
     manufacturer: this.manufacturer || "N/A",
     model: this.model || "N/A",
   };
 });
 
-const CPU = mongoose.model("CPU", assetSchema);
-export { CPU };
+const Laptop = mongoose.model("Laptop", laptopSchema);
+export { Laptop };

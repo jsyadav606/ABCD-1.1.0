@@ -549,9 +549,9 @@ const AddItemPage = () => {
         // @ts-ignore
         itemCategory: category || form.itemCategory || null,
         // @ts-ignore
-        manufacturer: form.manufacturer || form.cpuManufacturer,
+        manufacturer: form.manufacturer || null,
         // @ts-ignore
-        model: form.model || form.cpuModel,
+        model: form.model || null,
         memory,
         storage,
         sections: sectionsPayload,
