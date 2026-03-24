@@ -361,6 +361,7 @@ const Dashboard = () => {
                 <span className="user-id"> • ID: {profile?.userId || "--"}</span>
               </div>
               <div className="user-email">{profile?.email || "--"}</div>
+              <div className="user-stats">Total Logins: {profile?.totalLoginCount || 0}</div>
             </div>
           </div>
 

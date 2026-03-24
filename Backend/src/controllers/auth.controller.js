@@ -9,6 +9,7 @@ import { apiError } from "../utils/apiError.js";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
+import { UserLogin } from "../models/userLogin.model.js";
 
 /**
  * Auth Controller - Handles HTTP requests for authentication
@@ -348,6 +349,9 @@ export const profileController = asyncHandler(async (req, res) => {
     throw new apiError(404, "User not found");
   }
 
+  // Fetch user login information for total login count
+  const userLoginDoc = await UserLogin.findOne({ user: userId }).select("totalLoginCount");
+
   const minimalUser = {
     _id: userDoc._id,
     userId: userDoc.userId,
@@ -357,6 +361,7 @@ export const profileController = asyncHandler(async (req, res) => {
     roleId: userDoc.roleId?._id || userDoc.roleId || null,
     branchId: userDoc.branchId || [],
     organizationId: userDoc.organizationId || null,
+    totalLoginCount: userLoginDoc?.totalLoginCount || 0,
   };
 
   let permissions = [];

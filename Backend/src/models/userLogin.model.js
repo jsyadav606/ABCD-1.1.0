@@ -60,6 +60,7 @@ const userLoginSchema = new Schema(
     isPermanentlyLocked: { type: Boolean, default: false },
     isLoggedIn: { type: Boolean, default: false },
     lastLogin: { type: Date },
+    totalLoginCount: { type: Number, default: 0 }, // Total number of successful logins across all devices
     loggedInDevices: [
       {
         deviceId: { type: String, default: () => uuidv4() },

@@ -140,6 +140,7 @@ export const authService = {
       userLogin.lockUntil = null;
       userLogin.isLoggedIn = true;
       userLogin.lastLogin = new Date();
+      userLogin.totalLoginCount = (userLogin.totalLoginCount || 0) + 1; // Increment total login count
 
       // Generate tokens
       const accessToken = userLogin.generateAccessToken(deviceId);

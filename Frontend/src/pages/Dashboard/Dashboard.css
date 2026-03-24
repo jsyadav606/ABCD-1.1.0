@@ -126,6 +126,13 @@
   font-size: .8rem;
 }
 
+.user-stats {
+  color: #059669;
+  font-size: .75rem;
+  font-weight: 500;
+  margin-top: .25rem;
+}
+
 .filters {
   display: flex;
   gap: 1rem;
