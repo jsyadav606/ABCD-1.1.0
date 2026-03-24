@@ -22,14 +22,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [deviceId, setDeviceId] = useState(() => {
+  const generateValidDeviceId = () => {
     const stored = sessionStorage.getItem('deviceId')
-    return stored || uuidv4()
-  })
 
-  // Store device ID in session storage
+    if (!stored || stored === 'undefined' || stored === 'null') {
+      const newDeviceId = uuidv4()
+      sessionStorage.setItem('deviceId', newDeviceId)
+      return newDeviceId
+    }
+
+    return stored
+  }
+
+  const [deviceId, setDeviceId] = useState(generateValidDeviceId)
+
+  // Store device ID in session storage when it changes
   useEffect(() => {
-    if (deviceId) {
+    if (deviceId && deviceId !== 'undefined' && deviceId !== 'null') {
       sessionStorage.setItem('deviceId', deviceId)
     }
   }, [deviceId])
@@ -106,7 +115,9 @@ export const AuthProvider = ({ children }) => {
       setError('')
       
       // Send loginId (can be username, userId, or email) instead of email
-      const response = await authAPI.login(loginId, password, deviceId)
+      const activeDeviceId = (deviceId && deviceId !== 'undefined' && deviceId !== 'null') ? deviceId : generateValidDeviceId()
+      const response = await authAPI.login(loginId, password, activeDeviceId)
+   
       
       // Backend returns: { user, accessToken, deviceId, forcePasswordChange }
       const { user: userData, accessToken, deviceId: returnedDeviceId, forcePasswordChange, permissions } = response.data.data
@@ -124,10 +135,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('permissions', JSON.stringify(permissions))
       }
       
-      // Update device ID if returned
-      if (returnedDeviceId) {
-        setDeviceId(returnedDeviceId)
-        sessionStorage.setItem('deviceId', returnedDeviceId)
+      // Preserve device ID; prefer backend returned value if available
+      const finalDeviceId = returnedDeviceId || activeDeviceId
+      if (finalDeviceId && finalDeviceId !== 'undefined' && finalDeviceId !== 'null') {
+        setDeviceId(finalDeviceId)
+        sessionStorage.setItem('deviceId', finalDeviceId)
       }
       
       // Keep full user object in memory for the app to use
@@ -202,12 +214,18 @@ export const AuthProvider = ({ children }) => {
     } finally {
       clearAuthHeaders()
       clearAllAuthStorage()
+      // Store deviceId back to sessionStorage only if valid
+      if (currentDeviceId && currentDeviceId !== 'undefined' && currentDeviceId !== 'null') {
+        sessionStorage.setItem('deviceId', currentDeviceId)
+      }
       setUser(null)
       setIsAuthenticated(false)
+      // IMPORTANT: Do NOT reset deviceId state - it should persist!
     }
   }, [deviceId])
 
   const logoutAll = useCallback(async () => {
+    const currentDeviceId = deviceId
     try {
       await authAPI.logoutAll()
     } catch (err) {
@@ -215,10 +233,14 @@ export const AuthProvider = ({ children }) => {
     } finally {
       clearAuthHeaders()
       clearAllAuthStorage()
+      if (currentDeviceId && currentDeviceId !== 'undefined' && currentDeviceId !== 'null') {
+        sessionStorage.setItem('deviceId', currentDeviceId)
+      }
       setUser(null)
       setIsAuthenticated(false)
+      // IMPORTANT: Do NOT reset deviceId state - it should persist!
     }
-  }, [])
+  }, [deviceId])
 
   const changePassword = useCallback(async (oldPassword, newPassword, confirmPassword) => {
     try {

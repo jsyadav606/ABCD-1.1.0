@@ -248,8 +248,10 @@ export const clearAuthData = () => {
 
 /**
  * Clear ALL auth-related data from storage (called on logout).
- * Removes: accessToken, user, permissions, authData from localStorage,
- * and deviceId from sessionStorage.
+ * Removes: accessToken, user, permissions, authData from localStorage.
+ * NOTE: deviceId is intentionally preserved in sessionStorage so the same
+ * device ID persists across logout/login cycles. The device ID is only generated
+ * once and reused for the lifetime of the browser session.
  */
 export const clearAllAuthStorage = () => {
   try {
@@ -257,7 +259,8 @@ export const clearAllAuthStorage = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("permissions");
     localStorage.removeItem("authData");
-    sessionStorage.removeItem("deviceId");
+    // Intentionally NOT removing deviceId - it should persist across logouts
+    // sessionStorage.removeItem("deviceId");
   } catch (error) {
     console.error("Error clearing auth storage:", error);
   }

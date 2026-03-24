@@ -151,6 +151,10 @@ userLoginSchema.methods.generateRefreshToken = async function (deviceId, ipAddre
       device.loginCount = (device.loginCount || 0) + 1;
       if (ipAddress) device.ipAddress = ipAddress;
       if (userAgent) device.userAgent = userAgent;
+      // Ensure tokenVersion is initialized (important after logout and re-login)
+      if (!device.tokenVersion) {
+        device.tokenVersion = 0;
+      }
       device.loginHistory.push({
         loginAt: new Date(),
         logoutAt: null,
@@ -163,6 +167,7 @@ userLoginSchema.methods.generateRefreshToken = async function (deviceId, ipAddre
         userAgent: userAgent || null,
         refreshToken: token,
         loginCount: 1,
+        tokenVersion: 0,
         loginHistory: [
           {
             loginAt: new Date(),
