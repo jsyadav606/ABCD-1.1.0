@@ -67,7 +67,7 @@ export const fixedConfigs = {
             name: "processorManufacturer", 
             label: "Processor Manufacturer",
             type: "select", 
-            required: true, 
+            // required: true, 
             options: [
               { value: "intel", label: "Intel" },
               { value: "amd", label: "AMD" },
@@ -79,7 +79,7 @@ export const fixedConfigs = {
             name: "processorModel", 
             label: "Processor Series", 
             type: "select", 
-            required: true, 
+            // required: true, 
             options:[
               { value: "i9", label: "Intel Core i9", showIf: { processorManufacturer: "intel" } },
               { value: "i7", label: "Intel Core i7", showIf: { processorManufacturer: "intel" } },

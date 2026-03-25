@@ -77,9 +77,11 @@ const normalizeOptions = (options, getValue) => {
 };
 
 // @ts-ignore
-const Field = memo(({ def, value, onChange, onScan, error, formData }) => {
+const Field = memo(({ def, value, onChange, onScan, error, formData, overrideOptions = [], isFieldDisabled = false }) => {
   const getValue = useMemo(() => (k) => formData?.[k], [formData]);
-  const selectOptions = useMemo(() => normalizeOptions(def.options, getValue), [def.options, getValue]);
+  // Use override options if provided (for branch field), otherwise use def.options
+  const finalOptions = overrideOptions.length > 0 ? overrideOptions : def.options;
+  const selectOptions = useMemo(() => normalizeOptions(finalOptions, getValue), [finalOptions, getValue]);
 
   useEffect(() => {
     if (def.type !== "select") return;
@@ -96,7 +98,7 @@ const Field = memo(({ def, value, onChange, onScan, error, formData }) => {
     placeholder: def.placeholder,
     required: !!def.required,
     readOnly: !!def.readOnly,
-    disabled: !!def.disabled || (def.type === "select" && !!def.readOnly),
+    disabled: isFieldDisabled || !!def.disabled || (def.type === "select" && !!def.readOnly),
     error: error ?? def.error,
     "aria-label": def.label,
     maxLength: def.maxLength,
@@ -176,7 +178,7 @@ const TableField = memo(({ def, value, onChange, error, formData, rowIndex }) =>
   return <Input label={undefined} onScan={undefined} {...common} type={def.type || "text"} min={def.min} max={def.max} />;
 });
 
-const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onSubmit, onReset, onCancel, submitting }) => {
+const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onSubmit, onReset, onCancel, submitting, branchOptions = [], isBranchFieldDisabled = false, userSelectedBranch = '' }) => {
   const list = Array.isArray(sections) ? sections : [];
   const [rowCounts, setRowCounts] = useState({});
   const { openScan } = useScanning();
@@ -240,19 +242,28 @@ const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onS
               <section key={sec.sectionTitle} className="fr-card" aria-labelledby={`sec-${sec.sectionTitle}`}>
                 <div id={`sec-${sec.sectionTitle}`} className="fr-title">{sec.sectionTitle}</div>
                 <div className="fr-grid">
-                  {filtered.map((f) => (
-                    <Field
-                      key={f.name}
-                      // @ts-ignore
-                      def={f}
-                      value={formData[f.name]}
-                      error={errors?.[f.name]}
-                      onChange={onChange}
-                      // @ts-ignore
-                      onScan={(name) => openScan((text) => onChange(name, text))}
-                      formData={formData}
-                    />
-                  ))}
+                  {filtered.map((f) => {
+                    // Special handling for branch field
+                    const isBranchField = f.name === 'branch';
+                    const fieldOptions = isBranchField ? branchOptions : [];
+                    const fieldDisabled = isBranchField ? isBranchFieldDisabled : false;
+                    
+                    return (
+                      <Field
+                        key={f.name}
+                        // @ts-ignore
+                        def={f}
+                        value={formData[f.name]}
+                        error={errors?.[f.name]}
+                        onChange={onChange}
+                        // @ts-ignore
+                        onScan={(name) => openScan((text) => onChange(name, text))}
+                        formData={formData}
+                        overrideOptions={fieldOptions}
+                        isFieldDisabled={fieldDisabled}
+                      />
+                    );
+                  })}
                 </div>
               </section>
             );
@@ -282,7 +293,6 @@ const FormRenderer = ({ sections = [], formData = {}, errors = {}, onChange, onS
                 {headerFields.map((f) => (
                   <div key={`${f.name}-h`} className="fr-table-head-cell">{f.label}</div>
                 ))}
-                <div className="fr-table-head-cell"></div>
               </div>
               {Array.from({ length: count }).map((_, idx) => (
                 <div

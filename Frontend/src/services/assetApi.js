@@ -29,3 +29,33 @@ export const fetchAllAssets = async (limit = 1000) => {
     throw new Error(error.response?.data?.message || 'Failed to fetch assets')
   }
 }
+
+export const fetchAssetCategories = async () => {
+  try {
+    const response = await API.get('/assetcategories/active/list')
+    return response.data?.data?.items || []
+  } catch (error) {
+    console.error('Failed to fetch asset categories:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch asset categories')
+  }
+}
+
+export const fetchItemTypesByCategory = async (categoryId) => {
+  try {
+    const response = await API.get(`/itemtypes/category/${categoryId}`)
+    return response.data?.data?.items || []
+  } catch (error) {
+    console.error('Failed to fetch item types:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch item types')
+  }
+}
+
+export const createAsset = async (assetData) => {
+  try {
+    const response = await API.post('/assets', assetData)
+    return response.data?.data || {}
+  } catch (error) {
+    console.error('Failed to create asset:', error)
+    throw new Error(error.response?.data?.message || 'Failed to create asset')
+  }
+}

@@ -2,10 +2,10 @@ import './Select.css';
 
 const Select = ({
   name,
-  label,
+  label = '',
   value,
   onChange,
-  onBlur,
+  onBlur = () => {},
   options = [],
   error = '',
   required = false,

@@ -28,9 +28,9 @@ const EditUser = lazy(() => import("./pages/users/EditUserPage/EditUser"));
 const UserDetails = lazy(() => import("./pages/users/UserDetailsPage/UserDetails"));
 const Setup = lazy(() => import("./pages/Setup/Setup"));
 // @ts-ignore
-const AssetPage = lazy(() => import("./pages/assets/asset"));
+const AssetPage = lazy(() => import("./pages/Assets/asset"));
 // @ts-ignore
-const AddItemPage = lazy(() => import("./pages/assets/AddItem"));
+const AddItemPage = lazy(() => import("./pages/Assets/AddItem"));
 
 function App() {
   return (

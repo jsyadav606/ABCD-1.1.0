@@ -12,6 +12,11 @@ const laptopSchema = new mongoose.Schema(
       required: true
     },
     itemType: { type: String, required: true, trim: true },
+    itemTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ItemType",
+      default: null
+    },
 
     // Basic Information
     itemId: { type: String, trim: true },

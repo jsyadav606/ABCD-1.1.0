@@ -12,6 +12,11 @@ const monitorSchema = new mongoose.Schema(
       required: true
     },
     itemType: { type: String, required: true, trim: true },
+    itemTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ItemType",
+      default: null
+    },
 
     itemId: { type: String, trim: true },
     itemTag: { type: String, trim: true },
