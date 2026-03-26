@@ -113,7 +113,7 @@ const Login = () => {
           <div className="user-avatar">
             <span>{user.name?.charAt(0)?.toUpperCase() || 'U'}</span>
           </div>
-          <div className="user-details">
+          <div className="reauth-user-details">
             <p className="user-name">{user.name}</p>
             <p className="user-email">{user.email}</p>
           </div>

@@ -265,7 +265,7 @@ const Sidebar = ({ onCloseSidebar }) => {
       {user && (
         <div
           ref={userRef}
-          className={`user-details ${userOpen ? "active" : ""}`}
+          className={`sidebar-user-details ${userOpen ? "active" : ""}`}
         >
           <button
             className="user-toggle"

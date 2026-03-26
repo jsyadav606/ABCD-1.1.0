@@ -181,7 +181,7 @@
     width: 100%;
   }
   
-  .user-details {
+  .sidebar-user-details {
     width: 100%;
     padding: 0;
     padding-bottom: 2rem; /* Add more padding for safety */
@@ -198,7 +198,7 @@
 
    /* ============================================ */
 
-.user-details {
+.sidebar-user-details {
   position: relative;
   border-top: 1px solid #374151;
   padding: 0;
@@ -246,7 +246,7 @@
 
 .user-panel { display: none; }
 
-.user-details.active {
+.sidebar-user-details.active {
   overflow: visible; /* Allow popup to show outside */
 }
 
@@ -317,7 +317,7 @@
 }
 
 /* Hide old in-flow panel when active; portal handles it */
-.user-details.active .user-panel {
+.sidebar-user-details.active .user-panel {
   display: none !important;
 }
 
@@ -329,12 +329,12 @@
 /* ============================================
    DESKTOP (>= 993px): USER PANEL AS SUBMENU FLYOUT
    ============================================ */
-@media (min-width: 993px) {
-  .user-details {
+ @media (min-width: 993px) {
+ /* .user-details {
     overflow-x: hidden;
-  }
+  } */
 
-  .user-details.active {
+  .sidebar-user-details.active {
     overflow: visible;
   }
 }
