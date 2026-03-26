@@ -249,9 +249,10 @@ export const clearAuthData = () => {
 /**
  * Clear ALL auth-related data from storage (called on logout).
  * Removes: accessToken, user, permissions, authData from localStorage.
- * NOTE: deviceId is intentionally preserved in sessionStorage so the same
- * device ID persists across logout/login cycles. The device ID is only generated
- * once and reused for the lifetime of the browser session.
+ * NOTE: deviceId is intentionally preserved in localStorage so the same
+ * device ID persists across logout/login cycles and browser restarts.
+ * The device ID is only generated once and reused for the lifetime of the
+ * browser installation (until explicitly cleared).
  */
 export const clearAllAuthStorage = () => {
   try {

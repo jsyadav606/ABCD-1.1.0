@@ -195,10 +195,116 @@ export const authService = {
   },
 
   /**
+   * Re-authenticate user with password only (for session timeout)
+   * @param {string} userId - User ID from refresh token
+   * @param {string} password - Plain password
+   * @param {string} deviceId - Device identifier
+   * @param {string} ipAddress - Client IP address
+   * @param {string} userAgent - Client user agent
+   * @returns {Promise<Object>} - User data, access token, refresh token, permissions
+   */
+  async reauth(userId, password, deviceId, ipAddress = null, userAgent = null) {
+    try {
+      // Find UserLogin by user ID
+      const userLogin = await UserLogin.findOne({ user: userId }).select("+password");
+      if (!userLogin) {
+        throw new apiError(404, "User not found");
+      }
+
+      // Check if account is permanently locked
+      if (userLogin.isPermanentlyLocked) {
+        throw new apiError(403, "Account is permanently locked. Contact administrator.");
+      }
+
+      // Check if account is temporarily locked
+      if (userLogin.lockUntil && new Date() < userLogin.lockUntil) {
+        const remainingTime = Math.ceil(
+          (userLogin.lockUntil - new Date()) / (1000 * 60)
+        );
+        throw new apiError(429, `Account is locked. Try again in ${remainingTime} minutes.`);
+      }
+
+      // Verify password (convert to string in case it's sent as number)
+      const isPasswordValid = await userLogin.comparePassword(String(password));
+      if (!isPasswordValid) {
+        // Increment failed attempts
+        userLogin.failedLoginAttempts = (userLogin.failedLoginAttempts || 0) + 1;
+
+        // Lock account based on failed attempts
+        if (userLogin.failedLoginAttempts >= 5) {
+          userLogin.lockLevel = 1; // Temporary lock (15 minutes)
+          userLogin.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+        }
+
+        await userLogin.save();
+        throw new apiError(401, "Invalid password");
+      }
+
+      // Reset failed attempts on successful reauth
+      userLogin.failedLoginAttempts = 0;
+      userLogin.lockLevel = 0;
+      userLogin.lockUntil = null;
+      userLogin.isLoggedIn = true;
+      userLogin.lastLogin = new Date();
+      userLogin.totalLoginCount = (userLogin.totalLoginCount || 0) + 1; // Increment total login count
+
+      // Generate tokens
+      const accessToken = userLogin.generateAccessToken(deviceId);
+      const refreshToken = await userLogin.generateRefreshToken(
+        deviceId,
+        ipAddress,
+        userAgent
+      );
+
+      // Fetch user details for response (exclude sensitive fields) and populate role
+      const userResponse = await User.findById(userLogin.user)
+        .select("-password")
+        .populate("roleId");
+
+      let permissions = [];
+
+      if (userResponse && Array.isArray(userResponse.permissions)) {
+        permissions = [...userResponse.permissions];
+      }
+
+      if (userResponse?.roleId && Array.isArray(userResponse.roleId.permissionKeys)) {
+        permissions = [
+          ...permissions,
+          ...userResponse.roleId.permissionKeys,
+        ];
+      }
+
+      if (
+        userResponse?.roleId &&
+        userResponse.roleId.name === "super_admin" &&
+        !permissions.includes("*")
+      ) {
+        permissions.push("*");
+      }
+
+      permissions = Array.from(new Set(permissions));
+
+      return {
+        success: true,
+        user: userResponse,
+        accessToken,
+        refreshToken,
+        permissions,
+        forcePasswordChange: !!userLogin.forcePasswordChange,
+        deviceId,
+        message: "Re-authentication successful",
+      };
+    } catch (error) {
+      if (error instanceof apiError) throw error;
+      throw new apiError(500, error.message);
+    }
+  },
+
+  /**
    * Logout user from specific device
    * @param {string} userId - User ID from token
    * @param {string} deviceId - Device to logout from (optional)
-   * @returns {Promise<Boolean>} - Success status
+   * @returns {Promise<Object>} - Success status and message
    */
   async logout(userId, deviceId) {
     try {
@@ -207,17 +313,15 @@ export const authService = {
         throw new apiError(404, "User not found");
       }
 
-      let logoutSuccess = false;
-
-      // If deviceId is provided, try to logout from specific device
+      // If deviceId is provided, logout from specific device only
       if (deviceId) {
-        logoutSuccess = await userLogin.logoutDevice(deviceId);
-      }
-
-      // If deviceId not provided or not found, logout from all devices
-      if (!logoutSuccess) {
+        const logoutSuccess = await userLogin.logoutDevice(deviceId);
+        if (!logoutSuccess) {
+          throw new apiError(404, "Device not found or already logged out");
+        }
+      } else {
+        // If no deviceId provided, logout from all devices
         await userLogin.logoutAllDevices();
-        logoutSuccess = true;
       }
 
       // Check if any devices are still active
@@ -232,7 +336,7 @@ export const authService = {
 
       return {
         success: true,
-        message: "Logout successful",
+        message: deviceId ? "Device logout successful" : "All devices logout successful",
       };
     } catch (error) {
       if (error instanceof apiError) throw error;

@@ -100,6 +100,69 @@ export const loginController = asyncHandler(async (req, res) => {
 });
 
 // =====================================================
+// REAUTH CONTROLLER (Password-only re-authentication)
+// =====================================================
+export const reauthController = asyncHandler(async (req, res) => {
+  const { password, deviceId = uuidv4() } = req.body;
+
+  // Validation
+  if (!password) {
+    throw new apiError(400, "Password is required");
+  }
+
+  // Get userId from refresh token in cookie (user must have valid refresh token)
+  let userId = null;
+  if (req.cookies?.refreshToken) {
+    try {
+      const decoded = jwt.verify(
+        req.cookies.refreshToken,
+        process.env.REFRESH_TOKEN_SECRET || "REFRESH_TOKEN_DEFAULT"
+      );
+      userId = decoded.id;
+    } catch (error) {
+      throw new apiError(401, "Invalid or expired refresh token");
+    }
+  }
+
+  if (!userId) {
+    throw new apiError(401, "Valid refresh token required for re-authentication");
+  }
+
+  // Get client IP and user agent
+  const ipAddress =
+    req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+  const userAgent = req.get("user-agent");
+
+  // Call service
+  const result = await authService.reauth(
+    userId,
+    String(password),
+    deviceId,
+    ipAddress,
+    userAgent
+  );
+
+  // Set refresh token in httpOnly cookie
+  const refreshTokenCookieOptions = getRefreshTokenCookieOptions();
+  res.cookie("refreshToken", result.refreshToken, refreshTokenCookieOptions);
+
+  // Set access token in httpOnly cookie
+  res.cookie("accessToken", result.accessToken, {
+    ...refreshTokenCookieOptions,
+  });
+
+  return res.status(200).json(
+    new apiResponse(200, {
+      user: result.user,
+      accessToken: result.accessToken,
+      deviceId: result.deviceId,
+      permissions: result.permissions,
+      forcePasswordChange: result.forcePasswordChange || false,
+    }, result.message)
+  );
+});
+
+// =====================================================
 // LOGOUT CONTROLLER
 // =====================================================
 export const logoutController = asyncHandler(async (req, res) => {

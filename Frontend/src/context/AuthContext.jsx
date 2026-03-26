@@ -9,12 +9,15 @@ const AuthContext = createContext({
   error: '',
   isAuthenticated: false,
   deviceId: null,
+  needsReauth: false,
   login: async () => ({ success: false }),
+  reauth: async () => ({ success: false }),
   register: async () => ({ success: false }),
   logout: async () => {},
   logoutAll: async () => {},
   changePassword: async () => ({ success: false }),
-  clearError: () => {}
+  clearError: () => {},
+  updateActivity: () => {}
 })
 
 export const AuthProvider = ({ children }) => {
@@ -22,12 +25,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [needsReauth, setNeedsReauth] = useState(false)
   const generateValidDeviceId = () => {
-    const stored = sessionStorage.getItem('deviceId')
+    const stored = localStorage.getItem('deviceId')
 
     if (!stored || stored === 'undefined' || stored === 'null') {
       const newDeviceId = uuidv4()
-      sessionStorage.setItem('deviceId', newDeviceId)
+      localStorage.setItem('deviceId', newDeviceId)
       return newDeviceId
     }
 
@@ -36,10 +40,28 @@ export const AuthProvider = ({ children }) => {
 
   const [deviceId, setDeviceId] = useState(generateValidDeviceId)
 
-  // Store device ID in session storage when it changes
+  // Session timeout configuration (10 minutes)
+  const SESSION_TIMEOUT = 10 * 60 * 1000 // 10 minutes in milliseconds
+
+  // Update last activity time
+  const updateActivity = useCallback(() => {
+    const now = Date.now()
+    localStorage.setItem('lastActivity', now.toString())
+  }, [])
+
+  // Check if session has expired
+  const isSessionExpired = useCallback(() => {
+    const lastActivity = localStorage.getItem('lastActivity')
+    if (!lastActivity) return true
+
+    const timeSinceActivity = Date.now() - parseInt(lastActivity)
+    return timeSinceActivity > SESSION_TIMEOUT
+  }, [SESSION_TIMEOUT])
+
+  // Store device ID in localStorage when it changes (persistent across browser restarts)
   useEffect(() => {
     if (deviceId && deviceId !== 'undefined' && deviceId !== 'null') {
-      sessionStorage.setItem('deviceId', deviceId)
+      localStorage.setItem('deviceId', deviceId)
     }
   }, [deviceId])
 
@@ -50,10 +72,19 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('accessToken')
 
       if (storedUser && token) {
+        // Check if session has expired
+        if (isSessionExpired()) {
+          setNeedsReauth(true)
+          setLoading(false)
+          return
+        }
+
         try {
           const parsed = JSON.parse(storedUser)
           setUser(parsed)
           setIsAuthenticated(true)
+          updateActivity() // Update activity on successful auth check
+
           // Refresh profile and permissions from server so role rights changes reflect on refresh
           try {
             const prof = await authAPI.getProfile()
@@ -93,7 +124,28 @@ export const AuthProvider = ({ children }) => {
     }
 
     checkAuth()
-  }, [])
+  }, [isSessionExpired, updateActivity])
+
+  // Track user activity to prevent session timeout
+  useEffect(() => {
+    if (!isAuthenticated || needsReauth) return
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
+    
+    const handleActivity = () => {
+      updateActivity()
+    }
+
+    events.forEach(event => {
+      document.addEventListener(event, handleActivity, true)
+    })
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleActivity, true)
+      })
+    }
+  }, [isAuthenticated, needsReauth, updateActivity])
 
   // Extract only essential user info for localStorage (not sensitive data)
   const getMinimalUserInfo = (fullUser) => {
@@ -139,12 +191,14 @@ export const AuthProvider = ({ children }) => {
       const finalDeviceId = returnedDeviceId || activeDeviceId
       if (finalDeviceId && finalDeviceId !== 'undefined' && finalDeviceId !== 'null') {
         setDeviceId(finalDeviceId)
-        sessionStorage.setItem('deviceId', finalDeviceId)
+        localStorage.setItem('deviceId', finalDeviceId)
       }
       
       // Keep full user object in memory for the app to use
       setUser(minimalUser)
       setIsAuthenticated(true)
+      setNeedsReauth(false) // Clear reauth flag on successful login
+      updateActivity() // Update activity timestamp
       
       try {
         const prof = await authAPI.getProfile()
@@ -175,6 +229,72 @@ export const AuthProvider = ({ children }) => {
       setLoading(false)
     }
   }, [deviceId])
+
+  const reauth = useCallback(async (password) => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      const response = await authAPI.reauth(password, deviceId)
+      
+      // Backend returns: { user, accessToken, deviceId, forcePasswordChange }
+      const { user: userData, accessToken, deviceId: returnedDeviceId, forcePasswordChange, permissions } = response.data.data
+
+      if (!userData || !accessToken) {
+        throw new Error('Invalid response from server')
+      }
+
+      // Store minimal info only (security best practice)
+      const minimalUser = getMinimalUserInfo(userData)
+      
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('user', JSON.stringify(minimalUser))
+      if (Array.isArray(permissions)) {
+        localStorage.setItem('permissions', JSON.stringify(permissions))
+      }
+      
+      // Preserve device ID; prefer backend returned value if available
+      const finalDeviceId = returnedDeviceId || deviceId
+      if (finalDeviceId && finalDeviceId !== 'undefined' && finalDeviceId !== 'null') {
+        setDeviceId(finalDeviceId)
+        localStorage.setItem('deviceId', finalDeviceId)
+      }
+      
+      // Keep full user object in memory for the app to use
+      setUser(minimalUser)
+      setIsAuthenticated(true)
+      setNeedsReauth(false) // Clear reauth flag on successful reauth
+      updateActivity() // Update activity timestamp
+      
+      try {
+        const prof = await authAPI.getProfile()
+        const perms = prof.data?.data?.permissions
+        if (Array.isArray(perms)) {
+          localStorage.setItem('permissions', JSON.stringify(perms))
+        } else if (minimalUser?.role === 'super_admin') {
+          localStorage.setItem('permissions', JSON.stringify(['*']))
+        }
+      } catch (e) {
+        String(e)
+        if (minimalUser?.role === 'super_admin') {
+          localStorage.setItem('permissions', JSON.stringify(['*']))
+        }
+      }
+      
+      return { 
+        success: true, 
+        user: minimalUser,
+        forcePasswordChange: forcePasswordChange || false
+      }
+    } catch (err) {
+      const message = err.response?.data?.message || err.message || 'Re-authentication failed'
+      setError(message)
+      return { success: false, error: message }
+    } finally {
+      setLoading(false)
+    }
+  }, [deviceId, updateActivity])
+
   const register = useCallback(async (userData) => {
     try {
       setLoading(true)
@@ -214,9 +334,9 @@ export const AuthProvider = ({ children }) => {
     } finally {
       clearAuthHeaders()
       clearAllAuthStorage()
-      // Store deviceId back to sessionStorage only if valid
+      // Store deviceId back to localStorage only if valid (persistent across browser restarts)
       if (currentDeviceId && currentDeviceId !== 'undefined' && currentDeviceId !== 'null') {
-        sessionStorage.setItem('deviceId', currentDeviceId)
+        localStorage.setItem('deviceId', currentDeviceId)
       }
       setUser(null)
       setIsAuthenticated(false)
@@ -234,7 +354,7 @@ export const AuthProvider = ({ children }) => {
       clearAuthHeaders()
       clearAllAuthStorage()
       if (currentDeviceId && currentDeviceId !== 'undefined' && currentDeviceId !== 'null') {
-        sessionStorage.setItem('deviceId', currentDeviceId)
+        localStorage.setItem('deviceId', currentDeviceId)
       }
       setUser(null)
       setIsAuthenticated(false)
@@ -264,12 +384,15 @@ export const AuthProvider = ({ children }) => {
     error,
     isAuthenticated,
     deviceId,
+    needsReauth,
     login,
+    reauth,
     register,
     logout,
     logoutAll,
     changePassword,
-    clearError
+    clearError,
+    updateActivity
   }
 
   return (

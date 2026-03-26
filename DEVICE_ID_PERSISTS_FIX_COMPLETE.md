@@ -113,9 +113,9 @@ if (device) {
 │ Browser Opens (First Time)                          │
 ├─────────────────────────────────────────────────────┤
 │ 1. AuthContext initializes                          │
-│ 2. useState() checks sessionStorage for 'deviceId'  │
+│ 2. useState() checks localStorage for 'deviceId'    │
 │ 3. Not found → generates new UUID: abc-123          │
-│ 4. useEffect stores it: sessionStorage.setItem()    │
+│ 4. useEffect stores it: localStorage.setItem()      │
 └─────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -125,7 +125,7 @@ if (device) {
 │ 2. Backend receives: abc-123                                │
 │ 3. Backend finds NO device with abc-123 → CREATE new entry  │
 │ 4. Backend returns: deviceId: abc-123                       │
-│ 5. Frontend stores: sessionStorage.setItem('deviceId', abc) │
+│ 5. Frontend stores: localStorage.setItem('deviceId', abc) │
 └─────────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -134,8 +134,8 @@ if (device) {
 │ 1. logout() called with currentDeviceId = abc-123            │
 │ 2. clearAllAuthStorage() removes: user, tokens, etc.        │
 │ 3. clearAllAuthStorage() DOES NOT remove: deviceId ✓        │
-│ 4. logout() explicitly stores: sessionStorage.setItem()     │
-│ 5. Result: deviceId: abc-123 STILL in sessionStorage ✓      │
+│ 4. logout() explicitly stores: localStorage.setItem()     │
+│ 5. Result: deviceId: abc-123 STILL in localStorage ✓      │
 │ 6. React state deviceId: NOT reset (still abc-123)          │
 └─────────────────────────────────────────────────────────────┘
                           ↓
@@ -148,7 +148,7 @@ if (device) {
 │ 4. Backend finds EXISTING device → UPDATE IT not create new │
 │ 5. Backend increments loginCount: 1 → 2                     │
 │ 6. Backend returns: deviceId: abc-123 (SAME)                │
-│ 7. Frontend validates & stores: sessionStorage ✓            │
+│ 7. Frontend validates & stores: localStorage ✓            │
 │ 8. NO DUPLICATE DEVICE ENTRIES! ✓                           │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -160,13 +160,13 @@ if (device) {
 ### ✅ Test 1: Device ID Persists After Logout
 ```
 1. Open Browser DevTools (F12)
-2. Go to Application → Storage → Session Storage
+2. Go to Application → Storage → Local Storage
 3. Click your domain (localhost:5173)
 4. Look for key: "deviceId" → value: "abc-123" (random UUID)
 5. Login with credentials
-6. Check sessionStorage → deviceId still there
+6. Check localStorage → deviceId still there
 7. Logout via UI
-8. Check sessionStorage → DeviceId STILL THERE ✓
+8. Check localStorage → DeviceId STILL THERE ✓
    (Should NOT be cleared)
 9. Close DevTools
 10. Page still shows deviceId in storage
@@ -182,12 +182,15 @@ if (device) {
 5. Login → Check DB: SAME device, loginCount = 3 ✓
 ```
 
-### ✅ Test 3: Different Browsers Get Different IDs
+### ✅ Test 3: Browser Restart Preserves Device ID
 ```
-1. Browser A: Login → deviceId: abc-123
-2. Browser B: Login → deviceId: def-456 (different!)
-3. Check DB: Two separate device entries ✓
-   (One per browser - intentional)
+1. Login and get deviceId from localStorage: abc-123
+2. Close browser completely
+3. Shut down system (if possible) or wait some time
+4. Restart browser and open the app
+5. Check localStorage → Still abc-123 ✓
+6. Login again → Should reuse same device, increment loginCount ✓
+   (NO new device entry created)
 ```
 
 ### ✅ Test 4: Browser Refresh Preserves Device ID

@@ -115,15 +115,15 @@ Result: Separate devices tracked correctly ✓
 
 ## Storage Locations
 
-### sessionStorage (Browser Session)
+### localStorage (Persistent across browser restarts)
 - **Key:** `deviceId`
-- **Persists:** Throughout browser session on same tab/window
-- **Cleared:** When browser tab/window closes, or when user explicitly clears sessionStorage
-- **Not affected by:** Logout, page refresh
+- **Persists:** Across browser restarts, system shutdowns, and reinstalls
+- **Cleared:** Only when user explicitly clears browser data or localStorage
+- **Not affected by:** Logout, page refresh, browser close
 
-### localStorage (Persistent)
+### localStorage (Auth data - cleared on logout)
 - **Cleared on logout:** User data, access token, permissions
-- **NOT cleared on logout:** (None - intentional for security)
+- **NOT cleared on logout:** deviceId (intentional for persistence)
 
 ### Backend Database
 - **loggedInDevices:** Tracks all devices with full history
@@ -132,9 +132,9 @@ Result: Separate devices tracked correctly ✓
 
 ## Notes
 
-- **Session-based device ID:** Device ID is tied to browser session (sessionStorage), not persistent across browser restarts
+- **Persistent device ID:** Device ID is now stored in localStorage and persists across browser restarts and system shutdowns
 - **New browser/incognito:** Opening in incognito or new browser window generates new device ID (intentional - different session)
-- **Same browser/window:** Device ID persists across logout/login cycles
+- **Same browser/window:** Device ID persists across logout/login cycles and browser restarts
 - **Security:** Device ID is sent with login; backend validates device-specific refresh tokens
 
 ## Files Modified

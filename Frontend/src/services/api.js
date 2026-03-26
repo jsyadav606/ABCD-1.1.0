@@ -183,6 +183,8 @@ export default API
 export const authAPI = {
   login: (loginId, password, deviceId) =>
     API.post('/auth/login', { loginId, password, deviceId }),
+  reauth: (password, deviceId) =>
+    API.post('/auth/reauth', { password, deviceId }),
   register: (userData) =>
     API.post('/auth/register', userData),
   logout: (deviceId) =>

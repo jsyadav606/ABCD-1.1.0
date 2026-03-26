@@ -2,6 +2,7 @@ import express from "express";
 import { createRateLimiter } from "../middlewares/security.middleware.js";
 import {
   loginController,
+  reauthController,
   logoutController,
   logoutAllDevicesController,
   refreshTokenController,
@@ -23,6 +24,10 @@ const router = express.Router();
 const useLimiter = process.env.NODE_ENV === "production";
 const authLimiter = createRateLimiter({ windowMs: 60_000, max: 30 });
 router.post("/login", useLimiter ? authLimiter : (req, res, next) => next(), loginController);
+
+// Purpose: Re-authenticate user with password only (for session timeout)
+// POST /reauth { password, deviceId } (requires valid refresh token in cookie)
+router.post("/reauth", useLimiter ? authLimiter : (req, res, next) => next(), reauthController);
 
 // Purpose: Validate refresh token and issue new accessToken (sets new refresh cookie)
 // POST /refresh { refreshToken? (cookie or body), deviceId? }

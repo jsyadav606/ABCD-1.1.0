@@ -14,20 +14,23 @@ import './Login.css'
 
 const Login = () => {
   const navigate = useNavigate()
-  const { login, error, clearError, isAuthenticated } = useAuth()
+  const { login, reauth, error, clearError, isAuthenticated, needsReauth, user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [validationError, setValidationError] = useState('')
+  const [isReauthMode, setIsReauthMode] = useState(false)
   const [formData, setFormData] = useState({
     loginId: '', // Can be username, userId, or email
     password: ''
   })
 
-  // Redirect to dashboard if already authenticated
+  // Check if we need re-authentication
   useEffect(() => {
-    if (isAuthenticated) {
+    if (needsReauth && !isAuthenticated) {
+      setIsReauthMode(true)
+    } else if (isAuthenticated) {
       navigate('/dashboard')
     }
-  }, [isAuthenticated, navigate])
+  }, [needsReauth, isAuthenticated, navigate])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -39,8 +42,15 @@ const Login = () => {
     setValidationError('')
   }
 
+  const switchToNormalLogin = () => {
+    setIsReauthMode(false)
+    setFormData({ loginId: '', password: '' })
+    clearError()
+    setValidationError('')
+  }
+
   const validateForm = () => {
-    if (!formData.loginId.trim()) {
+    if (!isReauthMode && !formData.loginId.trim()) {
       setValidationError('Username, email, or user ID is required')
       return false
     }
@@ -65,7 +75,14 @@ const Login = () => {
     setLoading(true)
     setValidationError('')
 
-    const result = await login(formData.loginId, formData.password)
+    let result
+    if (isReauthMode) {
+      // Re-authentication mode - only password needed
+      result = await reauth(formData.password)
+    } else {
+      // Normal login mode
+      result = await login(formData.loginId, formData.password)
+    }
 
     if (result.success) {
       navigate('/dashboard')
@@ -75,9 +92,12 @@ const Login = () => {
   }
 
   return (
-    <AuthLayout title="Welcome Back" subtitle="Sign in to your account">
+    <AuthLayout 
+      title={isReauthMode ? "Session Expired" : "Welcome Back"} 
+      subtitle={isReauthMode ? "Please enter your password to continue" : "Sign in to your account"}
+    >
       {error && (
-        <Alert type="danger" title="Login Error">
+        <Alert type="danger" title="Authentication Error">
           {error}
         </Alert>
       )}
@@ -88,29 +108,44 @@ const Login = () => {
         </Alert>
       )}
 
+      {isReauthMode && user && (
+        <div className="reauth-user-info">
+          <div className="user-avatar">
+            <span>{user.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+          </div>
+          <div className="user-details">
+            <p className="user-name">{user.name}</p>
+            <p className="user-email">{user.email}</p>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="login-form">
-        <Input
-          type="text"
-          name="loginId"
-          label="Username, Email, or User ID"
-          placeholder="Enter your username, email, or user ID"
-          value={formData.loginId}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          autoFocus
-        />
+        {!isReauthMode && (
+          <Input
+            type="text"
+            name="loginId"
+            label="Username, Email, or User ID"
+            placeholder="Enter your username, email, or user ID"
+            value={formData.loginId}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            autoFocus
+          />
+        )}
 
         <Input
           type="password"
           name="password"
-          label="Password"
-          placeholder="Enter your password"
+          label={isReauthMode ? "Enter Password" : "Password"}
+          placeholder={isReauthMode ? "Enter your password to continue" : "Enter your password"}
           value={formData.password}
           onChange={handleChange}
           required
           disabled={loading}
           autoComplete="current-password"
+          autoFocus={isReauthMode}
         />
 
         <Button
@@ -120,23 +155,38 @@ const Login = () => {
           disabled={loading}
           className="login-button"
         >
-          {loading ? 'Signing In...' : 'Sign In'}
+          {loading ? (isReauthMode ? 'Verifying...' : 'Signing In...') : (isReauthMode ? 'Continue' : 'Sign In')}
         </Button>
       </form>
 
-      <div className="login-footer">
-        <p>
-          Don't have an account?{' '}
-          <Link to="/register" className="register-link">
-            Sign up here
-          </Link>
-        </p>
-        <p>
-          <Link to="/forgot-password" className="forgot-link">
-            Forgot Password?
-          </Link>
-        </p>
-      </div>
+      {isReauthMode && (
+        <div className="reauth-actions">
+          <Button
+            type="button"
+            variant="link"
+            onClick={switchToNormalLogin}
+            className="switch-user-link"
+          >
+            Login with different user
+          </Button>
+        </div>
+      )}
+
+      {!isReauthMode && (
+        <div className="login-footer">
+          <p>
+            Don't have an account?{' '}
+            <Link to="/register" className="register-link">
+              Sign up here
+            </Link>
+          </p>
+          <p>
+            <Link to="/forgot-password" className="forgot-link">
+              Forgot Password?
+            </Link>
+          </p>
+        </div>
+      )}
     </AuthLayout>
   )
 }
