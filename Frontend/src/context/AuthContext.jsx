@@ -40,8 +40,9 @@ export const AuthProvider = ({ children }) => {
 
   const [deviceId, setDeviceId] = useState(generateValidDeviceId)
 
-  // Session timeout configuration (10 minutes)
-  const SESSION_TIMEOUT = 10 * 60 * 1000 // 10 minutes in milliseconds
+  // Session timeout configuration (from environment variable, default 10 minutes)
+  const SESSION_TIMEOUT_MINUTES = parseInt(import.meta.env.VITE_SESSION_TIMEOUT_MINUTES) || 10
+  const SESSION_TIMEOUT = SESSION_TIMEOUT_MINUTES * 60 * 1000 // Convert to milliseconds
 
   // Update last activity time
   const updateActivity = useCallback(() => {
@@ -74,6 +75,13 @@ export const AuthProvider = ({ children }) => {
       if (storedUser && token) {
         // Check if session has expired
         if (isSessionExpired()) {
+          // Load user data for reauth UI even if session expired
+          try {
+            const parsed = JSON.parse(storedUser)
+            setUser(parsed)
+          } catch (err) {
+            console.error('Failed to parse stored user for reauth:', err)
+          }
           setNeedsReauth(true)
           setLoading(false)
           return

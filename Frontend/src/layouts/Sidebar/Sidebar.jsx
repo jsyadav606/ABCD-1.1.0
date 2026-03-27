@@ -274,7 +274,7 @@ const Sidebar = ({ onCloseSidebar }) => {
             title={user?.name || "User"}
             aria-label="Account menu"
           >
-            <span className="material-icons user-avatar">account_circle</span>
+            <span className="material-icons">account_circle</span>
             <span className="user-name">{user?.name || "User"}</span>
           </button>
 

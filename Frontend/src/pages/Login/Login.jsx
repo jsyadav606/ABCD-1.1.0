@@ -18,6 +18,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [validationError, setValidationError] = useState('')
   const [isReauthMode, setIsReauthMode] = useState(false)
+  const [fromReauthMode, setFromReauthMode] = useState(false)
   const [formData, setFormData] = useState({
     loginId: '', // Can be username, userId, or email
     password: ''
@@ -27,6 +28,7 @@ const Login = () => {
   useEffect(() => {
     if (needsReauth && !isAuthenticated) {
       setIsReauthMode(true)
+      setFromReauthMode(false)
     } else if (isAuthenticated) {
       navigate('/dashboard')
     }
@@ -44,6 +46,15 @@ const Login = () => {
 
   const switchToNormalLogin = () => {
     setIsReauthMode(false)
+    setFromReauthMode(true)
+    setFormData({ loginId: '', password: '' })
+    clearError()
+    setValidationError('')
+  }
+
+  const switchBackToReauth = () => {
+    setIsReauthMode(true)
+    setFromReauthMode(false)
     setFormData({ loginId: '', password: '' })
     clearError()
     setValidationError('')
@@ -114,7 +125,7 @@ const Login = () => {
             <span>{user.name?.charAt(0)?.toUpperCase() || 'U'}</span>
           </div>
           <div className="reauth-user-details">
-            <p className="user-name">{user.name}</p>
+            <p className="user-name">{user.name} ({user.userId || user.email})</p>
             <p className="user-email">{user.email}</p>
           </div>
         </div>
@@ -134,6 +145,14 @@ const Login = () => {
             autoFocus
           />
         )}
+
+        {/* {isReauthMode && user && (
+          <div className="reauth-user-display">
+            <span className="reauth-user-text">
+              {user.name} ({user.userId || user.email})
+            </span>
+          </div>
+        )} */}
 
         <Input
           type="password"
@@ -168,6 +187,19 @@ const Login = () => {
             className="switch-user-link"
           >
             Login with different user
+          </Button>
+        </div>
+      )}
+
+      {!isReauthMode && fromReauthMode && (
+        <div className="reauth-actions">
+          <Button
+            type="button"
+            variant="link"
+            onClick={switchBackToReauth}
+            className="switch-user-link"
+          >
+            Back to {user?.name || 'logged in user'}
           </Button>
         </div>
       )}
