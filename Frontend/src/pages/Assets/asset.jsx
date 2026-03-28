@@ -13,6 +13,7 @@ import Button from "../../components/Button/Button.jsx";
 import Table from "../../components/Table/Table.jsx";
 import Card from "../../components/Card/Card.jsx";
 import FilterPopup from "../../components/Filter/FilterPopup.jsx";
+import FilterDisplay from "../../components/Filter/FilterDisplay.jsx";
 import { PageLoader } from "../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
 import { fetchAllAssets, fetchAssetCategories } from "../../services/assetApi.js";
@@ -587,22 +588,7 @@ const AssetPage = () => {
 
       <div className="asset-content">
         {/* Filter Display Row - Always visible */}
-        <div className="asset-filters-display">
-          <span className="asset-filters-label">Filters:</span>
-          <div className="asset-filters-chips">
-            {getActiveFilters().length > 0 ? (
-              getActiveFilters().map((filter, idx) => (
-                <span key={idx} className="filter-chip">
-                  {filter.label}
-                  <span style={{ margin: '0 6px' }}>:</span>
-                  <strong>{filter.value},</strong>
-                </span>
-              ))
-            ) : (
-              <span className="filter-chip-empty">No filters applied</span>
-            )}
-          </div>
-        </div>
+        <FilterDisplay filters={getActiveFilters()} />
 
         {/* Table always visible - handles empty state internally */}
         {filteredAssets.length === 0 ? (

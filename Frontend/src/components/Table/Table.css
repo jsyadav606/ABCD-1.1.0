@@ -8,13 +8,16 @@
 
 .table__options {
 	display: flex;
-	justify-content: flex-start;
+	justify-content: space-between;
 	align-items: center;
 	gap: 1rem;
 	padding: 0.6rem;
 	border-bottom: 1px solid #ddd;
 	overflow: hidden;
+	margin: 0 0 14px;
 }
+
+
 
 .table__summary {
 	font-size: 0.95rem;
@@ -22,6 +25,12 @@
 	padding: 0.25rem 0.5rem;
 }
 
+.table__options-left{
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	
+}
 .table__options-right {
 	display: flex;
 	align-items: center;
@@ -201,10 +210,13 @@
 @media screen and (max-width: 600px) {
   .table__options{
     display: block;
-    
   }
+  .table__options-left{
+	margin: 0 0 14px;
+  }
+
  .table-search{
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   width: 100%;
  }
 }

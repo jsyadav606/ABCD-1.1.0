@@ -237,40 +237,4 @@
  }
 } */
 
-/* ============== USER FILTERS DISPLAY ROW ============== */
-.user-filters-display {
-  background: #f3f4f6;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.user-filters-label {
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 13px;
-}
-
-.user-filters-chips {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.filter-chip {
-  font-style: italic;
-  color: #6282b7;
-  display: inline-flex;
-  align-items: center;
-}
-
-.filter-chip-empty {
-  font-size: 12px;
-  color: #6b7280;
-  font-style: italic;
-}
+/* Filter display row styles are in FilterDisplay.css - shared component */

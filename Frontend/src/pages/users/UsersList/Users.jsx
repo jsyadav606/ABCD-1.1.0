@@ -13,6 +13,7 @@ import Button from "../../../components/Button/Button.jsx";
 import Input from "../../../components/Input/Input.jsx";
 import Modal from "../../../components/Modal/Modal.jsx";
 import FilterPopup from "../../../components/Filter/FilterPopup.jsx";
+import FilterDisplay from "../../../components/Filter/FilterDisplay.jsx";
 import { hasPermission } from "../../../utils/permissionHelper";
 import { PageLoader } from "../../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../../components/ErrorBoundary/ErrorNotification.jsx";
@@ -141,12 +142,10 @@ const Users = () => {
       try {
         const resp = await authAPI.getProfile();
         const userInfo = resp.data?.data?.user || {};
-        console.log("User profile loaded:", userInfo);
         
         // Load branches for this organization
         if (userInfo.organizationId) {
           const branchesData = await fetchBranchesForDropdown(userInfo.organizationId);
-          console.log("Branches loaded:", branchesData);
           setBranches(branchesData && branchesData.length > 0 ? branchesData : []);
         } else {
           console.warn("No organizationId found in user profile");
@@ -932,22 +931,7 @@ const Users = () => {
         />
 
         {/* Filter Display Row */}
-        <div className="user-filters-display">
-          <span className="user-filters-label">Filters:</span>
-          <div className="user-filters-chips">
-            {getActiveFilters().length > 0 ? (
-              getActiveFilters().map((filter, idx) => (
-                <span key={idx} className="filter-chip">
-                  {filter.label}
-                  <span style={{ margin: '0 6px' }}>:</span>
-                  <strong>{filter.value},</strong>
-                </span>
-              ))
-            ) : (
-              <span className="filter-chip-empty">No filters applied</span>
-            )}
-          </div>
-        </div>
+        <FilterDisplay filters={getActiveFilters()} />
 
         <div className="users-table">
           <

@@ -199,19 +199,22 @@ const Table = ({
     <div className="table">
       {(showSearch || showPagination || extraActions) && (
         <div className="table__options">
-          <div className="table__actions">
-            {extraActions}
-          </div>
+          <div className="table__options-left"> 
+            <div className="table__actions">
+              {extraActions}
+            </div>
 
-          {showSearch && (
-            <TableSearch
-              value={search}
-              onChange={(val) => {
-                setSearch(val);
-                setPage(1);
-              }}
-            />
-          )}
+            {showSearch && (
+              <TableSearch
+                value={search}
+                onChange={(val) => {
+                  setSearch(val);
+                  setPage(1);
+                }}
+              />
+            )}
+
+          </div>
 
           <div className="table__options-right">
             {showPagination && (
