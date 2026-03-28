@@ -11,6 +11,7 @@ import './FilterPopup.css';
  * @property {string} value
  * @property {(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void} onChange
  * @property {Array<string>} [options]
+ * @property {(option: string) => string} [optionRenderer]
  * @property {string} [placeholder]
  */
 
@@ -116,7 +117,7 @@ const FilterPopup = ({
             <select value={field.value} onChange={field.onChange}>
               {field.options.map((option) => (
                 <option key={option} value={option}>
-                  {capitalizeText(option)}
+                  {field.optionRenderer ? field.optionRenderer(option) : capitalizeText(option)}
                 </option>
               ))}
             </select>

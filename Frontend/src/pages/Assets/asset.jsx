@@ -16,9 +16,10 @@ import FilterPopup from "../../components/Filter/FilterPopup.jsx";
 import { PageLoader } from "../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
 import { fetchAllAssets, fetchAssetCategories } from "../../services/assetApi.js";
-import { fetchAllBranches } from "../../services/branchApi.js";
 import { getBranchName } from "../../utils/branchUtils.js";
 import { getSelectedBranch, onBranchChange } from "../../utils/scope";
+import { authAPI } from "../../services/api.js";
+import { fetchBranchesForDropdown } from "../../services/userApi.js";
 
 const tabs = ["ALL", "FIXED", "PERIPHERAL", "CONSUMABLE", "INTANGIBLE"];
 
@@ -36,9 +37,12 @@ const AssetPage = () => {
   const [appliedFilterStatus, setAppliedFilterStatus] = useState("ACTIVE");
   const [appliedFilterCategory, setAppliedFilterCategory] = useState("ALL");
   const [appliedFilterType, setAppliedFilterType] = useState("ALL");
+  const [appliedFilterBranch, setAppliedFilterBranch] = useState("ALL");
   const [pendingFilterStatus, setPendingFilterStatus] = useState("ACTIVE");
   const [pendingFilterCategory, setPendingFilterCategory] = useState("ALL");
   const [pendingFilterType, setPendingFilterType] = useState("ALL");
+  const [pendingFilterBranch, setPendingFilterBranch] = useState("ALL");
+  const [userBranchIds, setUserBranchIds] = useState([]);
   const filterButtonRef = useRef(null);
 
   useEffect(() => {
@@ -46,6 +50,7 @@ const AssetPage = () => {
       setPendingFilterStatus(appliedFilterStatus);
       setPendingFilterCategory(appliedFilterCategory);
       setPendingFilterType(appliedFilterType);
+      setPendingFilterBranch(appliedFilterBranch);
     }
   }, [isFilterOpen]);
 
@@ -76,17 +81,56 @@ const AssetPage = () => {
     loadAssets();
   }, []);
 
+  // Fetch user profile to get their assigned branches
   useEffect(() => {
-    const loadBranches = async () => {
+    const loadUserProfile = async () => {
       try {
-        const data = await fetchAllBranches();
-        setBranches(data);
+        const resp = await authAPI.getProfile();
+        const userInfo = resp.data?.data?.user || {};
+
+        const rawBranchList = Array.isArray(userInfo.branchId)
+          ? userInfo.branchId
+          : Array.isArray(userInfo.branchIds)
+            ? userInfo.branchIds
+            : [];
+
+        const branchIds = rawBranchList.map((b) => {
+          if (!b && b !== 0) return '';
+          if (typeof b === 'object') {
+            if (b._id) return String(b._id);
+            if (b.id) return String(b.id);
+            if (b.branchId) return String(b.branchId);
+            return String(b.branchName || b.name || '');
+          }
+          return String(b);
+        }).filter(Boolean);
+
+        setUserBranchIds(branchIds);
+
+        // Also load branches for this organization (same as dashboard logic)
+        const branchesData = await fetchBranchesForDropdown(userInfo.organizationId);
+        setBranches(branchesData);
+
+        // Set default branch filter
+        if (branchIds.length === 0) {
+          setAppliedFilterBranch("ALL");
+          setPendingFilterBranch("ALL");
+        } else if (branchIds.length === 1) {
+          // Single branch - default to that branch
+          setAppliedFilterBranch(branchIds[0]);
+          setPendingFilterBranch(branchIds[0]);
+        } else {
+          // Multiple branches - default to "All"
+          setAppliedFilterBranch("ALL");
+          setPendingFilterBranch("ALL");
+        }
       } catch (err) {
-        console.error("Failed to fetch branches", err);
-        // Don't set error for branches, as it's not critical
+        console.error("Failed to fetch user profile", err);
+        setAppliedFilterBranch("ALL");
+        setPendingFilterBranch("ALL");
       }
     };
-    loadBranches();
+    loadUserProfile();
   }, []);
 
   useEffect(() => {
@@ -178,6 +222,53 @@ const AssetPage = () => {
     return ["ALL", ...Array.from(values).filter((v) => v !== "ALL").sort()];
   }, [assetCategories]);
 
+  const branchOptions = useMemo(() => {
+    const options = [];
+
+    // Allow list: assigned branches from user profile, else all branches from API
+    const allowedBranchIds = userBranchIds.length > 0
+      ? userBranchIds
+      : branches.map((b) => String(b._id || b.id || b.branchId || ''))
+          .filter(Boolean);
+
+    const assignedBranchItems = allowedBranchIds
+      .map((branchId) => {
+        const id = String(branchId);
+        const branch = branches.find(
+          (b) => String(b._id) === id || String(b.id) === id || String(b.branchId) === id
+        );
+        return {
+          id,
+          label: branch?.branchName || branch?.name || id,
+        };
+      })
+      .filter((x, idx, arr) => x.id && arr.findIndex((item) => item.id === x.id) === idx);
+
+    // Add "ALL" if user has multiple assigned branches
+    if (assignedBranchItems.length > 1) {
+      options.push("ALL");
+    }
+
+    assignedBranchItems.forEach((item) => {
+      options.push(item.id);
+    });
+
+    // If still no options, fallback to ALL
+    if (options.length === 0) {
+      options.push("ALL");
+    }
+
+    return options;
+  }, [userBranchIds, branches]);
+
+  const getBranchDisplayName = useCallback((branchId) => {
+    if (branchId === "ALL") return "All Branches";
+    const branch = branches.find(
+      (b) => String(b._id) === branchId || String(b.id) === branchId || String(b.branchId) === branchId
+    );
+    return branch ? branch.branchName || branch.name || branchId : branchId;
+  }, [branches]);
+
   const typeOptions = useMemo(() => {
     const values = new Set();
     
@@ -235,7 +326,22 @@ const AssetPage = () => {
   const filteredAssets = useMemo(() => {
     let list = visibleAssets;
 
-    // Filter by Status FIRST (using isActive field)
+    // Filter by Branch
+    if (appliedFilterBranch !== "ALL") {
+      list = list.filter((a) => {
+        const branchId = a.branchId;
+        if (!branchId) return false;
+        if (typeof branchId === "string") {
+          return branchId === appliedFilterBranch;
+        }
+        if (typeof branchId === "object" && branchId?._id) {
+          return String(branchId._id) === appliedFilterBranch;
+        }
+        return false;
+      });
+    }
+
+    // Filter by Status (using isActive field)
     if (appliedFilterStatus === "ALL") {
       // Show both active and inactive
       list = list; // No filter
@@ -264,9 +370,18 @@ const AssetPage = () => {
     }
 
     return list;
-  }, [visibleAssets, appliedFilterStatus, appliedFilterCategory, appliedFilterType]);
+  }, [visibleAssets, appliedFilterStatus, appliedFilterCategory, appliedFilterType, appliedFilterBranch]);
 
   const filterFields = [
+    {
+      key: 'branch',
+      label: 'Branch',
+      type: 'select',
+      value: pendingFilterBranch,
+      onChange: (e) => setPendingFilterBranch(e.target.value),
+      options: branchOptions,
+      optionRenderer: getBranchDisplayName,
+    },
     {
       key: 'category',
       label: 'Category',
@@ -420,12 +535,14 @@ const AssetPage = () => {
             setPendingFilterStatus(appliedFilterStatus);
             setPendingFilterCategory(appliedFilterCategory);
             setPendingFilterType(appliedFilterType);
+            setPendingFilterBranch(appliedFilterBranch);
           }}
           onApply={() => {
             // Apply pending filters and close popup
             setAppliedFilterStatus(pendingFilterStatus);
             setAppliedFilterCategory(pendingFilterCategory);
             setAppliedFilterType(pendingFilterType);
+            setAppliedFilterBranch(pendingFilterBranch);
             setIsFilterOpen(false);
           }}
         />
