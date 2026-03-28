@@ -491,12 +491,12 @@ const AssetPage = () => {
       sortable: true,
       render: (row) => getCategoryName(row.itemCategory),
     },
-    { 
-      header: "Branch", 
-      key: "branchId", 
-      sortable: true,
-      render: (row) => getBranchName(row.branchId, branches)
-    },
+    // { 
+    //   header: "Branch", 
+    //   key: "branchId", 
+    //   sortable: true,
+    //   render: (row) => getBranchName(row.branchId, branches)
+    // },
     { header: "Model", key: "model", sortable: true },
     { header: "Serial Number", key: "serialNumber", sortable: true },
     { header: "Manufacturer", key: "manufacturer", sortable: true },

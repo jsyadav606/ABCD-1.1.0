@@ -888,7 +888,7 @@ const Users = () => {
                 <Button
                   onClick={() => alert("Export functionality would be triggered here")}
                   className="users-actions__btn users-actions__btn--export"
-                  style={{ marginLeft: "10px", backgroundColor: "#10b981" }}
+                  style={{ backgroundColor: "#10b981" }}
                 >
                   <span className="material-icons" style={{fontSize: "1.2rem", marginRight: "5px", verticalAlign: "middle"}}>download</span> 
                   Export Users

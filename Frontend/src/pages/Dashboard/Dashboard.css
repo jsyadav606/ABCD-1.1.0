@@ -88,6 +88,7 @@
   grid-template-columns: 1.2fr 1.2fr 1fr;
   gap: 1rem;
   align-items: center;
+  padding: 5px 10px;
 }
 
 .user-meta {

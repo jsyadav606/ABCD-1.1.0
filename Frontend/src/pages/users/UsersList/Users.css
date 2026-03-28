@@ -27,11 +27,10 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 0.8rem;
+  /* border-bottom: 1px solid #ddd; */
   position: sticky;
   top: 0;
-  background: #fff;
+  /* background: #fff; */
   z-index: 25;
 }
 
