@@ -8,9 +8,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
-import { CPU } from "../models/cpu.model.js";
-import { Monitor } from "../models/monitor.model.js";
-import { Printer } from "../models/printer.model.js";
+import { CPU } from "../models/fixed/cpu.model.js";
+import { Monitor } from "../models/fixed/monitor.model.js";
+import { Laptop } from "../models/fixed/laptop.model.js";
+import { Printer } from "../models/fixed/printer.model.js";
 import { handlers } from "../assets/handlers/index.js";
 import { Purchase } from "../models/purchase.model.js";
 import { Warranty } from "../models/warranty.model.js";
@@ -21,7 +22,11 @@ const normKey = (val) => String(val || "").trim().toLowerCase();
 
 const getHandler = (itemType) => {
   const key = normKey(itemType);
-  return handlers[key] || handlers.__generic;
+  const handler = handlers[key] || handlers.__generic;
+  if (!handler) {
+    throw new apiError(400, `Unsupported itemType: "${itemType}". No handler found.`);
+  }
+  return handler;
 };
 
 export const createAsset = asyncHandler(async (req, res) => {
@@ -81,7 +86,18 @@ export const listAssets = asyncHandler(async (req, res) => {
     .filter(([k]) => k !== "__generic")
     .map(([, h]) => h);
 
-  const results = await Promise.all(orderedHandlers.map((h) => h.list(req)));
+  const results = await Promise.all(
+    orderedHandlers.map(async (h) => {
+      try {
+        return await h.list(req);
+      } catch (err) {
+        // Ignore unsupported/unimplemented handlers while merging
+        console.warn("Asset handler list error (ignored):", err.message || err);
+        return { items: [] };
+      }
+    })
+  );
+
   const merged = results.flatMap((r) => r.items || []);
   merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -127,16 +143,20 @@ export const countAssets = asyncHandler(async (req, res) => {
   const roleName = String(req.user?.role || "").toLowerCase();
   const isSuper = roleName === "super_admin" || roleName === "super admin";
   const filter = { isDeleted: false };
+
   if (!isSuper && req.user?.organizationId) {
     filter.organizationId = req.user.organizationId;
   }
+
   if (branchId && branchId !== "__ALL__") {
     filter.branchId = branchId;
   }
-  console.log('Count filter:', filter);
-  const cpuCount = await CPU.countDocuments(filter);
-  const printerCount = await Printer.countDocuments(filter);
-  // Count all types
-  const total = cpuCount + printerCount;
+
+  // console.log('Count filter:', filter);
+
+  // All fixed assets are stored in asset_fixed collection (shared across CPU/Monitor/Laptop/Printer schemas)
+  // So count once from CPU model to avoid double-counting same records.
+  const total = await CPU.countDocuments(filter);
+
   return res.status(200).json(new apiResponse(200, { total }, "Assets count retrieved"));
 });

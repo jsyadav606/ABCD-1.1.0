@@ -1,47 +1,19 @@
 /**
- * Laptop Asset Handler
- * Description: Laptop create/list/get logic, currently model-shared with CPU-like structure.
+ * Monitor Asset Handler
+ * Description: Monitor create/list/get logics. Simple fields normalize + numeric sanitization.
  * Creates 3 documents: Fixed Asset (asset_fixed), Purchase (asset_purchases), Warranty (asset_warranties)
  */
-import { Laptop } from "../../models/laptop.model.js";
-import { Purchase } from "../../models/purchase.model.js";
-import { Warranty } from "../../models/warranty.model.js";
-import { norm, buildAssetListFilter, extractBranchIdFromBody, ensureOrgAndAudit } from "../../utils/assetUtils.js";
+import { Monitor } from "../../../models/fixed/monitor.model.js";
+import { Purchase } from "../../../models/purchase.model.js";
+import { Warranty } from "../../../models/warranty.model.js";
+import { norm, buildAssetListFilter, extractBranchIdFromBody, ensureOrgAndAudit } from "../../../utils/assetUtils.js";
 
 const create = async (req) => {
   const body = req.body || {};
   const itemType = norm(body.itemType).toLowerCase();
   const itemCategory = body.itemCategory; // Now it's ObjectId, no need to normalize to string
 
-  const memoryModules = body.memory?.ramModules || [];
-  const storageDevices = body.storage?.storageDevices || [];
   const branchId = extractBranchIdFromBody(body);
-
-  const validMemoryModules = memoryModules.filter((m) => m && (m.ramCapacityGB || m.ramManufacturer || m.ramModelNumber));
-  const memory = {
-    modules: validMemoryModules,
-    totalQty: validMemoryModules.length,
-    totalCapacityGB: validMemoryModules.reduce((sum, m) => sum + (Number(m.ramCapacityGB) || 0), 0),
-  };
-
-  const validStorageDevices = storageDevices.filter((d) => d && (d.driveCapacityGB || d.driveManufacturer || d.driveType));
-  const storage = {
-    devices: validStorageDevices,
-    totalQty: validStorageDevices.length,
-    totalCapacityGB: validStorageDevices.reduce((sum, d) => sum + (Number(d.driveCapacityGB) || 0), 0),
-    typeBreakdown: [],
-  };
-
-  const typeMap = new Map();
-  validStorageDevices.forEach((d) => {
-    const type = norm(d.driveType) || "Unknown";
-    const capacity = Number(d.driveCapacityGB) || 0;
-    if (!typeMap.has(type)) typeMap.set(type, { type, qty: 0, capacityGB: 0 });
-    const entry = typeMap.get(type);
-    entry.qty += 1;
-    entry.capacityGB += capacity;
-  });
-  storage.typeBreakdown = Array.from(typeMap.values());
 
   // Build Fixed Asset Payload (no purchase/warranty fields)
   const fixedPayload = {
@@ -49,15 +21,21 @@ const create = async (req) => {
     itemCategory,
     itemType,
     branchId,
-    memory,
-    storage,
+    screenSizeInches: toNumberOrNull(body.screenSizeInches),
+    refreshRateHz: toNumberOrNull(body.refreshRateHz),
+    brightnessNits: toNumberOrNull(body.brightnessNits),
+    responseTimeMs: toNumberOrNull(body.responseTimeMs),
+    hdmiPorts: toNumberOrNull(body.hdmiPorts),
+    displayPort: toNumberOrNull(body.displayPort),
+    usbPorts: toNumberOrNull(body.usbPorts),
+    powerConsumptionWatt: toNumberOrNull(body.powerConsumptionWatt),
     ...ensureOrgAndAudit(req),
   };
 
   delete fixedPayload.sections;
   delete fixedPayload.flat;
-  delete fixedPayload.memoryModules;
-  delete fixedPayload.storageDevices;
+  delete fixedPayload.memory;
+  delete fixedPayload.storage;
 
   // Purchase & Warranty field names to extract
   const purchaseFields = [
@@ -93,7 +71,7 @@ const create = async (req) => {
   [...purchaseFields, ...warrantyFields].forEach((k) => delete fixedPayload[k]);
 
   // 1️⃣ Save Fixed Asset first
-  const fixedDoc = await Laptop.create(fixedPayload);
+  const fixedDoc = await Monitor.create(fixedPayload);
   const assetId = fixedDoc._id;
 
   // 2️⃣ Create Purchase Document if any purchase field exists
@@ -136,12 +114,13 @@ const create = async (req) => {
 
 const list = async (req) => {
   const filter = buildAssetListFilter(req);
+
   // If caller provides a `limit` query param we'll paginate; otherwise return all matching items.
   const rawLimit = req.query?.limit !== undefined ? Number(req.query.limit) : 0;
   const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.max(Math.floor(rawLimit), 0) : 0;
   const page = Math.max(Number(req.query?.page) || 1, 1);
 
-  let query = Laptop.find(filter)
+  let query = Monitor.find(filter)
     .select("-__v")
     .sort({ createdAt: -1 });
 
@@ -150,7 +129,6 @@ const list = async (req) => {
   }
 
   const items = await query.lean();
-
   const flattenedItems = items.map((item) => ({
     ...item,
     itemName: item.itemId || item.summary?.itemName || "N/A",
@@ -165,7 +143,7 @@ const list = async (req) => {
 
 const getById = async (req) => {
   const { id } = req.params;
-  const doc = await Laptop.findById(id).lean();
+  const doc = await Monitor.findById(id).lean();
   if (!doc || doc.isDeleted) {
     const e = new Error("Asset not found");
     e.statusCode = 404;
@@ -176,6 +154,7 @@ const getById = async (req) => {
     e.statusCode = 403;
     throw e;
   }
+
   return { doc, message: "Asset retrieved" };
 };
 

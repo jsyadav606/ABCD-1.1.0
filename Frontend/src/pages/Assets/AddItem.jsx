@@ -302,7 +302,6 @@ const AddItem = () => {
 
       // Log payload to console for debugging
       // console.log('📤 Sending payload to backend:', payload);
-      console.table(payload);
 
       // Call createAsset API
       const result = await createAsset(payload);
