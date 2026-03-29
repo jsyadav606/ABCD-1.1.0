@@ -21,7 +21,7 @@ export const CATEGORY_ITEMS = {
   ],
   peripheral: [
     { value: "keyboard", label: "Keyboard" },
-    { value: "webcam", label: "Webcam" },
+    { value: "camera", label: "Camera" },
     { value: "mouse", label: "Mouse" },
     { value: "headphone", label: "Headphone" },
   ],

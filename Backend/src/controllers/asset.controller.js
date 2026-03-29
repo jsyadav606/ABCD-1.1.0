@@ -1,6 +1,6 @@
 /**
  * Assets Controller
- * Description: Type-based dispatcher. Frontend ke itemType ke hisaab se specific handler (cpu/monitor) choose karta hai.
+ * Description: Type-based dispatcher. Frontend ke itemType ke hisaab se specific handler (cpu/monitor/printer) choose karta hai.
  * Goals:
  * - Simple surface for FE: /assets POST/GET/GET/:id sabhi item types ke liye kaam kare
  * - Fast list: handler ke andar lean() + sort, aur yahan merge when multiple types
@@ -10,6 +10,7 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { CPU } from "../models/cpu.model.js";
 import { Monitor } from "../models/monitor.model.js";
+import { Printer } from "../models/printer.model.js";
 import { handlers } from "../assets/handlers/index.js";
 import { Purchase } from "../models/purchase.model.js";
 import { Warranty } from "../models/warranty.model.js";
@@ -134,7 +135,8 @@ export const countAssets = asyncHandler(async (req, res) => {
   }
   console.log('Count filter:', filter);
   const cpuCount = await CPU.countDocuments(filter);
-  // Assuming fixed assets are only CPUs, not monitors
-  const total = cpuCount;
+  const printerCount = await Printer.countDocuments(filter);
+  // Count all types
+  const total = cpuCount + printerCount;
   return res.status(200).json(new apiResponse(200, { total }, "Assets count retrieved"));
 });

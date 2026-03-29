@@ -1,0 +1,1119 @@
+/**
+ * Enhanced Asset Detail Page - v2
+ * Features:
+ * - Dynamic field rendering based on asset type
+ * - Modern, attractive UI with better information hierarchy
+ * - Responsive design with card-based layout
+ * - Smart tab organization
+ * - Status indicators and badges
+ * - Better information grouping
+ */
+
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { PageLoader } from "../../components/Loader/Loader.jsx";
+import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
+import Button from "../../components/Button/Button.jsx";
+import { getGroupedFields, getOrderedGroups, FIELD_GROUP_LABELS, getAssetSchema } from "../../utils/assetFieldSchema.js";
+import "./AssetDetail.css";
+
+const AssetDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [asset, setAsset] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("specs");
+  const [showActionMenu, setShowActionMenu] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  useEffect(() => {
+    const loadAsset = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const itemType = localStorage.getItem('lastItemType') || 'cpu';
+        const response = await fetch(`/api/v1/assets/${id}?itemType=${itemType}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load asset: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAsset(data.data || data);
+        
+        // Initialize all groups as expanded
+        const groupedFields = getGroupedFields(data.data || data, itemType);
+        const orderedGroups = getOrderedGroups(groupedFields);
+        const initialExpanded = {};
+        orderedGroups.forEach(group => {
+          initialExpanded[group] = true;
+        });
+        setExpandedGroups(initialExpanded);
+      } catch (err) {
+        setError(err.message || "Failed to load asset details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) loadAsset();
+  }, [id]);
+
+  // Memoize grouped fields to avoid recalculation
+  const groupedFields = useMemo(() => {
+    if (!asset) return {};
+    const itemType = localStorage.getItem('lastItemType') || 'cpu';
+    return getGroupedFields(asset, itemType);
+  }, [asset]);
+
+  const orderedGroups = useMemo(() => {
+    return getOrderedGroups(groupedFields);
+  }, [groupedFields]);
+
+  const itemType = localStorage.getItem('lastItemType') || 'cpu';
+  const schema = useMemo(() => getAssetSchema(itemType), [itemType]);
+
+  if (loading) return <PageLoader message="Loading asset details..." />;
+  if (error) return <ErrorNotification error={error} onClose={() => setError(null)} />;
+
+  if (!asset) {
+    return (
+      <div className="asset-detail-v2">
+        <div className="detail-back">
+          <Button variant="secondary" size="small" onClick={() => navigate('/assets')}>
+            ← Back to Assets
+          </Button>
+        </div>
+        <div className="empty-state">
+          <div className="empty-icon">📭</div>
+          <div className="empty-text">Asset not found</div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleToggleGroup = (group) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
+  };
+
+  const getStatusColor = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s.includes('active')) return 'status-active';
+    if (s.includes('inactive')) return 'status-inactive';
+    if (s.includes('repair')) return 'status-repair';
+    if (s.includes('damaged')) return 'status-damaged';
+    return 'status-default';
+  };
+
+  const getConditionColor = (condition) => {
+    const c = String(condition || '').toLowerCase();
+    if (c.includes('excellent') || c.includes('good') || c.includes('new')) return 'condition-excellent';
+    if (c.includes('fair') || c.includes('average')) return 'condition-fair';
+    if (c.includes('poor') || c.includes('broken')) return 'condition-poor';
+    return 'condition-default';
+  };
+
+  const formatValue = (value, field) => {
+    if (value === null || value === undefined || value === '') return 'N/A';
+    if (typeof value === 'boolean') return value ? '✓ Yes' : '✗ No';
+    if (field?.type === 'date') return new Date(value).toLocaleDateString();
+    if (field?.type === 'number') return String(value);
+    return String(value);
+  };
+
+  const totalFieldsWithValue = Object.values(groupedFields)
+    .flat()
+    .filter(f => f.hasValue).length;
+
+  const totalFields = orderedGroups
+    .reduce((sum, group) => sum + groupedFields[group]?.length || 0, 0);
+
+  const completionPercentage = Math.round((totalFieldsWithValue / totalFields) * 100);
+
+  return (
+    <div className="asset-detail-v2">
+      {/* Header Section */}
+      <div className="detail-header-section">
+        <div className="detail-back">
+          <Button variant="secondary" size="small" onClick={() => navigate('/assets')}>
+            ← Back to Assets
+          </Button>
+        </div>
+
+        {/* Enhanced Premium Header */}
+        <div className="enhanced-header">
+          <div className="header-content">
+            <div className="header-left">
+              <div className="asset-type-badge">
+                <span className="badge-icon">{schema.icon}</span>
+                <span className="badge-label">{schema.label}</span>
+              </div>
+              <div className="header-title-section">
+                <h1 className="asset-title">{asset.itemId || "Asset"}</h1>
+                <p className="asset-subtitle">
+                  {asset.manufacturer || 'Unknown'} • {asset.model || 'Unknown Model'}
+                </p>
+              </div>
+            </div>
+
+            <div className="header-right">
+              {/* Status Indicators */}
+              <div className="status-indicators">
+                {asset.itemStatus && (
+                  <div className={`status-indicator ${getStatusColor(asset.itemStatus)}`}>
+                    <span className="indicator-dot"></span>
+                    {asset.itemStatus}
+                  </div>
+                )}
+                {asset.itemCondition && (
+                  <div className={`condition-indicator ${getConditionColor(asset.itemCondition)}`}>
+                    ⭐ {asset.itemCondition}
+                  </div>
+                )}
+              </div>
+
+              {/* Completion Meter */}
+              <div className="completion-meter">
+                <div className="meter-label">
+                  <span className="meter-title">Data Completeness</span>
+                  <span className="meter-percentage">{completionPercentage}%</span>
+                </div>
+                <div className="meter-bar">
+                  <div className="meter-fill" style={{ width: `${completionPercentage}%` }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="header-actions">
+            <button className="action-btn secondary-action" title="Edit Serial Number">
+              ✏️ Edit
+            </button>
+            <button className="action-btn secondary-action" title="View History">
+              📜 History
+            </button>
+            <div className="action-menu-container">
+              <button 
+                className="action-btn primary-action"
+                onClick={() => setShowActionMenu(!showActionMenu)}
+                title="More Actions"
+              >
+                ⚙️ Actions
+              </button>
+              {showActionMenu && (
+                <div className="action-dropdown">
+                  <button className="dropdown-item">👤 Assign Asset</button>
+                  <button className="dropdown-item">🔧 Log Repair</button>
+                  <button className="dropdown-item">↔️ Transfer</button>
+                  <button className="dropdown-item">📥 Export Data</button>
+                  <button className="dropdown-item">🗑️ Soft Delete</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button 
+          className={`tab-btn ${activeTab === 'specs' ? 'active' : ''}`}
+          onClick={() => setActiveTab('specs')}
+        >
+          📋 Specifications
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'lifecycle' ? 'active' : ''}`}
+          onClick={() => setActiveTab('lifecycle')}
+        >
+          📅 Lifecycle
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'warranty' ? 'active' : ''}`}
+          onClick={() => setActiveTab('warranty')}
+        >
+          🛡️ Warranty
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'assignments' ? 'active' : ''}`}
+          onClick={() => setActiveTab('assignments')}
+        >
+          👤 Assignments
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="main-content-area">
+        {activeTab === 'specs' && (
+          <div className="tab-content specs-content">
+            {orderedGroups.map(groupKey => {
+              const fields = groupedFields[groupKey] || [];
+              const groupLabel = FIELD_GROUP_LABELS[groupKey];
+              const isExpanded = expandedGroups[groupKey] !== false;
+              const fieldsWithValue = fields.filter(f => f.hasValue).length;
+
+              return (
+                <div key={groupKey} className="spec-group">
+                  <div 
+                    className="group-header"
+                    onClick={() => handleToggleGroup(groupKey)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="group-title-section">
+                      {/* <span className="group-icon">{groupLabel.icon}</span> */}
+                      <span className="group-title">{groupLabel.label}</span>
+                      <span className="group-count">{fieldsWithValue}/{fields.length}</span>
+                    </div>
+                    <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
+                      ▼
+                    </span>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="group-content">
+                      <div className="fields-grid">
+                        {fields.map(field => (
+                          <div 
+                            key={field.key} 
+                            className={`field-item ${field.isEmpty ? 'empty-field' : 'filled-field'}`}
+                          >
+                            <div className="field-label">
+                              <span className="field-icon">{field.icon}</span>
+                              <span className="label-text">{field.label}</span>
+                              {field.required && <span className="required-mark">*</span>}
+                            </div>
+                            <div className={`field-value ${field.isEmpty ? 'empty-value' : ''}`}>
+                              {field.isEmpty ? (
+                                <span className="placeholder-text">Not provided</span>
+                              ) : (
+                                <span className="actual-value">{formatValue(field.value, field)}</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {activeTab === 'lifecycle' && (
+          <div className="tab-content lifecycle-content">
+            <div className="info-card">
+              <div className="card-header">📅 Asset Timeline</div>
+              <div className="timeline-items">
+                <div className="timeline-item">
+                  <div className="timeline-marker">
+                    <span className="marker-icon">✨</span>
+                  </div>
+                  <div className="timeline-info">
+                    <div className="timeline-date">Created On</div>
+                    <div className="timeline-value">
+                      {asset.createdAt ? new Date(asset.createdAt).toLocaleDateString() : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+                {asset.updatedAt && (
+                  <div className="timeline-item">
+                    <div className="timeline-marker">
+                      <span className="marker-icon">✏️</span>
+                    </div>
+                    <div className="timeline-info">
+                      <div className="timeline-date">Last Updated</div>
+                      <div className="timeline-value">
+                        {new Date(asset.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {asset.isActive === false && asset.inactiveAt && (
+                  <div className="timeline-item">
+                    <div className="timeline-marker">
+                      <span className="marker-icon">🔴</span>
+                    </div>
+                    <div className="timeline-info">
+                      <div className="timeline-date">Inactivated On</div>
+                      <div className="timeline-value">
+                        {new Date(asset.inactiveAt).toLocaleDateString()}
+                        {asset.inactiveReason && ` - ${asset.inactiveReason}`}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'warranty' && (
+          <div className="tab-content warranty-content">
+            {asset.warranty ? (
+              <div className="info-card">
+                <div className="card-header">🛡️ Warranty Information</div>
+                <div className="warranty-details">
+                  <div className="warranty-item">
+                    <span className="warranty-label">Status</span>
+                    <span className={`warranty-value ${asset.warranty.status === 'Active' ? 'active' : 'inactive'}`}>
+                      {asset.warranty.status}
+                    </span>
+                  </div>
+                  {asset.warranty.expiryDate && (
+                    <div className="warranty-item">
+                      <span className="warranty-label">Expiry Date</span>
+                      <span className="warranty-value">
+                        {new Date(asset.warranty.expiryDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  {asset.warranty.provider && (
+                    <div className="warranty-item">
+                      <span className="warranty-label">Provider</span>
+                      <span className="warranty-value">{asset.warranty.provider}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="info-card">
+                <div className="card-header">🛡️ No Warranty Information</div>
+                <p className="no-data-text">No warranty details found for this asset.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'assignments' && (
+          <div className="tab-content assignments-content">
+            <div className="info-card">
+              <div className="card-header">👤 Assignment Status</div>
+              <div className="assignment-status">
+                <div className="status-row">
+                  <span className="status-key">Currently Assigned To</span>
+                  <span className="status-val">{asset.itemUser || 'Not Assigned'}</span>
+                </div>
+                {asset.AssignDate && (
+                  <div className="status-row">
+                    <span className="status-key">Assignment Date</span>
+                    <span className="status-val">
+                      {new Date(asset.AssignDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                <div className="status-row">
+                  <span className="status-key">Location</span>
+                  <span className="status-val">{asset.itemIsCurrently || 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AssetDetail;
+
+
+
+
+/**
+ * Enhanced Asset Detail Page v2 - CSS
+ * Modern, responsive design with dynamic field handling
+ * Supports multiple asset types with different field structures
+ */
+* {
+  box-sizing: border-box;
+}
+.asset-detail-v2 {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+/* Header Section */
+.detail-header-section {
+  margin-bottom: 2rem;
+}
+.detail-back {
+  margin-bottom: 1rem;
+}
+/* Enhanced Header */
+.enhanced-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 15px 50px rgba(0, 123, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: slideInDown 0.4s ease;
+}
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+  min-width: 300px;
+}
+/* Asset Type Badge */
+.asset-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1.2rem;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.badge-icon {
+  font-size: 1.5rem;
+}
+.header-title-section h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: white;
+}
+.asset-subtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+}
+/* Status Indicators Section */
+.header-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 300px;
+}
+.status-indicators {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.status-indicator,
+.condition-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #28a745;
+}
+.status-indicator.status-inactive .indicator-dot {
+  background: #dc3545;
+}
+.status-indicator.status-repair .indicator-dot {
+  background: #ffc107;
+}
+/* Completion Meter */
+.completion-meter {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.meter-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+.meter-percentage {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.meter-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #20c997, #15b78b);
+  transition: width 0.6s ease;
+}
+/* Header Actions */
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.action-btn {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.action-btn.secondary-action {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+.action-btn.secondary-action:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+.action-btn.primary-action {
+  background: white;
+  color: #007bff;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.action-btn.primary-action:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+.action-menu-container {
+  position: relative;
+}
+.action-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  color: #333;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 200px;
+  animation: slideDown 0.3s ease;
+}
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 500;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-item:hover {
+  background: #f5f7fa;
+  color: #007bff;
+  padding-left: 2rem;
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 0 1rem;
+  border-radius: 12px 12px 0 0;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 1.2rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+}
+.tab-btn:hover {
+  color: #007bff;
+}
+.tab-btn.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+/* Main Content Area */
+.main-content-area {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.tab-content {
+  padding: 2rem;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Specs Content - Dynamic Fields */
+.specs-content {
+  padding: 0;
+}
+.spec-group {
+  border-bottom: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+.spec-group:last-child {
+  border-bottom: none;
+}
+.group-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+.group-header:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+.group-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+.group-icon {
+  font-size: 1.5rem;
+}
+.group-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+.group-count {
+  background: #007bff;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.expand-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+  color: #6c757d;
+}
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+.group-content {
+  padding: 2rem;
+  background: #f8f9fa;
+  animation: slideDown 0.3s ease;
+}
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.field-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+.field-item.filled-field {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+.field-item.empty-field {
+  opacity: 0.7;
+  border-style: dashed;
+}
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field-icon {
+  font-size: 1.2rem;
+}
+.label-text {
+  flex: 1;
+}
+.required-mark {
+  color: #dc3545;
+  font-size: 1.1rem;
+}
+.field-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+.field-value.empty-value {
+  color: #6c757d;
+  font-weight: 500;
+}
+.placeholder-text {
+  font-style: italic;
+  opacity: 0.7;
+}
+.actual-value {
+  word-break: break-word;
+}
+/* Lifecycle Content */
+.lifecycle-content {
+  padding: 2rem;
+}
+.info-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.timeline-items {
+  padding: 2rem;
+}
+.timeline-item {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.timeline-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.timeline-marker {
+  min-width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.marker-icon {
+  font-size: 1.8rem;
+}
+.timeline-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.timeline-date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+}
+.timeline-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+/* Warranty Content */
+.warranty-details {
+  padding: 2rem;
+}
+.warranty-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.warranty-item:last-child {
+  border-bottom: none;
+}
+.warranty-label {
+  font-weight: 600;
+  color: #6c757d;
+  min-width: 150px;
+}
+.warranty-value {
+  font-weight: 700;
+  color: #1e1e1e;
+  font-size: 1.05rem;
+}
+.warranty-value.active {
+  color: #28a745;
+}
+.warranty-value.inactive {
+  color: #dc3545;
+}
+.no-data-text {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+/* Assignments Content */
+.assignment-status {
+  padding: 2rem;
+}
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.status-row:last-child {
+  border-bottom: none;
+}
+.status-key {
+  font-weight: 600;
+  color: #6c757d;
+  min-width: 200px;
+}
+.status-val {
+  font-weight: 700;
+  color: #1e1e1e;
+  text-align: right;
+}
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+}
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.empty-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+/* Status Classes */
+.status-active .indicator-dot {
+  background: #28a745;
+  animation: pulse-green 2s infinite;
+}
+.status-inactive .indicator-dot {
+  background: #dc3545;
+}
+.status-repair .indicator-dot {
+  background: #ffc107;
+}
+.condition-excellent {
+  background: #d4edda;
+  color: #155724;
+}
+.condition-fair {
+  background: #fff3cd;
+  color: #856404;
+}
+.condition-poor {
+  background: #f8d7da;
+  color: #721c24;
+}
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .header-right {
+    width: 100%;
+  }
+  .status-indicators {
+    width: 100%;
+  }
+  .fields-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+@media (max-width: 768px) {
+  .asset-detail-v2 {
+    padding: 1rem;
+  }
+  .enhanced-header {
+    padding: 1.5rem;
+  }
+  .header-left {
+    min-width: auto;
+    gap: 1rem;
+  }
+  .asset-title {
+    font-size: 1.5rem;
+  }
+  .header-right {
+    min-width: auto;
+  }
+  .tab-navigation {
+    padding: 0;
+  }
+  .tab-btn {
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+  .tab-content {
+    padding: 1.5rem;
+  }
+  .group-header {
+    padding: 1rem;
+  }
+  .group-content {
+    padding: 1.5rem;
+  }
+  .fields-grid {
+    grid-template-columns: 1fr;
+  }
+  .field-item {
+    padding: 1rem;
+  }
+  .timeline-items {
+    padding: 1.5rem;
+  }
+  .warranty-details,
+  .assignment-status {
+    padding: 1.5rem;
+  }
+  .header-actions {
+    justift-content: flex-start;
+  }
+  .action-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+@media (max-width: 480px) {
+  .asset-detail-v2 {
+    padding: 0.75rem;
+  }
+  .enhanced-header {
+    padding: 1rem;
+  }
+  .asset-type-badge {
+    width: 100%;
+  }
+  .badge-label {
+    flex: 1;
+  }
+  .asset-title {
+    font-size: 1.2rem;
+  }
+  .asset-subtitle {
+    font-size: 0.9rem;
+  }
+  .status-indicators {
+    width: 100%;
+  }
+  .status-indicator,
+  .condition-indicator {
+    flex: 1;
+    min-width: 120px;
+  }
+  .tab-btn {
+    padding: 0.8rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+

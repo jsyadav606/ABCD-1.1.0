@@ -5,10 +5,12 @@
 import cpu from "./cpu.handler.js";
 import monitor from "./monitor.handler.js";
 import laptop from "./laptop.handler.js";
+import printer from "./printer.handler.js";
 
 export const handlers = {
   cpu,
   laptop,
   monitor,
+  printer,
   __generic: cpu,
 };

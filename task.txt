@@ -15,7 +15,1471 @@ DELETE /api/v1/itemtypes/:id                → Delete item type
 
 
 
+/**
+ * Advanced Asset Detail Page
+ * Modern, feature-rich view with:
+ * - Header with quick actions
+ * - Visual health indicators
+ * - Analytics & charts
+ * - Timeline of events
+ * - Document management
+ * - Complete asset information
+ */
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { PageLoader } from "../../components/Loader/Loader.jsx";
+import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
+import Button from "../../components/Button/Button.jsx";
+import "./AssetDetail.css";
+
+const AssetDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [asset, setAsset] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showActionMenu, setShowActionMenu] = useState(false);
+
+  useEffect(() => {
+    const loadAsset = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch(`/api/v1/assets/${id}?itemType=${localStorage.getItem('lastItemType') || 'cpu'}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load asset: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAsset(data.data || data);
+      } catch (err) {
+        setError(err.message || "Failed to load asset details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) loadAsset();
+  }, [id]);
+
+  if (loading) return <PageLoader message="Loading asset details..." />;
+  if (error) return <ErrorNotification error={error} onClose={() => setError(null)} />;
+
+  if (!asset) {
+    return (
+      <div className="asset-detail">
+        <div className="detail-back">
+          <Button variant="secondary" size="small" onClick={() => navigate('/assets')}>
+            ← Back to Assets
+          </Button>
+        </div>
+        <div className="empty-state">
+          <div className="empty-text">Asset not found</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mock data - replace with actual backend data
+  const assetStats = {
+    health: 85,
+    condition: "Excellent",
+    status: asset.isActive ? "Active" : "Inactive",
+    totalAssignments: 5,
+    totalRepairs: 3,
+    repairCost: 7500,
+    warranty: { status: "Active", expiry: "2026-02-18" },
+    location: "Lab 5",
+    usageHours: 1250,
+  };
+
+  const costBreakdown = [
+    { category: "Parts", amount: 4500, percentage: 60 },
+    { category: "Labor", amount: 2000, percentage: 27 },
+    { category: "Maintenance", amount: 1000, percentage: 13 },
+  ];
+
+  const documents = [
+    { name: "Warranty Certificate.pdf", date: "2024-02-18", type: "warranty", size: "2.4 MB" },
+    { name: "Purchase Invoice.pdf", date: "2024-02-15", type: "invoice", size: "1.8 MB" },
+    { name: "Asset Photo.jpg", date: "2024-02-15", type: "photo", size: "3.2 MB" },
+  ];
+
+  const activityFeed = [
+    { date: "28-Mar-2026", time: "10:30 AM", event: "Asset Created", by: "Admin", type: "create", details: "Initial asset registration" },
+    { date: "20-Feb-2026", time: "2:15 PM", event: "Assigned to Rahul", by: "Admin", type: "assign", details: "Office deployment" },
+    { date: "25-Feb-2026", time: "11:45 AM", event: "Repair - Screen Issue", by: "Technician", type: "repair", cost: "₹3000", details: "Screen flickering fixed" },
+    { date: "01-Mar-2026", time: "9:20 PM", event: "Issue Reported", by: "Rahul", type: "issue", details: "Battery draining fast" },
+  ];
+
+  const assignmentHistory = [
+    { user: "John Doe", department: "IT", assignedDate: "2024-03-01", returnedDate: "2024-06-01", days: 92, status: "Returned" },
+    { user: "Jane Smith", department: "HR", assignedDate: "2024-06-05", returnedDate: "-", days: 295, status: "Active" },
+  ];
+
+  const repairHistory = [
+    { date: "2024-02-15", description: "Screen Replacement", technician: "John Doe", cost: "₹2500", status: "Completed" },
+    { date: "2024-12-20", description: "Keyboard Repair", technician: "Jane Smith", cost: "₹1500", status: "Completed" },
+  ];
+
+  const getActivityIcon = (type) => {
+    switch(type) {
+      case 'create': return '✓';
+      case 'assign': return '👤';
+      case 'repair': return '🔧';
+      case 'issue': return '⚠';
+      default: return '●';
+    }
+  };
+
+  const handleQuickAction = (action) => {
+    console.log(`Action: ${action}`);
+    setShowActionMenu(false);
+  };
+
+  return (
+    <div className="asset-detail">
+      {/* Header Section */}
+      <div className="asset-header-wrapper">
+        <div className="header-back">
+          <Button variant="secondary" size="small" onClick={() => navigate('/assets')}>
+            ← Back to Assets
+          </Button>
+        </div>
+
+        {/* Premium Header Card */}
+        <div className="premium-header">
+          <div className="header-left">
+            <div className="header-icon-large">💻</div>
+            <div className="header-info">
+              <h1>{asset.itemId || "Asset"}</h1>
+              <p className="header-subtitle">{asset.manufacturer || "N/A"} • {asset.model || "N/A"}</p>
+              <div className="header-meta">
+                <span className="meta-item">📍 {assetStats.location}</span>
+                <span className="meta-item">🔋 {assetStats.usageHours}h used</span>
+                <span className={`status-badge ${assetStats.status === 'Active' ? 'active' : 'inactive'}`}>
+                  {assetStats.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="header-right">
+            <div className="quick-stats">
+              <div className="stat-box">
+                <span className="stat-value">{assetStats.health}%</span>
+                <span className="stat-label">Health</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-value">{assetStats.totalAssignments}</span>
+                <span className="stat-label">Assignments</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-value">₹{assetStats.repairCost}</span>
+                <span className="stat-label">Repair Cost</span>
+              </div>
+            </div>
+
+            <div className="action-menu-wrapper">
+              <button 
+                className="action-menu-btn"
+                onClick={() => setShowActionMenu(!showActionMenu)}
+              >
+                ⚙️ Actions
+              </button>
+              {showActionMenu && (
+                <div className="action-dropdown">
+                  <button onClick={() => handleQuickAction('assign')}>👤 Assign Asset</button>
+                  <button onClick={() => handleQuickAction('repair')}>🔧 Log Repair</button>
+                  <button onClick={() => handleQuickAction('transfer')}>↔️ Transfer</button>
+                  <button onClick={() => handleQuickAction('export')}>📥 Export</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Visual Health Indicators */}
+      <div className="health-indicators-bar">
+        <div className="indicator-item">
+          <label>Asset Health</label>
+          <div className="health-meter">
+            <div className="health-bar" style={{ width: `${assetStats.health}%` }}>
+              <span className="health-text">{assetStats.health}%</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="indicator-item">
+          <label>Condition</label>
+          <div className="condition-bar excellent">{assetStats.condition}</div>
+        </div>
+
+        <div className="indicator-item">
+          <label>Warranty</label>
+          <div className={`warranty-indicator ${assetStats.warranty.status === 'Active' ? 'active' : 'expired'}`}>
+            🛡️ {assetStats.warranty.status} - {assetStats.warranty.expiry}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area with Sidebar Navigation */}
+      <div className="main-content-wrapper">
+        {/* Sidebar Navigation */}
+        <div className="sidebar-nav">
+          <nav className="nav-list">
+            <button 
+              className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              📊 Overview
+            </button>
+            <button 
+              className={`nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
+              onClick={() => setActiveTab('timeline')}
+            >
+              📈 Timeline
+            </button>
+            <button 
+              className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
+              onClick={() => setActiveTab('history')}
+            >
+              📚 History
+            </button>
+            <button 
+              className={`nav-item ${activeTab === 'documents' ? 'active' : ''}`}
+              onClick={() => setActiveTab('documents')}
+            >
+              📄 Documents
+            </button>
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="content-main">
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <div className="tab-content overview-content">
+              <div className="section-row">
+                {/* Basic Information */}
+                <div className="content-section">
+                  <h2 className="section-heading">📌 Basic Information</h2>
+                  <div className="info-grid-2col">
+                    <div className="info-item">
+                      <label>Asset ID</label>
+                      <div className="value">{asset.itemId || "N/A"}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Serial Number</label>
+                      <div className="value">{asset.serialNumber || "N/A"}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Brand</label>
+                      <div className="value">{asset.manufacturer || "N/A"}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Model</label>
+                      <div className="value">{asset.model || "N/A"}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Category</label>
+                      <div className="value">{asset.itemCategory || "N/A"}</div>
+                    </div>
+                    <div className="info-item">
+                      <label>Type</label>
+                      <div className="value">{asset.itemType || "N/A"}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Analytics Section */}
+                <div className="content-section">
+                  <h2 className="section-heading">📊 Cost Breakdown</h2>
+                  <div className="cost-breakdown">
+                    {costBreakdown.map((item, idx) => (
+                      <div key={idx} className="breakdown-item">
+                        <div className="breakdown-header">
+                          <span className="category">{item.category}</span>
+                          <span className="amount">₹{item.amount}</span>
+                        </div>
+                        <div className="breakdown-bar">
+                          <div className="bar-fill" style={{ width: `${item.percentage}%` }}></div>
+                        </div>
+                        <span className="percentage">{item.percentage}%</span>
+                      </div>
+                    ))}
+                    <div className="breakdown-total">
+                      <strong>Total Cost: ₹{costBreakdown.reduce((sum, item) => sum + item.amount, 0)}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Timeline Tab */}
+          {activeTab === 'timeline' && (
+            <div className="tab-content timeline-content">
+              <h2 className="section-heading">📈 Complete Timeline</h2>
+              <div className="advanced-timeline">
+                {activityFeed.map((activity, idx) => (
+                  <div key={idx} className="timeline-event">
+                    <div className="timeline-marker">
+                      <div className="marker-icon" data-type={activity.type}>
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      {idx < activityFeed.length - 1 && <div className="timeline-line"></div>}
+                    </div>
+                    <div className="timeline-content-item">
+                      <div className="event-header">
+                        <h3 className="event-title">{activity.event}</h3>
+                        <span className="event-date">{activity.date} at {activity.time}</span>
+                      </div>
+                      <p className="event-details">{activity.details}</p>
+                      <div className="event-meta">
+                        <span>👤 {activity.by}</span>
+                        {activity.cost && <span className="cost">💰 {activity.cost}</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* History Tab */}
+          {activeTab === 'history' && (
+            <div className="tab-content history-content">
+              <div className="section-row">
+                {/* Assignment History */}
+                <div className="content-section">
+                  <h2 className="section-heading">👤 Assignment History</h2>
+                  <div className="history-cards">
+                    {assignmentHistory.map((item, idx) => (
+                      <div key={idx} className="history-card">
+                        <div className="card-header">
+                          <h4>{item.user}</h4>
+                          <span className={`status-badge ${item.status === 'Active' ? 'active' : 'inactive'}`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <div className="card-details">
+                          <div className="detail-row">
+                            <span>Department:</span>
+                            <strong>{item.department}</strong>
+                          </div>
+                          <div className="detail-row">
+                            <span>From:</span>
+                            <strong>{item.assignedDate}</strong>
+                          </div>
+                          <div className="detail-row">
+                            <span>To:</span>
+                            <strong>{item.returnedDate}</strong>
+                          </div>
+                          <div className="detail-row">
+                            <span>Duration:</span>
+                            <strong>{item.days} days</strong>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Repair History */}
+                <div className="content-section">
+                  <h2 className="section-heading">🔧 Repair History</h2>
+                  <div className="repair-table-wrapper">
+                    <table className="enhanced-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Description</th>
+                          <th>Technician</th>
+                          <th>Cost</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {repairHistory.map((item, idx) => (
+                          <tr key={idx}>
+                            <td>{item.date}</td>
+                            <td>{item.description}</td>
+                            <td>{item.technician}</td>
+                            <td className="cost">{item.cost}</td>
+                            <td><span className="status-badge completed">{item.status}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Documents Tab */}
+          {activeTab === 'documents' && (
+            <div className="tab-content documents-content">
+              <h2 className="section-heading">📄 Documents & Attachments</h2>
+              <div className="document-upload-area">
+                <p>📤 Drag files here or click to upload</p>
+              </div>
+              <div className="documents-list">
+                {documents.map((doc, idx) => (
+                  <div key={idx} className="document-item">
+                    <div className="doc-icon">📄</div>
+                    <div className="doc-info">
+                      <h4>{doc.name}</h4>
+                      <span className="doc-meta">{doc.date} • {doc.size}</span>
+                    </div>
+                    <div className="doc-actions">
+                      <button className="btn-small">⬇️ Download</button>
+                      <button className="btn-small danger">🗑️ Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AssetDetail;
 
 
 
-a ek asi fucationlity likho, jo table ke column ko manage kar ske. yani agr table asset.jsx me h to m vaha present table ke column me or column add kar sku or unka data bhi fatch ho jaye. 
+
+
+
+
+
+
+
+/* Advanced Asset Detail Page - Theme Matched */
+
+* {
+  box-sizing: border-box;
+}
+
+.asset-detail {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header Wrapper */
+.asset-header-wrapper {
+  margin-bottom: 2rem;
+}
+
+.header-back {
+  margin-bottom: 1rem;
+}
+
+/* Premium Header Card */
+.premium-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  box-shadow: 0 10px 40px rgba(0, 123, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+}
+
+.header-icon-large {
+  font-size: 4rem;
+  min-width: 100px;
+  text-align: center;
+}
+
+.header-info h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+  margin: 0.5rem 0 1rem;
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Quick Stats in Header */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.quick-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 120px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Action Menu */
+.action-menu-wrapper {
+  position: relative;
+}
+
+.action-menu-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.action-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 180px;
+  animation: slideDown 0.3s ease;
+}
+
+.action-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.action-dropdown button:last-child {
+  border-bottom: none;
+}
+
+.action-dropdown button:hover {
+  background: #f5f7fa;
+  color: #007bff;
+  padding-left: 2rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Health Indicators Bar */
+.health-indicators-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.indicator-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.indicator-item label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+/* Health Meter */
+.health-meter {
+  height: 12px;
+  background: #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.health-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #1e7e34);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease;
+  min-width: 40px;
+}
+
+.health-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Condition Bar */
+.condition-bar {
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.condition-bar.excellent {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Warranty Indicator */
+.warranty-indicator {
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.warranty-indicator.active {
+  background: #cff4fc;
+  color: #055160;
+}
+
+.warranty-indicator.expired {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Main Content Wrapper with Sidebar */
+.main-content-wrapper {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  height: fit-content;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 20px;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.nav-item {
+  padding: 1rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: #495057;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background: #f8f9fa;
+  color: #1e1e1e;
+}
+
+.nav-item.active {
+  background: #e7f0ff;
+  color: #007bff;
+  border-left-color: #007bff;
+}
+
+/* Content Main */
+.content-main {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tab-content {
+  padding: 2rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Heading */
+.section-heading {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e1e1e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Overview Content */
+.section-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.content-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+}
+
+/* Info Grid */
+.info-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.info-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.info-item label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.info-item .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+/* Cost Breakdown */
+.cost-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.breakdown-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.breakdown-header .amount {
+  color: #007bff;
+}
+
+.breakdown-bar {
+  height: 8px;
+  background: #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0d6efd, #0056b3);
+  transition: width 0.5s ease;
+}
+
+.percentage {
+  display: block;
+  font-size: 0.85rem;
+  color: #6c757d;
+  text-align: right;
+}
+
+.breakdown-total {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Timeline Content */
+.advanced-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-event {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marker-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: white;
+  border: 2px solid #007bff;
+  z-index: 10;
+}
+
+.marker-icon[data-type="create"] {
+  border-color: #28a745;
+  background: #d4edda;
+}
+
+.marker-icon[data-type="assign"] {
+  border-color: #007bff;
+  background: #cfe2ff;
+}
+
+.marker-icon[data-type="repair"] {
+  border-color: #ffc107;
+  background: #fff3cd;
+}
+
+.marker-icon[data-type="issue"] {
+  border-color: #dc3545;
+  background: #f8d7da;
+}
+
+.timeline-line {
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(180deg, #007bff, transparent);
+  margin-top: -5px;
+}
+
+.timeline-content-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 3px solid #007bff;
+  margin-left: 2rem;
+  margin-top: -5px;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 0.75rem;
+}
+
+.event-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+
+.event-date {
+  font-size: 0.85rem;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.event-details {
+  margin: 0.5rem 0;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.event-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.event-meta .cost {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* History Cards */
+.history-cards {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.history-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.history-card:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e1e1e;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.detail-row span {
+  color: #6c757d;
+}
+
+.detail-row strong {
+  color: #1e1e1e;
+}
+
+/* Enhanced Table */
+.repair-table-wrapper {
+  overflow-x: auto;
+}
+
+.enhanced-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.enhanced-table thead {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.enhanced-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.enhanced-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.enhanced-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.enhanced-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.enhanced-table td.cost {
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Document Upload Area */
+.document-upload-area {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.document-upload-area:hover {
+  border-color: white;
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
+}
+
+.document-upload-area p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Documents List */
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.document-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+}
+
+.doc-icon {
+  font-size: 2rem;
+}
+
+.doc-info {
+  flex: 1;
+}
+
+.doc-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1e1e1e;
+  font-weight: 600;
+}
+
+.doc-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.3rem;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-small:hover {
+  background: #e7f0ff;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.btn-small.danger:hover {
+  background: #f8d7da;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-block;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.completed {
+  background: #cfe2ff;
+  color: #052c65;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6c757d;
+}
+
+.empty-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .premium-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .action-dropdown {
+    right: auto;
+    left: 0;
+  }
+
+  .section-row {
+    grid-template-columns: 1fr;
+  }
+
+  .main-content-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-nav {
+    position: static;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.5rem;
+  }
+
+  .nav-item {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-item.active {
+    border-left: none;
+    border-bottom-color: #007bff;
+  }
+}
+
+@media (max-width: 768px) {
+  .asset-detail {
+    padding: 1rem;
+  }
+
+  .premium-header {
+    padding: 1.5rem;
+    flex-direction: column;
+  }
+
+  .header-icon-large {
+    font-size: 2.5rem;
+    min-width: 60px;
+  }
+
+  .header-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-meta {
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .quick-stats {
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.75rem 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .health-indicators-bar {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .tab-content {
+    padding: 1.5rem;
+  }
+
+  .info-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .section-row {
+    gap: 1.5rem;
+  }
+
+  .advanced-timeline {
+    padding-left: 1rem;
+  }
+
+  .timeline-event {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-content-item {
+    margin-left: 1rem;
+  }
+
+  .timeline-line {
+    height: 60px;
+  }
+
+  .document-upload-area {
+    padding: 2rem;
+  }
+
+  .document-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .doc-actions {
+    width: 100%;
+  }
+
+  .btn-small {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-header {
+    padding: 1rem;
+  }
+
+  .header-icon-large {
+    font-size: 2rem;
+  }
+
+  .header-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .header-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .quick-stats {
+    justify-content: space-between;
+  }
+
+  .stat-box {
+    min-width: 80px;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .section-heading {
+    font-size: 1.1rem;
+  }
+
+  .tab-content {
+    padding: 1rem;
+  }
+
+  .content-section {
+    padding: 1rem;
+  }
+
+  .nav-list {
+    gap: 0.25rem;
+  }
+
+  .nav-item {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .event-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .event-date {
+    white-space: normal;
+  }
+
+  .history-card {
+    padding: 1rem;
+  }
+
+  .enhanced-table {
+    font-size: 0.85rem;
+  }
+
+  .enhanced-table th,
+  .enhanced-table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+
+

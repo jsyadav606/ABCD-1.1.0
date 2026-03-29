@@ -30,6 +30,8 @@ const Setup = lazy(() => import("./pages/Setup/Setup"));
 const AssetPage = lazy(() => import("./pages/Assets/asset"));
 // @ts-ignore
 const AddItemPage = lazy(() => import("./pages/Assets/AddItem"));
+// @ts-ignore
+const AssetDetails = lazy(() => import("./pages/Assets/AssetDetails"));
 
 function App() {
   return (
@@ -145,6 +147,18 @@ function App() {
               ProtectedRoute>
                 <MainLayout>
                   <AddItemPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assets/:id"
+            element={
+              <
+// @ts-ignore
+              ProtectedRoute>
+                <MainLayout>
+                  <AssetDetails />
                 </MainLayout>
               </ProtectedRoute>
             }

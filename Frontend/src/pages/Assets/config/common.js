@@ -33,5 +33,5 @@ export const common = {
   chargerPinTypes: toOptions([ "Type C", "Small Barrel (Thin Pin)", "Standard Barrel (Medium)", "Big Barrel (Thick Pin)", "Blue Tip / Smart Pin", "Slim Tip (Rectangular)","Magnetic Connectors"]),
 };
 
-export const TABLE_SECTION_TITLES = ["Processors", "Storage", "Memory", "Network Details"];
+export const TABLE_SECTION_TITLES = ["Processors", "Storage", "Memory", "Network Details", "Cartridge / Toner Details"];
 

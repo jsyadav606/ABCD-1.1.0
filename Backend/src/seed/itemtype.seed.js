@@ -21,7 +21,7 @@ const itemTypesData = {
     "CPU", "Monitor", "Laptop", "Printer", "Tablet", "Interactive Panel", "Projector", "Network Switch", "Router", "Firewall", "Barcode Printer", "Barcode Scanner", "Scanner", "Biometric Device", "NAS Storage"
   ],
   "Peripherals": [
-    "Keyboard", "Webcam", "Mouse", "Headphone"
+    "Keyboard", "Camera", "Mouse", "Headphone"
   ],
   "Consumables": [
     "Toner", "Cable"

@@ -42,7 +42,7 @@ async function seedAndTestCategories() {
         {
           name: "Peripherals",
           code: "peripheral",
-          description: "Peripheral devices like keyboards, mice, webcams, etc.",
+          description: "Peripheral devices like keyboards, mice, cameras, etc.",
           sortOrder: 2,
         },
         {

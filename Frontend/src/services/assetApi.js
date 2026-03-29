@@ -60,6 +60,16 @@ export const createAsset = async (assetData) => {
   }
 }
 
+export const fetchAssetDetailsById = async (assetId, itemType = "CPU") => {
+  try {
+    const response = await API.get(`/assets/${assetId}?itemType=${itemType}`)
+    return response.data?.data || {}
+  } catch (error) {
+    console.error('Failed to fetch asset details:', error)
+    throw new Error(error.response?.data?.message || 'Failed to fetch asset details')
+  }
+}
+
 export const fetchLookupsByCategory = async (category) => {
   try {
     if (!category) return [];

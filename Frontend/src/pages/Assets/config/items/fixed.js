@@ -277,48 +277,149 @@ export const fixedConfigs = {
         sectionTitle: "Print Specifications",
         fields: [
           { name: "printTechnology", label: "Print Technology", type: "select", options: common.printTechnologies },
+
           { name: "colorSupport", label: "Color Printing Supported", type: "select", options: common.booleanOptions },
-          { name: "printSpeedPPM", placeholder: "e.g. 300", label: "Print Speed (PPM)", type: "number", min: 1, max: 500 },
-          { name: "maxResolutionDPI", placeholder: "e.g. 600", label: "Max Resolution (DPI)", type: "number", min: 300, max: 9600 },
+
+          { name: "printSpeedPPM", placeholder: "e.g. 30", label: "Print Speed (PPM)", type: "number", min: 1, max: 200 },
+
+          { name: "maxResolutionDPI", placeholder: "e.g. 600", label: "Max Resolution (DPI)", type: "number", min: 300, max: 4800 },
+
           { name: "monthlyDutyCycle", placeholder: "e.g. 5000", label: "Monthly Duty Cycle (Pages)", type: "number", min: 1000, max: 1000000 },
-          { name: "recommendedMonthlyVolume", placeholder: "e.g. 10000", label: "Recommended Monthly Volume", type: "number", min: 1000, max: 500000 },
+
           { name: "duplexPrinting", label: "Duplex Printing Supported", type: "select", options: common.booleanOptions },
+
           { name: "networkSupport", label: "Network Support", type: "select", options: common.booleanOptions, defaultValue: "No" },
+
+          {name: "wirelessSupport", label: "Wireless Support", type: "select", options: common.booleanOptions, defaultValue: "No" },
+
+          { name: "scannerSupport", label: "Scanner Support (MFP)", type: "select", options: common.booleanOptions, defaultValue: "No" },
+
+          { name: "copierSupport", label: "Copier Support (MFP)", type: "select", options: common.booleanOptions, defaultValue: "No" },
+
+
         ],
       },
-      //! Item Lifecycle Status
-       {
-        sectionTitle: "Item Lifecycle Status",
 
+      //! Item Lifecycle Status
+      {
+        sectionTitle: "Item Lifecycle Status",
         fields: [
           { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
+
           { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
-          { name: "totalPrintCount", placeholder: "e.g. 1000000", label: "Total Print Count", type: "number", min: 0, max: 100000000 },
+
+          { name: "totalPrintCount", placeholder: "e.g. 100000", label: "Total Print Count", type: "number", min: 0, max: 100000000 },
+
           { name: "lastServiceDate", label: "Last Service Date", type: "date" },
+
           { name: "condition", label: "Physical Condition", type: "select", options: common.conditionStatus },
-          
         ],
       },
+
       //! Scanner & Copier (If MFP)
       {
         sectionTitle: "Scanner & Copier (If MFP)",
         fields: [
-          { name: "scannerAvailable",  label: "Scanner Available", type: "select", options: common.booleanOptions },
-          { name: "scanResolutionDPI", placeholder: "e.g. 4800", label: "Scan Resolution (DPI)", type: "number", min: 300, max: 4800 },
-          { name: "adfAvailable", label: "ADF Available", type: "select", options: common.booleanOptions },
-          { name: "copySpeedCPM", placeholder: "e.g. 300", label: "Copy Speed (CPM)", type: "number", min: 1, max: 500 },
+          { name: "scannerAvailable", label: "Scanner Available", type: "select", options: common.booleanOptions },
+
+          { name: "scanResolutionDPI", placeholder: "e.g. 1200", label: "Scan Resolution (DPI)", type: "number", min: 300, max: 4800 },
+
+          { name: "copySpeedCPM", placeholder: "e.g. 25", label: "Copy Speed (CPM)", type: "number", min: 1, max: 200 },
         ],
       },
-      //! Cartridge / Toner Details
+
+      //! Cartridge / Toner Details - Black Only (No Color Support)
+      {
+        sectionTitle: "Black Toner/Cartridge Details",
+        showIf: { colorSupport: "No" },
+        fields: [
+          { name: "blackCartridgeModel", label: "Cartridge Model", type: "text", placeholder: "e.g. HP CF279A", maxLength: 100 },
+          
+          { name: "blackCartridgeYieldPages", label: "Yield (Pages)", type: "number", placeholder: "e.g. 1000", min: 0, max: 1000000 },
+          
+          { name: "blackCartridgePartNumber", label: "Part/Cartridge Number", type: "text", placeholder: "e.g. CF279A", maxLength: 100 },
+          
+          { name: "blackCartridgeManufacturer", label: "Manufacturer", type: "text", placeholder: "e.g. HP, Canon, Brother", maxLength: 80 },
+          
+          { name: "blackCartridgeLastChanged", label: "Last Changed Date", type: "date" },
+          
+          { name: "blackCartridgeEstimatedEnd", label: "Estimated End Date", type: "date" },
+          
+          { name: "blackCartridgeNotes", label: "Notes", type: "textarea", rows: 2, placeholder: "e.g. Compatible with XY model" }
+        ]
+      },
+
+      //! Cartridge / Toner Details - Multi-Color (With Color Support)
       {
         sectionTitle: "Cartridge / Toner Details",
+        showIf: { colorSupport: "Yes" },
         fields: [
-          { name: "cartridgeModel", placeholder: "e.g. HP LaserJet", label: "Cartridge / Toner Model", type: "text", maxLength: 120 },
-          { name: "cartridgeType", placeholder: "e.g. Black", label: "Cartridge Type (Black/Color)", type: "text", maxLength: 80 },
-          { name: "yieldPages", placeholder: "e.g. 10000", label: "Cartridge Yield (Pages)", type: "number", min: 100, max: 100000 },
-          { name: "lastCartridgeChangeDate", label: "Last Cartridge Change Date", type: "date" },
-        ],
+          { 
+            name: "cartridgeColor", 
+            label: "Cartridge Color", 
+            type: "select", 
+            options: [
+              { value: "Black", label: "Black" },
+              { value: "Cyan", label: "Cyan" },
+              { value: "Magenta", label: "Magenta" },
+              { value: "Yellow", label: "Yellow" },
+              { value: "Light Cyan", label: "Light Cyan" },
+              { value: "Light Magenta", label: "Light Magenta" },
+              { value: "Photo Black", label: "Photo Black" },
+              { value: "Gray", label: "Gray" },
+              { value: "Red", label: "Red" },
+              { value: "Blue", label: "Blue" },
+              { value: "Green", label: "Green" }
+            ] 
+          },
+
+          { 
+            name: "cartridgeModel", 
+            label: "Model Number", 
+            type: "text",
+            placeholder: "e.g. HP CF401X",
+            maxLength: 100
+          },
+
+          { 
+            name: "cartridgePartNumber", 
+            label: "Part/Cartridge Number", 
+            type: "text",
+            placeholder: "e.g. CF401X",
+            maxLength: 100
+          },
+
+          { 
+            name: "cartridgeManufacturer", 
+            label: "Manufacturer", 
+            type: "text",
+            placeholder: "e.g. HP, Canon, Brother",
+            maxLength: 80
+          },
+
+          { 
+            name: "cartridgeYieldPages", 
+            label: "Yield (Pages)", 
+            type: "number",
+            placeholder: "e.g. 2300",
+            min: 0,
+            max: 1000000
+          },
+
+          { 
+            name: "cartridgeLastChanged", 
+            label: "Last Changed Date", 
+            type: "date"
+          },
+
+          { 
+            name: "cartridgeEstimatedEnd", 
+            label: "Estimated End Date", 
+            type: "date"
+          }
+        ]
       },
+
       //!Network Details
       fromGeneric("Network Details",{
         showIf: { networkSupport: "Yes" },
@@ -331,8 +432,7 @@ export const fixedConfigs = {
       {
         sectionTitle: "Physical & Power",
         fields: [
-          { name: "color", placeholder: "e.g. Black", label: "Color", type: "text", maxLength: 40 },
-          { name: "weightKg", placeholder: "e.g. 1.5", label: "Weight (Kg)", type: "number", min: 0, max: 200 },
+          { name: "printerColor", placeholder: "e.g. Black", label: "Printer Color", type: "text", maxLength: 40 },
           { name: "powerConsumptionWatt", placeholder: "e.g. 200", label: "Power Consumption (Watts)", type: "number", min: 10, max: 5000 },
           { name: "voltageRange", placeholder: "e.g. 220V", label: "Voltage Range", type: "text", maxLength: 40 },
         ],

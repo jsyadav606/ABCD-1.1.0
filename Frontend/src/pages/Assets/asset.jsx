@@ -482,7 +482,28 @@ const AssetPage = () => {
       header: "Item ID", 
       key: "itemId", 
       sortable: true,
-      tooltip: (row) => getTooltipDetails(row)
+      tooltip: (row) => getTooltipDetails(row),
+      render: (row) => (
+        <button
+          onClick={() => {
+            localStorage.setItem('lastItemType', row.itemType || 'cpu');
+            navigate(`/assets/${row._id}`);
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#0284c7',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            fontSize: 'inherit',
+            fontWeight: 'inherit',
+            padding: 0,
+          }}
+          title="Click to view asset details"
+        >
+          {row.itemId}
+        </button>
+      )
     },
     { header: "Type", key: "itemType", sortable: true },
     {

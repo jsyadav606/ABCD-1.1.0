@@ -1,0 +1,2621 @@
+last
+
+
+
+
+
+
+/**
+ * Modern Asset Detail Page
+ * Beautiful, professional asset details view with tabs and comprehensive information
+ */
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { PageLoader } from "../../components/Loader/Loader.jsx";
+import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
+import "./AssetDetail.css";
+
+const AssetDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [asset, setAsset] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showActionMenu, setShowActionMenu] = useState(false);
+
+  // Mock data - will be replaced by actual API data
+  const assetStats = {
+    health: 85,
+    totalAssignments: 5,
+    totalRepairs: 3,
+    repairCost: 7500,
+    location: "Lab 5",
+    status: "Active",
+    usageHours: 1250,
+    warranty: { status: "Active", expiry: "2026-02-18" },
+  };
+
+  const costBreakdown = [
+    { category: "Parts", amount: 4500, percentage: 60 },
+    { category: "Labor", amount: 2000, percentage: 27 },
+    { category: "Maintenance", amount: 1000, percentage: 13 },
+  ];
+
+  const documents = [
+    { name: "Warranty Certificate.pdf", date: "2024-02-18", type: "warranty", size: "2.4 MB" },
+    { name: "Purchase Invoice.pdf", date: "2024-02-15", type: "invoice", size: "1.8 MB" },
+    { name: "Asset Photo.jpg", date: "2024-02-15", type: "photo", size: "3.2 MB" },
+  ];
+
+  const activityFeed = [
+    { date: "28-Mar-2026", time: "10:30 AM", event: "Asset Created", by: "Admin", type: "create", details: "Initial asset registration" },
+    { date: "20-Feb-2026", time: "2:15 PM", event: "Assigned to Rahul", by: "Admin", type: "assign", details: "Office deployment" },
+    { date: "25-Feb-2026", time: "11:45 AM", event: "Repair - Screen Issue", by: "Technician", type: "repair", cost: "₹3000", details: "Screen flickering fixed" },
+    { date: "01-Mar-2026", time: "9:20 PM", event: "Issue Reported", by: "Rahul", type: "issue", details: "Battery draining fast" },
+  ];
+
+  useEffect(() => {
+    const loadAsset = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch(`/api/v1/assets/${id}?itemType=${localStorage.getItem('lastItemType') || 'cpu'}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load asset: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAsset(data.data || data);
+      } catch (err) {
+        setError(err.message || "Failed to load asset details");
+        // Set mock asset for demo
+        setAsset({
+          _id: "mock123456",
+          modelName: "Dell OptiPlex 7090",
+          category: "CPU",
+          isActive: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) loadAsset();
+  }, [id]);
+
+  if (loading) return <PageLoader message="Loading asset details..." />;
+  if (error) return <ErrorNotification error={error} onClose={() => setError(null)} />;
+
+  return (
+    <div className="asset-detail-modern">
+      {/* Header Section */}
+      <div className="modern-header">
+        <div className="header-top">
+          <button className="back-button" onClick={() => navigate('/assets')}>
+            <span>←</span> Back
+          </button>
+        </div>
+
+        <div className="header-main">
+          <div className="header-left">
+            <div className="asset-icon-large">🖥️</div>
+            <div className="header-info">
+              <h1>{asset?.modelName || 'Asset Details'}</h1>
+              <p className="asset-code">ID: {asset?._id?.slice(-8) || 'N/A'}</p>
+              <div className="status-badges">
+                <span className={`status-badge ${asset?.isActive ? 'active' : 'inactive'}`}>
+                  {asset?.isActive ? '● Active' : '● Inactive'}
+                </span>
+                <span className="status-badge condition">Excellent</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="header-actions">
+            <button className="action-btn primary">Edit</button>
+            <div className="action-menu-wrapper">
+              <button 
+                className="action-btn secondary"
+                onClick={() => setShowActionMenu(!showActionMenu)}
+              >
+                ⋮
+              </button>
+              {showActionMenu && (
+                <div className="action-dropdown-modern">
+                  <button>Assign Asset</button>
+                  <button>Request Repair</button>
+                  <button>Transfer</button>
+                  <button>Export</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics Section */}
+      <div className="metrics-section">
+        <div className="metric-box">
+          <div className="metric-icon">📊</div>
+          <div className="metric-info">
+            <span className="metric-value">{assetStats.health}%</span>
+            <span className="metric-label">Health</span>
+          </div>
+        </div>
+        <div className="metric-box">
+          <div className="metric-icon">👤</div>
+          <div className="metric-info">
+            <span className="metric-value">{assetStats.totalAssignments}</span>
+            <span className="metric-label">Assignments</span>
+          </div>
+        </div>
+        <div className="metric-box">
+          <div className="metric-icon">🔧</div>
+          <div className="metric-info">
+            <span className="metric-value">{assetStats.totalRepairs}</span>
+            <span className="metric-label">Repairs</span>
+          </div>
+        </div>
+        <div className="metric-box">
+          <div className="metric-icon">💰</div>
+          <div className="metric-info">
+            <span className="metric-value">₹{assetStats.repairCost.toLocaleString()}</span>
+            <span className="metric-label">Repair Cost</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="modern-tabs">
+        {['overview', 'timeline', 'documents', 'repairs'].map(tab => (
+          <button
+            key={tab}
+            className={`tab-button ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Content Sections */}
+      <div className="content-wrapper">
+        {activeTab === 'overview' && (
+          <div className="content-section">
+            <div className="section-grid">
+              {/* Asset Information */}
+              <div className="info-card">
+                <h3>Asset Information</h3>
+                <div className="info-row">
+                  <span className="label">Category:</span>
+                  <span className="value">{asset?.category || 'CPU'}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">Location:</span>
+                  <span className="value">{assetStats.location}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">Status:</span>
+                  <span className="value">{assetStats.status}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">Warranty:</span>
+                  <span className="value">{assetStats.warranty.status}</span>
+                </div>
+              </div>
+
+              {/* Cost Breakdown */}
+              <div className="info-card">
+                <h3>Cost Breakdown</h3>
+                <div className="cost-chart">
+                  {costBreakdown.map((item, idx) => (
+                    <div key={idx} className="cost-item">
+                      <div className="cost-header">
+                        <span>{item.category}</span>
+                        <span className="amount">₹{item.amount.toLocaleString()}</span>
+                      </div>
+                      <div className="cost-bar">
+                        <div 
+                          className="cost-fill" 
+                          style={{width: `${item.percentage}%`}}
+                        ></div>
+                      </div>
+                      <span className="percentage">{item.percentage}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Specifications */}
+              <div className="info-card">
+                <h3>Specifications</h3>
+                <div className="specs-list">
+                  <div className="spec-item">
+                    <span className="label">Processor:</span>
+                    <span className="value">Intel Core i5</span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="label">RAM:</span>
+                    <span className="value">8GB DDR4</span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="label">Storage:</span>
+                    <span className="value">256GB SSD</span>
+                  </div>
+                  <div className="spec-item">
+                    <span className="label">Usage Hours:</span>
+                    <span className="value">{assetStats.usageHours}h</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'timeline' && (
+          <div className="content-section">
+            <div className="timeline-modern">
+              {activityFeed.map((activity, idx) => (
+                <div key={idx} className="timeline-entry">
+                  <div className={`timeline-icon type-${activity.type}`}>
+                    {activity.type === 'create' && '📝'}
+                    {activity.type === 'assign' && '👤'}
+                    {activity.type === 'repair' && '🔧'}
+                    {activity.type === 'issue' && '⚠️'}
+                  </div>
+                  <div className="timeline-content">
+                    <div className="entry-header">
+                      <h4>{activity.event}</h4>
+                      <span className="entry-date">{activity.date} at {activity.time}</span>
+                    </div>
+                    <p className="entry-details">{activity.details}</p>
+                    <div className="entry-meta">
+                      <span>By: {activity.by}</span>
+                      {activity.cost && <span className="cost">{activity.cost}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div className="content-section">
+            <div className="upload-area">
+              <div className="upload-icon">📁</div>
+              <p>Drag & drop documents here or <span>click to upload</span></p>
+            </div>
+            <div className="documents-list">
+              <h3>Recent Documents</h3>
+              {documents.map((doc, idx) => (
+                <div key={idx} className="document-item">
+                  <div className="doc-icon">📄</div>
+                  <div className="doc-info">
+                    <p className="doc-name">{doc.name}</p>
+                    <p className="doc-meta">{doc.date} • {doc.size}</p>
+                  </div>
+                  <div className="doc-actions">
+                    <button className="icon-btn">⬇️</button>
+                    <button className="icon-btn delete">🗑️</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'repairs' && (
+          <div className="content-section">
+            <div className="repairs-list">
+              <h3>Repair History</h3>
+              {activityFeed.filter(a => a.type === 'repair').length > 0 ? (
+                activityFeed.filter(a => a.type === 'repair').map((repair, idx) => (
+                  <div key={idx} className="repair-item">
+                    <div className="repair-header">
+                      <h4>{repair.event}</h4>
+                      <span className="repair-date">{repair.date}</span>
+                    </div>
+                    <p>{repair.details}</p>
+                    <div className="repair-footer">
+                      <span>Technician: {repair.by}</span>
+                      <span className="repair-cost">{repair.cost}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p style={{color: '#999', textAlign: 'center', padding: '2rem'}}>
+                  No repairs recorded yet
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AssetDetail;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Modern Asset Detail Page - Premium Design */
+
+.asset-detail-modern {
+  background: linear-gradient(135deg, #f5f7fa 0%, #f0f3f8 100%);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.modern-header {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: slideDown 0.4s ease-out;
+}
+
+.header-top {
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  background: #f0f3f8;
+  border: none;
+  color: #0066cc;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-button:hover {
+  background: #0066cc;
+  color: white;
+  transform: translateX(-2px);
+}
+
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.asset-icon-large {
+  font-size: 3.5rem;
+  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+}
+
+.header-info h1 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.asset-code {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem 0;
+}
+
+.status-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #e6f7e6;
+  color: #22863a;
+}
+
+.status-badge.inactive {
+  background: #fef2f2;
+  color: #cb2431;
+}
+
+.status-badge.condition {
+  background: #e3f2fd;
+  color: #0066cc;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.action-btn {
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.action-btn.secondary {
+  background: #f0f3f8;
+  color: #333;
+  font-size: 1.2rem;
+  padding: 0.6rem 0.9rem;
+  line-height: 1;
+}
+
+.action-btn.secondary:hover {
+  background: #e3e8f0;
+}
+
+.action-menu-wrapper {
+  position: relative;
+}
+
+.action-dropdown-modern {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  margin-top: 0.5rem;
+  min-width: 180px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+.action-dropdown-modern button {
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f3f8;
+}
+
+.action-dropdown-modern button:last-child {
+  border-bottom: none;
+}
+
+.action-dropdown-modern button:hover {
+  background: #f9f9f9;
+  color: #0066cc;
+  padding-left: 1.2rem;
+}
+
+/* Metrics Section */
+.metrics-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  animation: slideUp 0.4s ease-out;
+}
+
+.metric-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 102, 204, 0.12);
+}
+
+.metric-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0066cc;
+  line-height: 1.2;
+}
+
+.metric-label {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tab Navigation */
+.modern-tabs {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 10px;
+  padding: 0.4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  border: none;
+  background: none;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  color: #666;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  position: relative;
+}
+
+.tab-button:hover {
+  color: #0066cc;
+  background: #f9f9f9;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.content-section {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Section Grid */
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.info-card {
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  border-color: #0066cc;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+}
+
+.info-card h3 {
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  margin: 0 0 1.2rem 0;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #0066cc;
+  font-weight: 700;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.info-row .value {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* Cost Breakdown */
+.cost-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cost-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cost-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.cost-header .amount {
+  color: #0066cc;
+}
+
+.cost-bar {
+  height: 8px;
+  background: #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cost-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0066cc 0%, #004499 100%);
+  transition: width 0.4s ease;
+}
+
+.percentage {
+  font-size: 0.8rem;
+  color: #999;
+  align-self: flex-end;
+}
+
+/* Specifications */
+.specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spec-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 6px;
+  border-left: 3px solid #0066cc;
+}
+
+.spec-item .label {
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.spec-item .value {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+/* Timeline */
+.timeline-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #0066cc;
+  transition: all 0.3s ease;
+}
+
+.timeline-entry:hover {
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+  transform: translateX(4px);
+}
+
+.timeline-icon {
+  font-size: 1.8rem;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid #0066cc;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.entry-header h4 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.entry-date {
+  color: #999;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.entry-details {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.entry-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+.entry-meta .cost {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed #0066cc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  background: #f5f9ff;
+}
+
+.upload-area:hover {
+  border-color: #004499;
+  background: #eef5ff;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-area p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.upload-area p span {
+  color: #0066cc;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Documents List */
+.documents-list h3,
+.repairs-list h3 {
+  color: #1a1a1a;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #0066cc;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.document-item:hover {
+  border-left-color: #0066cc;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+  transform: translateX(4px);
+}
+
+.doc-icon {
+  font-size: 1.5rem;
+  min-width: 30px;
+  text-align: center;
+}
+
+.doc-info {
+  flex: 1;
+}
+
+.doc-name {
+  margin: 0;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.doc-meta {
+  margin: 0.3rem 0 0 0;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  border: none;
+  background: #e8e8e8;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  background: #0066cc;
+  transform: scale(1.1);
+}
+
+.icon-btn.delete:hover {
+  background: #d9534f;
+}
+
+/* Repairs List */
+.repairs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.repair-item {
+  padding: 1.2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #0066cc;
+  transition: all 0.3s ease;
+}
+
+.repair-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+  transform: translateX(4px);
+}
+
+.repair-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.repair-header h4 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.repair-date {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.repair-item p {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.repair-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #eee;
+}
+
+.repair-cost {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .asset-detail-modern {
+    padding: 1rem;
+  }
+
+  .modern-header {
+    padding: 1.5rem;
+  }
+
+  .header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .metrics-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .metric-box {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
+
+  .metric-icon {
+    font-size: 1.5rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+
+  .section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modern-tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .content-section {
+    padding: 1.5rem;
+  }
+
+  .timeline-entry {
+    gap: 1rem;
+  }
+
+  .entry-header {
+    flex-direction: column;
+  }
+
+  .entry-date {
+    margin-top: 0.5rem;
+  }
+
+  .repair-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .repair-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .asset-detail-modern {
+    padding: 0.75rem;
+  }
+
+  .asset-icon-large {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .header-info h1 {
+    font-size: 1.4rem;
+  }
+
+  .metrics-section {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-box {
+    justify-content: flex-start;
+  }
+
+  .header-actions {
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .section-grid {
+    gap: 1rem;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+
+  .content-section {
+    padding: 1.2rem;
+  }
+
+  .timeline-entry {
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+
+  .timeline-icon {
+    font-size: 1.5rem;
+    width: 34px;
+    height: 34px;
+  }
+
+  .upload-area {
+    padding: 1.5rem;
+  }
+
+  .upload-icon {
+    font-size: 2rem;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+// ------------------------            2nd
+
+
+/**
+ * Advanced Asset Detail Page
+ * Modern, feature-rich view with:
+ * - Header with quick actions
+ * - Visual health indicators
+ * - Analytics & charts
+ * - Timeline of events
+ * - Document management
+ * - Complete asset information
+ */
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { PageLoader } from "../../components/Loader/Loader.jsx";
+import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
+import Button from "../../components/Button/Button.jsx";
+import "./AssetDetail.css";
+
+const AssetDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [asset, setAsset] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showActionMenu, setShowActionMenu] = useState(false);
+
+  useEffect(() => {
+    const loadAsset = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch(`/api/v1/assets/${id}?itemType=${localStorage.getItem('lastItemType') || 'cpu'}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load asset: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAsset(data.data || data);
+      } catch (err) {
+        setError(err.message || "Failed to load asset details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) loadAsset();
+  }, [id]);
+
+  if (loading) return <PageLoader message="Loading asset details..." />;
+  if (error) return <ErrorNotification error={error} onClose={() => setError(null)} />;
+
+  if (!asset) {
+    return (
+      <div className="asset-detail">
+        <div className="detail-back">
+          <Button variant="secondary" size="small" onClick={() => navigate('/assets')}>
+            ← Back to Assets
+          </Button>
+        </div>
+        <div className="empty-state">
+          <div className="empty-text">Asset not found</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mock data - replace with actual backend data
+  const assetStats = {
+    health: 85,
+    condition: "Excellent",
+    status: asset.isActive ? "Active" : "Inactive",
+    totalAssignments: 5,
+    totalRepairs: 3,
+    repairCost: 7500,
+    warranty: { status: "Active", expiry: "2026-02-18" },
+    location: "Lab 5",
+    usageHours: 1250,
+  };
+
+  const costBreakdown = [
+    { category: "Parts", amount: 4500, percentage: 60 },
+    { category: "Labor", amount: 2000, percentage: 27 },
+    { category: "Maintenance", amount: 1000, percentage: 13 },
+  ];
+
+  const documents = [
+    { name: "Warranty Certificate.pdf", date: "2024-02-18", type: "warranty", size: "2.4 MB" },
+    { name: "Purchase Invoice.pdf", date: "2024-02-15", type: "invoice", size: "1.8 MB" },
+    { name: "Asset Photo.jpg", date: "2024-02-15", type: "photo", size: "3.2 MB" },
+  ];
+
+  const activityFeed = [
+    { date: "28-Mar-2026", time: "10:30 AM", event: "Asset Created", by: "Admin", type: "create", details: "Initial asset registration" },
+    { date: "20-Feb-2026", time: "2:15 PM", event: "Assigned to Rahul", by: "Admin", type: "assign", details: "Office deployment" },
+    { date: "25-Feb-2026", time: "11:45 AM", event: "Repair - Screen Issue", by: "Technician", type: "repair", cost: "₹3000", details: "Screen flickering fixed" },
+    { date: "01-Mar-2026", time: "9:20 PM", event: "Issue Reported", by: "Rahul", type: "issue", details: "Battery draining fast" },
+  ];
+
+  const assignmentHistory = [
+    { user: "John Doe", department: "IT", assignedDate: "2024-03-01", returnedDate: "2024-06-01", days: 92, status: "Returned" },
+    { user: "Jane Smith", department: "HR", assignedDate: "2024-06-05", returnedDate: "-", days: 295, status: "Active" },
+  ];
+
+  const repairHistory = [
+    { date: "2024-02-15", description: "Screen Replacement", technician: "John Doe", cost: "₹2500", status: "Completed" },
+    { date: "2024-12-20", description: "Keyboard Repair", technician: "Jane Smith", cost: "₹1500", status: "Completed" },
+  ];
+
+  const getActivityIcon = (type) => {
+    switch(type) {
+      case 'create': return '✓';
+      case 'assign': return '👤';
+      case 'repair': return '🔧';
+      case 'issue': return '⚠';
+      default: return '●';
+    }
+  };
+
+  const handleQuickAction = (action) => {
+    console.log(`Action: ${action}`);
+    setShowActionMenu(false);
+  };
+
+  return (
+    <div className="asset-detail">
+      {/* Back Button */}
+      <div className="back-button-wrapper">
+        <button className="back-btn" onClick={() => navigate('/assets')}>
+          ← Back to Assets
+        </button>
+      </div>
+
+      {/* Hero Section - Top Banner */}
+      <div className="hero-section">
+        <div className="hero-content">
+          <div className="hero-icon">💻</div>
+          <div className="hero-info">
+            <h1>{asset.itemId || "Asset"}</h1>
+            <p className="hero-subtitle">{asset.manufacturer || "N/A"} {asset.model || "N/A"}</p>
+            <div className="hero-badges">
+              <span className={`badge ${assetStats.status === 'Active' ? 'badge-active' : 'badge-inactive'}`}>
+                {assetStats.status}
+              </span>
+              <span className="badge badge-location">📍 {assetStats.location}</span>
+              <span className="badge badge-type">{asset.itemType}</span>
+            </div>
+          </div>
+        </div>
+        <div className="hero-actions">
+          <div className="action-menu-wrapper">
+            <button 
+              className="action-menu-btn"
+              onClick={() => setShowActionMenu(!showActionMenu)}
+            >
+              ⚙️ Quick Actions
+            </button>
+            {showActionMenu && (
+              <div className="action-dropdown">
+                <button onClick={() => handleQuickAction('assign')}>👤 Assign</button>
+                <button onClick={() => handleQuickAction('repair')}>🔧 Log Repair</button>
+                <button onClick={() => handleQuickAction('transfer')}>↔️ Transfer</button>
+                <button onClick={() => handleQuickAction('export')}>📥 Export</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics - Grid */}
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-icon">❤️</div>
+          <div className="metric-content">
+            <span className="metric-value">{assetStats.health}%</span>
+            <span className="metric-label">Health</span>
+          </div>
+          <div className="metric-bar">
+            <div className="metric-progress" style={{ width: `${assetStats.health}%` }}></div>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">👥</div>
+          <div className="metric-content">
+            <span className="metric-value">{assetStats.totalAssignments}</span>
+            <span className="metric-label">Assignments</span>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">🔧</div>
+          <div className="metric-content">
+            <span className="metric-value">{assetStats.totalRepairs}</span>
+            <span className="metric-label">Repairs</span>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">💰</div>
+          <div className="metric-content">
+            <span className="metric-value">₹{assetStats.repairCost}</span>
+            <span className="metric-label">Total Cost</span>
+          </div>
+        </div>
+
+        <div className="metric-card highlight">
+          <div className="metric-icon">✨</div>
+          <div className="metric-content">
+            <span className="metric-value">{assetStats.condition}</span>
+            <span className="metric-label">Condition</span>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">🛡️</div>
+          <div className="metric-content">
+            <span className="metric-value">{assetStats.warranty.status}</span>
+            <span className="metric-label">Warranty</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation - Horizontal */}
+      <div className="tab-navigation">
+        <button 
+          className={`tab-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+          onClick={() => setActiveTab('overview')}
+        >
+          <span className="tab-icon">📊</span>
+          <span className="tab-text">Overview</span>
+        </button>
+        <button 
+          className={`tab-nav-item ${activeTab === 'timeline' ? 'active' : ''}`}
+          onClick={() => setActiveTab('timeline')}
+        >
+          <span className="tab-icon">📈</span>
+          <span className="tab-text">Timeline</span>
+        </button>
+        <button 
+          className={`tab-nav-item ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('history')}
+        >
+          <span className="tab-icon">📚</span>
+          <span className="tab-text">History</span>
+        </button>
+        <button 
+          className={`tab-nav-item ${activeTab === 'documents' ? 'active' : ''}`}
+          onClick={() => setActiveTab('documents')}
+        >
+          <span className="tab-icon">📄</span>
+          <span className="tab-text">Documents</span>
+        </button>
+      </div>
+
+      {/* Tab Content Area */}
+      <div className="tab-content-area">
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="tab-pane">
+            <div className="grid-2col">
+              {/* Left: Basic Info */}
+              <div className="card-container">
+                <h2 className="card-title">📌 Basic Information</h2>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>Asset ID</label>
+                    <span>{asset.itemId || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Serial Number</label>
+                    <span>{asset.serialNumber || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Brand</label>
+                    <span>{asset.manufacturer || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Model</label>
+                    <span>{asset.model || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Category</label>
+                    <span>{asset.itemCategory || "N/A"}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Type</label>
+                    <span>{asset.itemType || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Cost Breakdown */}
+              <div className="card-container">
+                <h2 className="card-title">💹 Repair Cost Breakdown</h2>
+                <div className="breakdown-list">
+                  {costBreakdown.map((item, idx) => (
+                    <div key={idx} className="breakdown-row">
+                      <div className="breakdown-label">{item.category}</div>
+                      <div className="breakdown-middle">
+                        <div className="breakdown-bar-thin">
+                          <div className="breakdown-bar-fill" style={{ width: `${item.percentage}%` }}></div>
+                        </div>
+                      </div>
+                      <div className="breakdown-values">
+                        <span className="breakdown-amount">₹{item.amount}</span>
+                        <span className="breakdown-pct">{item.percentage}%</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="breakdown-divider"></div>
+                  <div className="breakdown-row total">
+                    <div className="breakdown-label">Total Cost</div>
+                    <div></div>
+                    <div className="breakdown-amount">
+                      ₹{costBreakdown.reduce((sum, item) => sum + item.amount, 0)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Timeline Tab */}
+        {activeTab === 'timeline' && (
+          <div className="tab-pane">
+            <div className="card-container full-width">
+              <h2 className="card-title">📊 Activity Timeline</h2>
+              <div className="timeline">
+                {activityFeed.map((activity, idx) => (
+                  <div key={idx} className="timeline-item">
+                    <div className="timeline-dot" data-type={activity.type}>
+                      {getActivityIcon(activity.type)}
+                    </div>
+                    <div className="timeline-body">
+                      <h4>{activity.event}</h4>
+                      <p>{activity.details}</p>
+                      <div className="timeline-footer">
+                        <span className="timeline-date">📅 {activity.date} {activity.time}</span>
+                        <span className="timeline-by">👤 {activity.by}</span>
+                        {activity.cost && <span className="timeline-cost">💰 {activity.cost}</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* History Tab */}
+        {activeTab === 'history' && (
+          <div className="tab-pane">
+            <div className="grid-2col">
+              {/* Assignment History */}
+              <div className="card-container">
+                <h2 className="card-title">👤 Assignment History</h2>
+                <div className="card-list">
+                  {assignmentHistory.map((item, idx) => (
+                    <div key={idx} className="list-item">
+                      <div className="list-item-header">
+                        <h4>{item.user}</h4>
+                        <span className={`status-small ${item.status === 'Active' ? 'active' : ''}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      <div className="list-item-meta">
+                        <div>📂 {item.department}</div>
+                        <div>📅 {item.assignedDate}</div>
+                        <div>⏱️ {item.days} days</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Repair History */}
+              <div className="card-container">
+                <h2 className="card-title">🔧 Repair History</h2>
+                <div className="card-list">
+                  {repairHistory.map((item, idx) => (
+                    <div key={idx} className="list-item">
+                      <div className="list-item-header">
+                        <h4>{item.description}</h4>
+                        <span className="status-cost">{item.cost}</span>
+                      </div>
+                      <div className="list-item-meta">
+                        <div>👨‍🔧 {item.technician}</div>
+                        <div>📅 {item.date}</div>
+                        <div>✅ {item.status}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Documents Tab */}
+        {activeTab === 'documents' && (
+          <div className="tab-pane">
+            <div className="card-container full-width">
+              <h2 className="card-title">📄 Documents & Attachments</h2>
+              
+              <div className="upload-zone">
+                <div className="upload-icon">📤</div>
+                <p>Drag files here or click to upload</p>
+                <small>Supported: PDF, Images, Documents</small>
+              </div>
+
+              <div className="documents-grid">
+                {documents.map((doc, idx) => (
+                  <div key={idx} className="doc-card">
+                    <div className="doc-card-header">
+                      <span className="doc-type">📄</span>
+                      <div className="doc-badge">{doc.type}</div>
+                    </div>
+                    <div className="doc-card-body">
+                      <h4>{doc.name}</h4>
+                      <p>{doc.size} • {doc.date}</p>
+                    </div>
+                    <div className="doc-card-footer">
+                      <button className="doc-btn">⬇️ Download</button>
+                      <button className="doc-btn delete">🗑️</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AssetDetail;
+
+
+
+/* Modern Asset Detail Page - Complete New Layout */
+
+* {
+  box-sizing: border-box;
+}
+
+.asset-detail {
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  min-height: 100vh;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* Back Button */
+.back-button-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.back-btn {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  background: white;
+  border-radius: 8px;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #f0f5ff;
+  border-color: #007bff;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(207, 226, 255, 0.5) 100%);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 123, 255, 0.12);
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.06);
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+}
+
+.hero-icon {
+  font-size: 3.5rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+.hero-info h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e1e1e;
+}
+
+.hero-subtitle {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.badge {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.badge-active {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+  color: #28a745;
+  border-color: rgba(40, 167, 69, 0.2);
+}
+
+.badge-inactive {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.2);
+}
+
+.badge-location {
+  background: linear-gradient(135deg, rgba(17, 162, 184, 0.1) 0%, rgba(17, 162, 184, 0.05) 100%);
+  color: #17a2b8;
+  border-color: rgba(17, 162, 184, 0.2);
+}
+
+.badge-type {
+  background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 100%);
+  color: #6f42c1;
+  border-color: rgba(111, 66, 193, 0.2);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(207, 226, 255, 0.3) 100%);
+  backdrop-filter: blur(10px);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metric-card:hover {
+  border-color: rgba(0, 123, 255, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.08);
+  transform: translateY(-4px);
+}
+
+.metric-card.highlight {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+  border-color: rgba(0, 123, 255, 0.15);
+}
+
+.metric-icon {
+  font-size: 1.8rem;
+  min-width: 45px;
+  text-align: center;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #007bff;
+  margin-bottom: 0.2rem;
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.metric-bar {
+  display: none;
+}
+
+.metric-card:first-child .metric-bar {
+  display: block;
+  width: 100%;
+  height: 6px;
+  background: #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+}
+
+.metric-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #1e7e34);
+  border-radius: 4px;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.tab-nav-item {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  background: white;
+  color: #495057;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.tab-nav-item:hover {
+  background: #f0f5ff;
+  border-color: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+}
+
+.tab-nav-item.active {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+}
+
+.tab-text {
+  font-weight: 600;
+}
+
+/* Tab Content Area */
+.tab-content-area {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Grid Layouts */
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Card Container */
+.card-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(207, 226, 255, 0.3) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+}
+
+.card-container:hover {
+  border-color: rgba(0, 123, 255, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.06);
+}
+
+.card-container.full-width {
+  grid-column: 1 / -1;
+}
+
+.card-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e1e1e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 123, 255, 0.08);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.4rem;
+}
+
+.info-item span {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+/* Breakdown List */
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+}
+
+.breakdown-label {
+  font-weight: 600;
+  color: #1e1e1e;
+  font-size: 0.95rem;
+}
+
+.breakdown-middle {
+  width: 100%;
+}
+
+.breakdown-bar-thin {
+  height: 8px;
+  background: #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0d6efd, #0056b3);
+  border-radius: 4px;
+}
+
+.breakdown-values {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.breakdown-amount {
+  font-weight: 700;
+  color: #007bff;
+}
+
+.breakdown-pct {
+  font-size: 0.8rem;
+  color: #6c757d;
+  min-width: 35px;
+  text-align: right;
+}
+
+.breakdown-row.total {
+  border-top: 2px solid rgba(0, 123, 255, 0.15);
+  padding-top: 1rem;
+  margin-top: 1rem;
+  font-weight: 700;
+}
+
+.breakdown-row.total .breakdown-label {
+  color: #007bff;
+}
+
+.breakdown-divider {
+  height: 1px;
+  background: rgba(0, 123, 255, 0.08);
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -3rem;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: white;
+  border: 2px solid #007bff;
+  z-index: 10;
+}
+
+.timeline-dot[data-type="create"] {
+  border-color: #28a745;
+  background: #d4edda;
+}
+
+.timeline-dot[data-type="assign"] {
+  border-color: #007bff;
+  background: #cfe2ff;
+}
+
+.timeline-dot[data-type="repair"] {
+  border-color: #ffc107;
+  background: #fff3cd;
+}
+
+.timeline-dot[data-type="issue"] {
+  border-color: #dc3545;
+  background: #f8d7da;
+}
+
+.timeline-body {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(13, 110, 253, 0.05) 100%);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  border-left: 3px solid #007bff;
+  border-radius: 10px;
+  padding: 1.25rem;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.timeline-body:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+}
+
+.timeline-body h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.05rem;
+  color: #1e1e1e;
+}
+
+.timeline-body p {
+  margin: 0.5rem 0 0.75rem 0;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.timeline-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.timeline-cost {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Card List */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.list-item {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 110, 253, 0.02) 100%);
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.list-item:hover {
+  border-color: rgba(0, 123, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.08);
+}
+
+.list-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.list-item-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1e1e1e;
+}
+
+.status-small {
+  padding: 0.3rem 0.7rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-small.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-cost {
+  color: #007bff;
+  font-weight: 700;
+}
+
+.list-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Upload Zone */
+.upload-zone {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.08) 0%, rgba(13, 110, 253, 0.04) 100%);
+  border: 2px dashed rgba(0, 123, 255, 0.3);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  border-color: rgba(0, 123, 255, 0.5);
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12) 0%, rgba(13, 110, 253, 0.06) 100%);
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-zone p {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.upload-zone small {
+  display: block;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+/* Documents Grid */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.doc-card {
+  background: white;
+  border: 1px solid rgba(0, 123, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.doc-card:hover {
+  border-color: rgba(0, 123, 255, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.08);
+  transform: translateY(-4px);
+}
+
+.doc-card-header {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.08) 0%, rgba(13, 110, 253, 0.04) 100%);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.doc-type {
+  font-size: 1.8rem;
+}
+
+.doc-badge {
+  padding: 0.3rem 0.6rem;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12) 0%, rgba(13, 110, 253, 0.06) 100%);
+  color: #007bff;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.doc-card-body {
+  padding: 1rem;
+  flex: 1;
+}
+
+.doc-card-body h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 0.9rem;
+  color: #1e1e1e;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-card-body p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.doc-card-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(0, 123, 255, 0.08);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.doc-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.06) 0%, rgba(13, 110, 253, 0.02) 100%);
+  color: #007bff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.doc-btn:hover {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12) 0%, rgba(13, 110, 253, 0.06) 100%);
+  border-color: #007bff;
+}
+
+.doc-btn.delete {
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.2);
+}
+
+.doc-btn.delete:hover {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.12) 0%, rgba(220, 53, 69, 0.06) 100%);
+  border-color: #dc3545;
+}
+
+/* Action Menu */
+.action-menu-wrapper {
+  position: relative;
+}
+
+.action-menu-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  color: white;
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.action-menu-btn:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 160px;
+  animation: slideDown 0.2s ease;
+  border: 1px solid rgba(0, 123, 255, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.action-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.action-dropdown button:last-child {
+  border-bottom: none;
+}
+
+.action-dropdown button:hover {
+  background: #f0f5ff;
+  color: #007bff;
+  padding-left: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  .grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .asset-detail {
+    padding: 1rem;
+  }
+
+  .hero-section {
+    padding: 1.5rem;
+  }
+
+  .hero-icon {
+    font-size: 2.5rem;
+    min-width: 60px;
+  }
+
+  .hero-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .metric-card {
+    padding: 1rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+
+  .tab-navigation {
+    gap: 0.3rem;
+  }
+
+  .tab-nav-item {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tab-icon {
+    display: none;
+  }
+
+  .card-container {
+    padding: 1.25rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline {
+    padding-left: 2rem;
+  }
+
+  .timeline-dot {
+    left: -2rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .timeline-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .documents-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .asset-detail {
+    padding: 0.75rem;
+  }
+
+  .hero-section {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .hero-icon {
+    font-size: 2rem;
+  }
+
+  .hero-info h1 {
+    font-size: 1.2rem;
+  }
+
+  .hero-badges {
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .metric-card {
+    padding: 0.85rem;
+  }
+
+  .metric-icon {
+    font-size: 1.5rem;
+  }
+
+  .metric-value {
+    font-size: 1.2rem;
+  }
+
+  .tab-navigation {
+    gap: 0.25rem;
+  }
+
+  .tab-nav-item {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.75rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-grid {
+    gap: 0.8rem;
+  }
+
+  .info-item label {
+    font-size: 0.7rem;
+  }
+
+  .info-item span {
+    font-size: 0.95rem;
+  }
+
+  .breakdown-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .breakdown-values {
+    justify-content: flex-start;
+  }
+
+  .timeline {
+    padding-left: 1.5rem;
+  }
+
+  .timeline-dot {
+    left: -1.5rem;
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .upload-zone {
+    padding: 2rem 1rem;
+  }
+
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+}

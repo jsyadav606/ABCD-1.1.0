@@ -1,0 +1,21 @@
+[
+  {
+    "itemType": "printer",
+    "itemCategory": "fixed",
+    "branch": "69935a85b680a2e0b7064e4e",
+    "itemId": "PRT-HP-OFFICE-001",
+    "itemTag": "PRT-001",
+    "serialNumber": "CNMZQ83D01R8V",
+    "manufacturer": "HP",
+    "model": "LaserJet Pro M404n",
+    "printTechnology": "Laser",
+    "colorSupport": "No",
+    "printSpeedPPM": 38,
+    "maxResolutionDPI": 600,
+    "duplexPrinting": "Yes",
+    "networkSupport": "Yes",
+    "lifeCycleStatus": "In Stock",
+    "operationalStatus": "Good",
+    "condition": "Good"
+  }
+]
