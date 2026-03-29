@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const [branchOptions, setBranchOptions] = useState([]);
   const [totalUsers, setTotalUsers] = useState(null);
-  const [totalFixedAssets, setTotalFixedAssets] = useState(null);
+  const [totalAssets, setTotalAssets] = useState(null);
 
   async function computeUsersCount(selected) {
     try {
@@ -63,13 +63,13 @@ const Dashboard = () => {
     }
   }
 
-  async function computeFixedAssetsCount(selected) {
+  async function computeAssetsCount(selected) {
     try {
       const count = await fetchAssetsCount(selected);
-      setTotalFixedAssets(count);
+      setTotalAssets(count);
     } catch (error) {
-      console.error("Error fetching fixed assets count:", error);
-      setTotalFixedAssets(null);
+      console.error("Error fetching assets count:", error);
+      setTotalAssets(null);
     }
   }
 
@@ -118,7 +118,7 @@ const Dashboard = () => {
         setBranch(selectedValue);
 
         await computeUsersCount(selectedValue);
-        await computeFixedAssetsCount(selectedValue);
+        await computeAssetsCount(selectedValue);
       } catch {}
     };
 
@@ -130,10 +130,10 @@ const Dashboard = () => {
     try {
       if (branch) setSelectedBranch(branch);
       await computeUsersCount(branch);
-      await computeFixedAssetsCount(branch);
+      await computeAssetsCount(branch);
     } catch {
       setTotalUsers(null);
-      setTotalFixedAssets(null);
+      setTotalAssets(null);
     }
   };
 
@@ -179,7 +179,7 @@ const Dashboard = () => {
       clearTimeout(timeout3);
       window.removeEventListener('resize', handleResize);
     };
-  }, [totalUsers, totalFixedAssets]);
+  }, [totalUsers, totalAssets]);
 
   // Auto-scroll loop (for continuous marquee effect)
   useEffect(() => {
@@ -262,7 +262,7 @@ const Dashboard = () => {
 
   const statsTiles = [
     { title: "Total Users", value: totalUsers ?? "—" },
-    { title: "Total Fixed Asset", value: totalFixedAssets ?? "—" },
+    { title: "Total Asset", value: totalAssets ?? "—" },
     { title: "Computers", value: 110 },
     { title: "Faulty Items", value: 6, danger: true },
     // { title: "Total Desktop", value: 110 }, 

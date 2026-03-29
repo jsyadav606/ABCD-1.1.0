@@ -12,6 +12,10 @@ import { CPU } from "../models/fixed/cpu.model.js";
 import { Monitor } from "../models/fixed/monitor.model.js";
 import { Laptop } from "../models/fixed/laptop.model.js";
 import { Printer } from "../models/fixed/printer.model.js";
+import { Camera } from "../models/peripheral/camera.model.js";
+import { Keyboard } from "../models/peripheral/keyboard.model.js";
+import { Mouse } from "../models/peripheral/mouse.model.js";
+import { Headphone } from "../models/peripheral/headphone.model.js";
 import { handlers } from "../assets/handlers/index.js";
 import { Purchase } from "../models/purchase.model.js";
 import { Warranty } from "../models/warranty.model.js";
@@ -152,11 +156,18 @@ export const countAssets = asyncHandler(async (req, res) => {
     filter.branchId = branchId;
   }
 
-  // console.log('Count filter:', filter);
+  // Count from both collections:
+  // 1. Fixed assets (asset_fixed): CPU/Monitor/Laptop/Printer all in one collection - count once from any model
+  // 2. Peripheral assets: Camera/Keyboard/Mouse/Headphone each in their own collection
+  const [fixedCount, cameraCount, keyboardCount, mouseCount, headphoneCount] = await Promise.all([
+    CPU.countDocuments(filter), // Counts all fixed assets from asset_fixed collection
+    Camera.countDocuments(filter),
+    Keyboard.countDocuments(filter),
+    Mouse.countDocuments(filter),
+    Headphone.countDocuments(filter),
+  ]);
 
-  // All fixed assets are stored in asset_fixed collection (shared across CPU/Monitor/Laptop/Printer schemas)
-  // So count once from CPU model to avoid double-counting same records.
-  const total = await CPU.countDocuments(filter);
+  const total = fixedCount + cameraCount + keyboardCount + mouseCount + headphoneCount;
 
   return res.status(200).json(new apiResponse(200, { total }, "Assets count retrieved"));
 });
