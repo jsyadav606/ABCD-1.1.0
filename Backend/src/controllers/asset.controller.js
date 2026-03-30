@@ -5,6 +5,7 @@
  * - Simple surface for FE: /assets POST/GET/GET/:id sabhi item types ke liye kaam kare
  * - Fast list: handler ke andar lean() + sort, aur yahan merge when multiple types
  */
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -146,14 +147,43 @@ export const countAssets = asyncHandler(async (req, res) => {
   const branchId = req.query.branchId;
   const roleName = String(req.user?.role || "").toLowerCase();
   const isSuper = roleName === "super_admin" || roleName === "super admin";
-  const filter = { isDeleted: false };
+  const filter = { isDeleted: false, isActive: true };
 
-  if (!isSuper && req.user?.organizationId) {
+  // Always scope by organization
+  if (req.user?.organizationId) {
     filter.organizationId = req.user.organizationId;
   }
 
-  if (branchId && branchId !== "__ALL__") {
-    filter.branchId = branchId;
+  // Apply branch scoping
+  // For super admins: no branch filter (count all)
+  // For non-super admins:
+  //   - If specific branchId: convert to ObjectId and count from that branch
+  //   - If "__ALL__" or no branchId: count only from their assigned branches
+  
+  if (!isSuper) {
+    // Get user's assigned branches
+    const userBranchIds = Array.isArray(req.user?.branchId)
+      ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
+      : [];
+
+    if (branchId && branchId !== "__ALL__" && branchId !== "") {
+      // User selected a specific branch - convert string to ObjectId
+      try {
+        // Validate and convert the branchId string to ObjectId
+        if (!mongoose.Types.ObjectId.isValid(branchId)) {
+          return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
+        }
+        filter.branchId = new mongoose.Types.ObjectId(branchId);
+      } catch (err) {
+        console.error("Error converting branchId:", err.message);
+        return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
+      }
+    } else {
+      // "__ALL__" or no branchId: count from user's assigned branches only
+      if (userBranchIds.length > 0) {
+        filter.branchId = { $in: userBranchIds };
+      }
+    }
   }
 
   // Count from both collections directly:
