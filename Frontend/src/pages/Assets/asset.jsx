@@ -414,15 +414,17 @@ const AssetPage = () => {
   }, [visibleAssets, appliedFilterStatus, appliedFilterCategory, appliedFilterType, appliedFilterBranch]);
 
   const filterFields = [
-    {
-      key: 'branch',
-      label: 'Branch',
-      type: 'select',
-      value: pendingFilterBranch,
-      onChange: (e) => setPendingFilterBranch(e.target.value),
-      options: branchOptions,
-      optionRenderer: getBranchDisplayName,
-    },
+    ...(userBranchIds.length > 1 && (!selectedBranch || selectedBranch === "__ALL__" || selectedBranch === "") ? [
+      {
+        key: 'branch',
+        label: 'Branch',
+        type: 'select',
+        value: pendingFilterBranch,
+        onChange: (e) => setPendingFilterBranch(e.target.value),
+        options: branchOptions,
+        optionRenderer: getBranchDisplayName,
+      }
+    ] : []),
     {
       key: 'category',
       label: 'Category',

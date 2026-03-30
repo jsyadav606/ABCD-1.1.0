@@ -95,6 +95,7 @@ const Users = () => {
   const [pendingFilterRole, setPendingFilterRole] = useState("ALL");
   const [pendingFilterCanLogin, setPendingFilterCanLogin] = useState("ALL");
   const [branches, setBranches] = useState([]);
+  const [userBranchIds, setUserBranchIds] = useState([]);
   const filterButtonRef = useRef(null);
 
   const pageSize = Number(import.meta.env.VITE_PAGE_SIZE || import.meta.env.page_size) || 20;
@@ -143,6 +144,23 @@ const Users = () => {
         const resp = await authAPI.getProfile();
         const userInfo = resp.data?.data?.user || {};
         
+        // Get user's assigned branches
+        const rawBranchList = Array.isArray(userInfo.branchId)
+          ? userInfo.branchId
+          : Array.isArray(userInfo.branchIds)
+            ? userInfo.branchIds
+            : [];
+        const branchIds = rawBranchList.map((b) => {
+          if (!b && b !== 0) return '';
+          if (typeof b === 'object') {
+            if (b._id) return String(b._id);
+            if (b.id) return String(b.id);
+            return String(b);
+          }
+          return String(b);
+        }).filter(Boolean);
+        setUserBranchIds(branchIds);
+        
         // Load branches for this organization
         if (userInfo.organizationId) {
           const branchesData = await fetchBranchesForDropdown(userInfo.organizationId);
@@ -153,6 +171,7 @@ const Users = () => {
       } catch (err) {
         console.error("Failed to load user profile or branches", err);
         setBranches([]);
+        setUserBranchIds([]);
       }
     };
     
@@ -765,16 +784,24 @@ const Users = () => {
   ];
 
   // Filter fields configuration
+  // Determine if branch field should be shown:
+  // - Single branch user: never show (filtered by that branch only)
+  // - Multi-branch user with "ALL" selected: show branch field
+  // - Multi-branch user with specific branch selected: never show
+  const shouldShowBranchField = userBranchIds.length > 1 && (!selectedBranch || selectedBranch === "__ALL__" || selectedBranch === "");
+
   const filterFields = [
-    {
-      key: 'branch',
-      label: 'Branch',
-      type: 'select',
-      value: pendingFilterBranch,
-      onChange: (e) => setPendingFilterBranch(e.target.value),
-      options: branchOptions,
-      optionRenderer: getBranchDisplayName,
-    },
+    ...(shouldShowBranchField ? [
+      {
+        key: 'branch',
+        label: 'Branch',
+        type: 'select',
+        value: pendingFilterBranch,
+        onChange: (e) => setPendingFilterBranch(e.target.value),
+        options: branchOptions,
+        optionRenderer: getBranchDisplayName,
+      }
+    ] : []),
     
     {
       key: 'role',
