@@ -155,36 +155,35 @@ export const countAssets = asyncHandler(async (req, res) => {
   }
 
   // Apply branch scoping
-  // For super admins: no branch filter (count all)
-  // For non-super admins:
-  //   - If specific branchId: convert to ObjectId and count from that branch
-  //   - If "__ALL__" or no branchId: count only from their assigned branches
+  // If specific branchId selected: apply for both super admins and regular users
+  // If "__ALL__" or no branchId:
+  //   - For super admin: show all branches (no filter)
+  //   - For non-super admin: show only their assigned branches
   
-  if (!isSuper) {
+  if (branchId && branchId !== "__ALL__" && branchId !== "") {
+    // Selected branch is provided - apply for all roles
+    try {
+      if (!mongoose.Types.ObjectId.isValid(branchId)) {
+        return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
+      }
+      filter.branchId = new mongoose.Types.ObjectId(branchId);
+    } catch (err) {
+      console.error("Error converting branchId:", err.message);
+      return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
+    }
+  } else if (!isSuper) {
+    // "__ALL__" or no branchId, and user is NOT super admin
     // Get user's assigned branches
     const userBranchIds = Array.isArray(req.user?.branchId)
       ? req.user.branchId.map((b) => (typeof b === "object" && b?._id ? b._id : b))
       : [];
 
-    if (branchId && branchId !== "__ALL__" && branchId !== "") {
-      // User selected a specific branch - convert string to ObjectId
-      try {
-        // Validate and convert the branchId string to ObjectId
-        if (!mongoose.Types.ObjectId.isValid(branchId)) {
-          return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
-        }
-        filter.branchId = new mongoose.Types.ObjectId(branchId);
-      } catch (err) {
-        console.error("Error converting branchId:", err.message);
-        return res.status(400).json(new apiResponse(400, { total: 0 }, "Invalid branchId format"));
-      }
-    } else {
-      // "__ALL__" or no branchId: count from user's assigned branches only
-      if (userBranchIds.length > 0) {
-        filter.branchId = { $in: userBranchIds };
-      }
+    // Restrict to user's assigned branches only
+    if (userBranchIds.length > 0) {
+      filter.branchId = { $in: userBranchIds };
     }
   }
+  // For super admin with "__ALL__" or no branchId: no branch filter (count all)
 
   // Count from both collections directly:
   // 1. Fixed assets (asset_fixed): All types (CPU, Monitor, Laptop, Printer) are in this collection

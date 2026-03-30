@@ -336,7 +336,6 @@ const Dashboard = () => {
         onMouseMove={isMarqueeEnabled ? handleMouseMove : undefined}
         onWheel={isMarqueeEnabled ? handleWheel : undefined}
         onMouseEnter={isMarqueeEnabled ? () => setIsAutoScrolling(false) : undefined}
-        onMouseLeave={isMarqueeEnabled ? () => setIsAutoScrolling(true) : undefined}
       >
         <div className="stats-grid">
           {animatedTiles.map((stat, idx) => (
