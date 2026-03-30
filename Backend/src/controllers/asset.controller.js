@@ -156,18 +156,16 @@ export const countAssets = asyncHandler(async (req, res) => {
     filter.branchId = branchId;
   }
 
-  // Count from both collections:
-  // 1. Fixed assets (asset_fixed): CPU/Monitor/Laptop/Printer all in one collection - count once from any model
-  // 2. Peripheral assets: Camera/Keyboard/Mouse/Headphone each in their own collection
-  const [fixedCount, cameraCount, keyboardCount, mouseCount, headphoneCount] = await Promise.all([
-    CPU.countDocuments(filter), // Counts all fixed assets from asset_fixed collection
-    Camera.countDocuments(filter),
-    Keyboard.countDocuments(filter),
-    Mouse.countDocuments(filter),
-    Headphone.countDocuments(filter),
+  // Count from both collections directly:
+  // 1. Fixed assets (asset_fixed): All types (CPU, Monitor, Laptop, Printer) are in this collection
+  // 2. Peripheral assets (asset_peripheral): All types (Camera, Keyboard, Mouse, Headphone) are in this collection
+  // Use .collection.countDocuments to count all docs in the collection, not just one type
+  const [fixedCount, peripheralCount] = await Promise.all([
+    CPU.collection.countDocuments(filter), // asset_fixed collection
+    Camera.collection.countDocuments(filter), // asset_peripheral collection
   ]);
 
-  const total = fixedCount + cameraCount + keyboardCount + mouseCount + headphoneCount;
+  const total = fixedCount + peripheralCount;
 
   return res.status(200).json(new apiResponse(200, { total }, "Assets count retrieved"));
 });

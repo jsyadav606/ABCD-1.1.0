@@ -21,6 +21,7 @@ import { getBranchName } from "../../utils/branchUtils.js";
 import { getSelectedBranch, onBranchChange } from "../../utils/scope";
 import { authAPI } from "../../services/api.js";
 import { fetchBranchesForDropdown } from "../../services/userApi.js";
+import { getTooltipDetails, highlightText } from "../../utils/assetUtils.jsx";
 
 const tabs = ["ALL", "FIXED", "PERIPHERAL", "CONSUMABLE", "INTANGIBLE"];
 
@@ -450,40 +451,12 @@ const AssetPage = () => {
 
   const tableExtraActions = null;
 
-  const getTooltipDetails = (row) => {
-    const safe = (value) => (value || value === 0 ? value : "N/A");
-    const itemType = row.itemType?.toUpperCase();
-
-    const totalRam = Number(row.memory?.totalCapacityGB) || (row.memory?.modules?.reduce((sum, module) => sum + (Number(module.ramCapacityGB) || 0), 0) || 0);
-    const totalStorage = Number(row.storage?.totalCapacityGB) || (row.storage?.devices?.reduce((sum, device) => sum + (Number(device.driveCapacityGB) || 0), 0) || 0);
-
-    if (itemType === 'CPU') {
-      return `OS: ${safe(row.osName)}, Model: ${safe(row.model)}, CPU: ${safe(row.processorModel)}, RAM: ${totalRam ? `${totalRam}GB` : 'N/A'}, Storage: ${totalStorage ? `${totalStorage}GB` : 'N/A'}`;
-    }
-
-    if (itemType === 'LAPTOP') {
-      return `OS: ${safe(row.osName)}, Model: ${safe(row.model)}, CPU: ${safe(row.processorModel)}, RAM: ${totalRam ? `${totalRam}GB` : 'N/A'}, Storage: ${totalStorage ? `${totalStorage}GB` : 'N/A'}`;
-    }
-
-    if (itemType === 'MONITOR') {
-      const size = safe(row.screenSizeInches);
-      const resolution = safe(row.resolution);
-      const panel = safe(row.panelType ?? row.panel_type);
-      const refresh = safe(row.refreshRateHz ?? row.refresh_rate_hz);
-      return `Size: ${size}", Resolution: ${resolution}, Panel: ${panel}, Refresh Rate: ${refresh}Hz`;
-    }
-
-    // Default fallback
-    return `Model: ${safe(row.model)}, Serial: ${safe(row.serialNumber)}, Manufacturer: ${safe(row.manufacturer)}`;
-  };
-
   const columns = [
     { 
       header: "Item ID", 
       key: "itemId", 
       sortable: true,
-      tooltip: (row) => getTooltipDetails(row),
-      render: (row) => (
+      render: (row, search) => (
         <button
           onClick={() => {
             localStorage.setItem('lastItemType', row.itemType || 'cpu');
@@ -499,9 +472,9 @@ const AssetPage = () => {
             fontWeight: 'inherit',
             padding: 0,
           }}
-          title="Click to view asset details"
+          title={getTooltipDetails(row)}
         >
-          {row.itemId}
+          {highlightText(row.itemId, search)}
         </button>
       )
     },
@@ -512,12 +485,12 @@ const AssetPage = () => {
       sortable: true,
       render: (row) => getCategoryName(row.itemCategory),
     },
-    // { 
-    //   header: "Branch", 
-    //   key: "branchId", 
-    //   sortable: true,
-    //   render: (row) => getBranchName(row.branchId, branches)
-    // },
+    { 
+      header: "Branch", 
+      key: "branchId", 
+      sortable: true,
+      render: (row) => getBranchName(row.branchId, branches)
+    },
     { header: "Model", key: "model", sortable: true },
     { header: "Serial Number", key: "serialNumber", sortable: true },
     { header: "Manufacturer", key: "manufacturer", sortable: true },

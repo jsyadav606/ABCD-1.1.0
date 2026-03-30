@@ -15,6 +15,30 @@ DELETE /api/v1/itemtypes/:id                → Delete item type
 
 
 
+
+Camera type - Conference Camera, PTZ Camera, Webcam
+Connection Type - USB, USB-C, Wireless
+Item is Currently - In Store, In used
+Item Status - Active
+
+Plug and Play Support - Yes, No (id Connection Type is USB or USB-C)
+Built-in Microphone - Yes, No
+
+Sensor Type - CMOS, CCD 
+
+Branch Id's - 69935a85b680a2e0b7064e4e, 69935a85b680a2e0b7064e51, 69935a85b680a2e0b7064e54, 69935a86b680a2e0b7064e57, 69935a86b680a2e0b7064e5a
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Advanced Asset Detail Page
  * Modern, feature-rich view with:

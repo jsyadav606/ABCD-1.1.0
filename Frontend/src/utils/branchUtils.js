@@ -8,24 +8,30 @@
  */
 
 export const getBranchName = (branchId, branches) => {
-  if (!branchId || !branches || branches.length === 0) return '--'
+  if (!branchId || !branches || branches.length === 0) return '--';
 
-  // If branchId is string, find by _id
+  // Normalize branchId to string for comparison
+  let id = '';
   if (typeof branchId === 'string') {
-    const branch = branches.find(b => b._id === branchId)
-    return branch ? branch.branchName : 'Unknown'
+    id = branchId;
+  } else if (typeof branchId === 'object' && branchId._id) {
+    id = String(branchId._id);
+  } else if (typeof branchId === 'object' && branchId.id) {
+    id = String(branchId.id);
+  } else if (typeof branchId === 'object' && branchId.branchId) {
+    id = String(branchId.branchId);
   }
 
-  // If branchId is object with _id
-  if (typeof branchId === 'object' && branchId._id) {
-    const branch = branches.find(b => b._id === branchId._id)
-    return branch ? branch.branchName : 'Unknown'
-  }
+  // Try to find branch by _id, id, or branchId
+  const branch = branches.find(
+    b => String(b._id) === id || String(b.id) === id || String(b.branchId) === id
+  );
+  if (branch) return branch.branchName || branch.name || '--';
 
   // If branchId is object with branchName
   if (typeof branchId === 'object' && branchId.branchName) {
-    return branchId.branchName
+    return branchId.branchName;
   }
 
-  return 'Unknown'
-}
+  return '--';
+};

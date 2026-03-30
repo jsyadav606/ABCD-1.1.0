@@ -9,25 +9,28 @@ const warrantySchema = new mongoose.Schema(
     organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null, index: true },
     branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", default: null, index: true },
 
-    warrantyAvailable: { type: String, trim: true, default: "No" },
-    warrantyMode: { type: String, trim: true, default: null },
-    inYear: { type: Number, default: null },
-    inMonth: { type: Number, default: null },
-    warrantyStartDate: { type: Date, default: null },
-    warrantyEndDate: { type: Date, default: null },
-    warrantyProvider: { type: String, trim: true, default: null },
+    warrantyAvailable: { type: String, trim: true, default: "No" }, // Yes or No
+    warrantyMode: { type: String, trim: true, default: null }, // Applicable if warrantyAvailable is "Yes", e.g. Duration, End Date
+    inYear: { type: Number, default: null }, // Applicable if warrantyMode is "Duration"
+    inMonth: { type: Number, default: null }, // Applicable if warrantyMode is "Duration"
+    warrantyStartDate: { type: Date, default: null }, // Applicable if warrantyMode is "End Date"
+    warrantyEndDate: { type: Date, default: null }, // Applicable if warrantyMode is "End Date"
+    warrantyProvider: { type: String, trim: true, default: null }, // Applicable if warrantyAvailable is "Yes", e.g. Manufacturer, Vendor, External
     supportVendor: { type: String, trim: true, default: null },
     supportPhone: { type: String, trim: true, default: null },
     supportEmail: { type: String, trim: true, default: null },
 
     // Calculated warranty till date and status
-    warrantyTillDate: { type: Date, default: null },
-    warrantyStatus: { type: String, enum: ["Under Warranty", "Expired"], default: null },
+    warrantyTillDate: { type: Date, default: null }, // Calculated field based on invoice Date and warrantyMode, inYear, inMonth, warrantyStartDate, warrantyEndDate and current date. 
+    warrantyStatus: { type: String, enum: ["Under Warranty", "Expired"], default: null }, // Calculated field based on warrantyTillDate and current date.
 
-    amcAvailable: { type: String, trim: true, default: null },
-    amcVendor: { type: String, trim: true, default: null },
-    amcStartDate: { type: Date, default: null },
-    amcEndDate: { type: Date, default: null },
+    amcAvailable: { type: String, trim: true, default: "No" }, // Applicable if warrantyAvailable is "No", e.g. Yes or No
+    amcVendor: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes" 
+    amcPhone: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes"
+    amcEmail: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes"
+    amcStartDate: { type: Date, default: null }, // Applicable if amcAvailable is "Yes"
+    amcEndDate: { type: Date, default: null }, // Applicable if amcAvailable is "Yes"
+    amcStatus: { type: String, enum: ["Active", "Expired"], default: null }, // Calculated field based on amcEndDate and current date.
 
     isActive: { type: Boolean, default: true },
     inactiveAt: { type: Date, default: null },

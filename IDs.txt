@@ -1,0 +1,142 @@
+Camera type - Conference Camera, PTZ Camera, Webcam
+Connection Type - USB, USB-C, Wireless
+Item is Currently - In Store, In used
+Item Status - Active
+
+Plug and Play Support - Yes, No (id Connection Type is USB or USB-C)
+Built-in Microphone - Yes, No
+
+Sensor Type - CMOS, CCD 
+
+Branch Id's - 69935a85b680a2e0b7064e4e, 69935a85b680a2e0b7064e51, 69935a85b680a2e0b7064e54, 69935a86b680a2e0b7064e57, 69935a86b680a2e0b7064e5a
+
+
+
+itemCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AssetCategory",
+      required: true
+    },
+    itemType: { type: String, required: true, trim: true },
+    itemTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ItemType",
+      default: null
+    },
+
+    // Basic Information
+    itemId: { type: String, trim: true, default: null },
+    itemTag: { type: String, trim: true, default: null },
+    barcode: { type: String, trim: true, default: null },
+    itemSubType: { type: String, trim: true, default: null },
+    manufacturer: { type: String, trim: true, default: null },
+    model: { type: String, trim: true, default: null },
+    modelNumber: { type: String, trim: true, default: null },
+    partNumber: { type: String, trim: true, default: null },
+    serialNumber: { type: String, trim: true, default: null },
+    ownershipType: { type: String, trim: true, default: null },
+    manufacturingDate: { type: Date, default: null },
+
+    // Camera Type (e.g., "USB Webcam", "Security Camera", "Video Conference Camera")
+    cameraType: { type: String, trim: true, default: null },
+
+
+
+    // Camera Specifications
+    resolution: { type: String, trim: true, default: null }, // e.g., "1080p", "4K", "2MP"
+    frameRate: { type: Number, default: null }, // FPS (0-240)
+    sensorType: { type: String, trim: true, default: null }, // "CMOS" or "CCD"
+    fieldOfView: { type: Number, default: null }, // Degrees (0-180)
+    autoFocus: { type: String, trim: true, default: null }, // "Yes" / "No"
+
+    // Audio Features
+    builtInMicrophone: { type: String, trim: true, default: null }, // "Yes" / "No"
+    microphoneType: { type: String, trim: true, default: null }, // e.g., "Array Microphone", "Single Mic"
+    noiseReduction: { type: String, trim: true, default: null }, // "Yes" / "No"
+
+    // Connectivity
+    connectionType: { type: String, trim: true, default: null }, // "USB", "USB-C", "Wireless"
+    cableLength: { type: Number, default: null }, // meters
+    plugAndPlay: { type: String, trim: true, default: null }, // "Yes" / "No"
+
+    // Mounting & Physical
+    mountType: { type: String, trim: true, default: null }, // "Monitor Clip", "Tripod Mount", "Wall Mount"
+    color: { type: String, trim: true, default: null },
+    weight: { type: Number, default: null }, // grams
+
+    // Item State
+    itemStatus: { type: String, trim: true, default: "active" },
+    itemIsCurrently: { type: String, trim: true, default: "inStore" },
+    itemUser: { type: String, trim: true, default: null },
+    AssignDate: { type: Date, default: null },
+
+    // Infrastructure fields
+    organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null },
+    branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", default: null },
+
+    isActive: { type: Boolean, default: true },
+    inactiveAt: { type: Date, default: null },
+    inactiveBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    inactiveReason: { type: String, trim: true, default: null },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+    deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    deletedReason: { type: String, trim: true, default: null },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+
+    // Summary field for quick listing
+    summary: {
+      itemName: { type: String, trim: true, default: null },
+      itemTag: { type: String, trim: true, default: null },
+      serialNumber: { type: String, trim: true, default: null },
+      manufacturer: { type: String, trim: true, default: null },
+      model: { type: String, trim: true, default: null },
+    
+    purchaseType: { type: String, trim: true, default: null }, //e.g. PO, Direct.
+    poNumber: { type: String, trim: true, default: null }, // Applicable if purchaseType is PO.
+    poDate: { type: Date, default: null }, // Applicable if purchaseType is PO.
+    receiptNumber: { type: String, trim: true, default: null },
+    receiptDate: { type: Date, default: null },
+    purchaseDate: { type: Date, default: null }, // Date of invoice or delivery Challan.
+    vendorId: { type: String, trim: true, default: null }, // Could be a reference to a Vendor collection if needed.
+
+    itemReceivedOn: { type: String, trim: true, default: null }, // e.g. invoice, challan.
+    invoiceNumber: { type: String, trim: true, default: null }, // Applicable if itemReceivedOn is invoice.
+    invoiceDate: { type: Date, default: null }, // Applicable if itemReceivedOn is invoice.
+    deliveryChallanNumber: { type: String, trim: true, default: null }, // Applicable if itemReceivedOn is challan.
+    deliveryChallanDate: { type: Date, default: null }, // Applicable if itemReceivedOn is challan.
+
+    purchaseCost: { type: Number, default: null },
+    taxAmount: { type: Number, default: null },
+    totalAmount: { type: Number, default: null },
+    currency: { type: String, trim: true, default: null },
+
+    deliveryDate: { type: Date, default: null },
+    receivedBy: { type: String, trim: true, default: null },
+
+
+    
+    warrantyAvailable: { type: String, trim: true, default: "No" }, // Yes or No
+    warrantyMode: { type: String, trim: true, default: null }, // Applicable if warrantyAvailable is "Yes", e.g. Duration, End Date
+    inYear: { type: Number, default: null }, // Applicable if warrantyMode is "Duration"
+    inMonth: { type: Number, default: null }, // Applicable if warrantyMode is "Duration"
+    warrantyStartDate: { type: Date, default: null }, // Applicable if warrantyMode is "End Date"
+    warrantyEndDate: { type: Date, default: null }, // Applicable if warrantyMode is "End Date"
+    warrantyProvider: { type: String, trim: true, default: null }, // Applicable if warrantyAvailable is "Yes", e.g. Manufacturer, Vendor, External
+    supportVendor: { type: String, trim: true, default: null },
+    supportPhone: { type: String, trim: true, default: null },
+    supportEmail: { type: String, trim: true, default: null },
+
+    // Calculated warranty till date and status
+    warrantyTillDate: { type: Date, default: null }, // Calculated field based on invoice Date and warrantyMode, inYear, inMonth, warrantyStartDate, warrantyEndDate and current date. 
+    warrantyStatus: { type: String, enum: ["Under Warranty", "Expired"], default: null }, // Calculated field based on warrantyTillDate and current date.
+
+    amcAvailable: { type: String, trim: true, default: "No" }, // Applicable if warrantyAvailable is "No", e.g. Yes or No
+    amcVendor: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes" 
+    amcPhone: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes"
+    amcEmail: { type: String, trim: true, default: null },  // Applicable if amcAvailable is "Yes"
+    amcStartDate: { type: Date, default: null }, // Applicable if amcAvailable is "Yes"
+    amcEndDate: { type: Date, default: null }, // Applicable if amcAvailable is "Yes"
+    amcStatus: { type: String, enum: ["Active", "Expired"], default: null }, // Calculated field based on amcEndDate and current date.
+

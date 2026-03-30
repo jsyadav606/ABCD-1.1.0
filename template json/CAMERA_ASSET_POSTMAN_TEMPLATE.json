@@ -1,0 +1,3384 @@
+[
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B1-001",
+  "itemTag": "CAM-LOGI-001",
+  "barcode": "BAR001CAM",
+  "itemSubType": "Webcam",
+  "manufacturer": "Logitech",
+  "model": "C270",
+  "modelNumber": "C270-HD",
+  "partNumber": "PN-C270",
+  "serialNumber": "SN-CAM-001",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-01-10",
+
+  "cameraType": "Webcam",
+
+  "resolution": "720p",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 78,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 1.5,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 150,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": "6991f27977da956717ec33f5",
+  "branchId": "69935a85b680a2e0b7064e4e",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Logitech C270 Webcam",
+    "itemTag": "CAM-LOGI-001",
+    "serialNumber": "SN-CAM-001",
+    "manufacturer": "Logitech",
+    "model": "C270"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-1001",
+  "poDate": "2023-02-01",
+  "receiptNumber": "RCPT-001",
+  "receiptDate": "2023-02-05",
+  "purchaseDate": "2023-02-03",
+  "vendorId": "VENDOR-01",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-001",
+  "invoiceDate": "2023-02-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 2500,
+  "taxAmount": 450,
+  "totalAmount": 2950,
+  "currency": "INR",
+
+  "deliveryDate": "2023-02-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 1,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Logitech Support",
+  "supportPhone": "1800123456",
+  "supportEmail": "support@logi.com",
+
+  "warrantyTillDate": "2024-02-03",
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B1-002",
+  "itemTag": "CAM-SONY-002",
+  "barcode": "BAR002CAM",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X120",
+  "modelNumber": "SRGX120",
+  "partNumber": "PN-SRG",
+  "serialNumber": "SN-CAM-002",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-08-15",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 90,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Wall Mount",
+  "color": "White",
+  "weight": 1200,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-01",
+  "AssignDate": "2024-01-10",
+
+  "organizationId": "6991f27977da956717ec33f5",
+  "branchId": "69935a85b680a2e0b7064e4e",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Sony PTZ Camera",
+    "itemTag": "CAM-SONY-002",
+    "serialNumber": "SN-CAM-002",
+    "manufacturer": "Sony",
+    "model": "SRG-X120"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-002",
+  "receiptDate": "2022-09-01",
+  "purchaseDate": "2022-08-20",
+  "vendorId": "VENDOR-02",
+
+  "itemReceivedOn": "challan",
+  "invoiceNumber": null,
+  "invoiceDate": null,
+  "deliveryChallanNumber": "DC-002",
+  "deliveryChallanDate": "2022-08-25",
+
+  "purchaseCost": 85000,
+  "taxAmount": 15300,
+  "totalAmount": 100300,
+  "currency": "INR",
+
+  "deliveryDate": "2022-08-26",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": "2022-08-20",
+  "warrantyEndDate": "2025-08-20",
+  "warrantyProvider": "Vendor",
+  "supportVendor": "Sony India",
+  "supportPhone": "1800222222",
+  "supportEmail": "support@sony.in",
+
+  "warrantyTillDate": "2025-08-20",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B1-003",
+  "itemTag": "CAM-POLY-003",
+  "barcode": "BAR003CAM",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Poly",
+  "model": "Studio X30",
+  "modelNumber": "X30",
+  "partNumber": "PN-X30",
+  "serialNumber": "SN-CAM-003",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-05-12",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 120,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 900,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e4e",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Poly Studio X30",
+    "itemTag": "CAM-POLY-003",
+    "serialNumber": "SN-CAM-003",
+    "manufacturer": "Poly",
+    "model": "Studio X30"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-1003",
+  "poDate": "2023-06-01",
+  "receiptNumber": "RCPT-003",
+  "receiptDate": "2023-06-05",
+  "purchaseDate": "2023-06-03",
+  "vendorId": "VENDOR-03",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-003",
+  "invoiceDate": "2023-06-03",
+
+  "purchaseCost": 65000,
+  "taxAmount": 11700,
+  "totalAmount": 76700,
+  "currency": "INR",
+
+  "deliveryDate": "2023-06-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+  "inMonth": 0,
+  "warrantyProvider": "Manufacturer",
+
+  "warrantyTillDate": "2025-06-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B1-004",
+  "itemTag": "CAM-HP-004",
+  "barcode": "BAR004CAM",
+  "itemSubType": "Webcam",
+  "manufacturer": "HP",
+  "model": "W200",
+  "modelNumber": "HP-W200",
+  "partNumber": "PN-W200",
+  "serialNumber": "SN-CAM-004",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2022-11-10",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 80,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 200,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-02",
+  "AssignDate": "2024-02-01",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e4e",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "HP W200 Webcam",
+    "itemTag": "CAM-HP-004",
+    "serialNumber": "SN-CAM-004",
+    "manufacturer": "HP",
+    "model": "W200"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-004",
+  "receiptDate": "2022-12-01",
+  "purchaseDate": "2022-11-20",
+  "vendorId": "VENDOR-04",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-004",
+  "invoiceDate": "2022-11-20",
+
+  "purchaseCost": 3500,
+  "taxAmount": 630,
+  "totalAmount": 4130,
+  "currency": "INR",
+
+  "deliveryDate": "2022-11-25",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "HP Service",
+  "amcPhone": "1800111111",
+  "amcEmail": "hp@support.com",
+  "amcStartDate": "2024-01-01",
+  "amcEndDate": "2025-01-01",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B1-005",
+  "itemTag": "CAM-CISCO-005",
+  "barcode": "BAR005CAM",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Webex Room Kit",
+  "modelNumber": "WRK-4K",
+  "partNumber": "PN-WEBEX",
+  "serialNumber": "SN-CAM-005",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-03-18",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 110,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2.5,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Black",
+  "weight": 1500,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Conference-Room-01",
+  "AssignDate": "2024-03-01",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e4e",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Cisco Webex Room Kit",
+    "itemTag": "CAM-CISCO-005",
+    "serialNumber": "SN-CAM-005",
+    "manufacturer": "Cisco",
+    "model": "Webex Room Kit"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-1005",
+  "poDate": "2023-04-01",
+  "receiptNumber": "RCPT-005",
+  "receiptDate": "2023-04-05",
+  "purchaseDate": "2023-04-03",
+  "vendorId": "VENDOR-05",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-005",
+  "invoiceDate": "2023-04-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 120000,
+  "taxAmount": 21600,
+  "totalAmount": 141600,
+  "currency": "INR",
+
+  "deliveryDate": "2023-04-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": "2023-04-03",
+  "warrantyEndDate": "2026-04-03",
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Cisco Support",
+  "supportPhone": "1800555555",
+  "supportEmail": "support@cisco.com",
+
+  "warrantyTillDate": "2026-04-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+
+
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-001",
+  "itemTag": "CAM-DELL-001",
+  "barcode": "BARB2001",
+  "itemSubType": "Webcam",
+  "manufacturer": "Dell",
+  "model": "WB3023",
+  "modelNumber": "WB3023",
+  "partNumber": "PN-DELL-01",
+  "serialNumber": "SN-B2-001",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-01-05",
+
+  "cameraType": "Webcam",
+
+  "resolution": "2K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 90,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 1.8,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 180,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Dell WB3023 Webcam",
+    "itemTag": "CAM-DELL-001",
+    "serialNumber": "SN-B2-001",
+    "manufacturer": "Dell",
+    "model": "WB3023"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B2-001",
+  "receiptDate": "2023-01-10",
+  "purchaseDate": "2023-01-08",
+  "vendorId": "VENDOR-11",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B2-001",
+  "invoiceDate": "2023-01-08",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 5500,
+  "taxAmount": 990,
+  "totalAmount": 6490,
+  "currency": "INR",
+
+  "deliveryDate": "2023-01-12",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Dell Support",
+  "supportPhone": "18004252067",
+  "supportEmail": "support@dell.com",
+
+  "warrantyTillDate": "2025-01-08",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-002",
+  "itemTag": "CAM-LENOVO-002",
+  "barcode": "BARB2002",
+  "itemSubType": "Webcam",
+  "manufacturer": "Lenovo",
+  "model": "500 FHD",
+  "modelNumber": "LEN-500",
+  "partNumber": "PN-LEN-02",
+  "serialNumber": "SN-B2-002",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2022-09-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 85,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.5,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Grey",
+  "weight": 170,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-11",
+  "AssignDate": "2024-02-10",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Lenovo 500 FHD",
+    "itemTag": "CAM-LENOVO-002",
+    "serialNumber": "SN-B2-002",
+    "manufacturer": "Lenovo",
+    "model": "500 FHD"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B2-002",
+  "poDate": "2022-09-10",
+  "receiptNumber": "RCPT-B2-002",
+  "receiptDate": "2022-09-15",
+  "purchaseDate": "2022-09-12",
+  "vendorId": "VENDOR-12",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B2-002",
+  "invoiceDate": "2022-09-12",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 3200,
+  "taxAmount": 576,
+  "totalAmount": 3776,
+  "currency": "INR",
+
+  "deliveryDate": "2022-09-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyMode": null,
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": null,
+  "supportVendor": null,
+  "supportPhone": null,
+  "supportEmail": null,
+
+  "warrantyTillDate": null,
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "Lenovo Service",
+  "amcPhone": "18004197555",
+  "amcEmail": "support@lenovo.com",
+  "amcStartDate": "2024-01-01",
+  "amcEndDate": "2025-01-01",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-003",
+  "itemTag": "CAM-LOGI-003",
+  "barcode": "BARB2003",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Logitech",
+  "model": "MeetUp",
+  "modelNumber": "MEETUP-4K",
+  "partNumber": "PN-MEET",
+  "serialNumber": "SN-B2-003",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-03-12",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 120,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Black",
+  "weight": 1040,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Meeting-Room-02",
+  "AssignDate": "2024-01-20",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Logitech MeetUp",
+    "itemTag": "CAM-LOGI-003",
+    "serialNumber": "SN-B2-003",
+    "manufacturer": "Logitech",
+    "model": "MeetUp"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B2-003",
+  "poDate": "2023-04-01",
+  "receiptNumber": "RCPT-B2-003",
+  "receiptDate": "2023-04-05",
+  "purchaseDate": "2023-04-03",
+  "vendorId": "VENDOR-13",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B2-003",
+  "invoiceDate": "2023-04-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 72000,
+  "taxAmount": 12960,
+  "totalAmount": 84960,
+  "currency": "INR",
+
+  "deliveryDate": "2023-04-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Logitech Support",
+  "supportPhone": "1800123456",
+  "supportEmail": "support@logi.com",
+
+  "warrantyTillDate": "2025-04-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-004",
+  "itemTag": "CAM-HP-004",
+  "barcode": "BARB2004",
+  "itemSubType": "Webcam",
+  "manufacturer": "HP",
+  "model": "320 FHD",
+  "modelNumber": "HP-320",
+  "partNumber": "PN-HP-04",
+  "serialNumber": "SN-B2-004",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2022-12-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 75,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 160,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "HP 320 FHD",
+    "itemTag": "CAM-HP-004",
+    "serialNumber": "SN-B2-004",
+    "manufacturer": "HP",
+    "model": "320 FHD"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B2-004",
+  "receiptDate": "2022-12-05",
+  "purchaseDate": "2022-12-03",
+  "vendorId": "VENDOR-14",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B2-004",
+  "invoiceDate": "2022-12-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 2800,
+  "taxAmount": 504,
+  "totalAmount": 3304,
+  "currency": "INR",
+
+  "deliveryDate": "2022-12-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyMode": null,
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": null,
+  "supportVendor": null,
+  "supportPhone": null,
+  "supportEmail": null,
+
+  "warrantyTillDate": null,
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-005",
+  "itemTag": "CAM-SONY-005",
+  "barcode": "BARB2005",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X400",
+  "modelNumber": "SRGX400",
+  "partNumber": "PN-SRGX400",
+  "serialNumber": "SN-B2-005",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2023-02-15",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 100,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1300,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Auditorium",
+  "AssignDate": "2024-01-15",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Sony SRG-X400",
+    "itemTag": "CAM-SONY-005",
+    "serialNumber": "SN-B2-005",
+    "manufacturer": "Sony",
+    "model": "SRG-X400"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B2-005",
+  "poDate": "2023-03-01",
+  "receiptNumber": "RCPT-B2-005",
+  "receiptDate": "2023-03-05",
+  "purchaseDate": "2023-03-03",
+  "vendorId": "VENDOR-15",
+
+  "itemReceivedOn": "challan",
+  "invoiceNumber": null,
+  "invoiceDate": null,
+  "deliveryChallanNumber": "DC-B2-005",
+  "deliveryChallanDate": "2023-03-02",
+
+  "purchaseCost": 95000,
+  "taxAmount": 17100,
+  "totalAmount": 112100,
+  "currency": "INR",
+
+  "deliveryDate": "2023-03-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": "2023-03-03",
+  "warrantyEndDate": "2026-03-03",
+  "warrantyProvider": "Vendor",
+  "supportVendor": "Sony India",
+  "supportPhone": "1800222222",
+  "supportEmail": "support@sony.in",
+
+  "warrantyTillDate": "2026-03-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B2-006",
+  "itemTag": "CAM-CISCO-006",
+  "barcode": "BARB2006",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Room Kit Mini",
+  "modelNumber": "RKM-4K",
+  "partNumber": "PN-RKM",
+  "serialNumber": "SN-B2-006",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-06-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 105,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1100,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e51",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Cisco Room Kit Mini",
+    "itemTag": "CAM-CISCO-006",
+    "serialNumber": "SN-B2-006",
+    "manufacturer": "Cisco",
+    "model": "Room Kit Mini"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B2-006",
+  "receiptDate": "2023-06-05",
+  "purchaseDate": "2023-06-03",
+  "vendorId": "VENDOR-16",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B2-006",
+  "invoiceDate": "2023-06-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 78000,
+  "taxAmount": 14040,
+  "totalAmount": 92040,
+  "currency": "INR",
+
+  "deliveryDate": "2023-06-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Cisco Support",
+  "supportPhone": "1800555555",
+  "supportEmail": "support@cisco.com",
+
+  "warrantyTillDate": "2026-06-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+
+
+
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-001",
+  "itemTag": "CAM-LOGI-B3-001",
+  "barcode": "BARB3001",
+  "itemSubType": "Webcam",
+  "manufacturer": "Logitech",
+  "model": "C920",
+  "modelNumber": "C920-HD",
+  "partNumber": "PN-C920",
+  "serialNumber": "SN-B3-001",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-02-11",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 78,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 1.5,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 180,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-21",
+  "AssignDate": "2024-01-05",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Logitech C920",
+    "itemTag": "CAM-LOGI-B3-001",
+    "serialNumber": "SN-B3-001",
+    "manufacturer": "Logitech",
+    "model": "C920"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B3-001",
+  "poDate": "2023-03-01",
+  "receiptNumber": "RCPT-B3-001",
+  "receiptDate": "2023-03-05",
+  "purchaseDate": "2023-03-03",
+  "vendorId": "VENDOR-21",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B3-001",
+  "invoiceDate": "2023-03-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 6200,
+  "taxAmount": 1116,
+  "totalAmount": 7316,
+  "currency": "INR",
+
+  "deliveryDate": "2023-03-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Logitech Support",
+  "supportPhone": "1800123456",
+  "supportEmail": "support@logi.com",
+
+  "warrantyTillDate": "2025-03-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-002",
+  "itemTag": "CAM-SONY-B3-002",
+  "barcode": "BARB3002",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X120",
+  "modelNumber": "SRGX120",
+  "partNumber": "PN-SRG120",
+  "serialNumber": "SN-B3-002",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-10-10",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 95,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1300,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Hall-01",
+  "AssignDate": "2024-02-01",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Sony SRG-X120",
+    "itemTag": "CAM-SONY-B3-002",
+    "serialNumber": "SN-B3-002",
+    "manufacturer": "Sony",
+    "model": "SRG-X120"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B3-002",
+  "receiptDate": "2022-10-15",
+  "purchaseDate": "2022-10-12",
+  "vendorId": "VENDOR-22",
+
+  "itemReceivedOn": "challan",
+  "invoiceNumber": null,
+  "invoiceDate": null,
+  "deliveryChallanNumber": "DC-B3-002",
+  "deliveryChallanDate": "2022-10-13",
+
+  "purchaseCost": 88000,
+  "taxAmount": 15840,
+  "totalAmount": 103840,
+  "currency": "INR",
+
+  "deliveryDate": "2022-10-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": "2022-10-12",
+  "warrantyEndDate": "2025-10-12",
+  "warrantyProvider": "Vendor",
+  "supportVendor": "Sony India",
+  "supportPhone": "1800222222",
+  "supportEmail": "support@sony.in",
+
+  "warrantyTillDate": "2025-10-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-003",
+  "itemTag": "CAM-HP-B3-003",
+  "barcode": "BARB3003",
+  "itemSubType": "Webcam",
+  "manufacturer": "HP",
+  "model": "W300",
+  "modelNumber": "HP-W300",
+  "partNumber": "PN-W300",
+  "serialNumber": "SN-B3-003",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-04-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 82,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.4,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 170,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "HP W300 Webcam",
+    "itemTag": "CAM-HP-B3-003",
+    "serialNumber": "SN-B3-003",
+    "manufacturer": "HP",
+    "model": "W300"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B3-003",
+  "receiptDate": "2023-04-05",
+  "purchaseDate": "2023-04-03",
+  "vendorId": "VENDOR-23",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B3-003",
+  "invoiceDate": "2023-04-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 3000,
+  "taxAmount": 540,
+  "totalAmount": 3540,
+  "currency": "INR",
+
+  "deliveryDate": "2023-04-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyMode": null,
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": null,
+  "supportVendor": null,
+  "supportPhone": null,
+  "supportEmail": null,
+
+  "warrantyTillDate": null,
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "HP Service",
+  "amcPhone": "1800111111",
+  "amcEmail": "hp@support.com",
+  "amcStartDate": "2024-01-01",
+  "amcEndDate": "2025-01-01",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-004",
+  "itemTag": "CAM-CISCO-B3-004",
+  "barcode": "BARB3004",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Room Kit",
+  "modelNumber": "RK-4K",
+  "partNumber": "PN-RK",
+  "serialNumber": "SN-B3-004",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-06-10",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 110,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1200,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Conference-02",
+  "AssignDate": "2024-02-20",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Cisco Room Kit",
+    "itemTag": "CAM-CISCO-B3-004",
+    "serialNumber": "SN-B3-004",
+    "manufacturer": "Cisco",
+    "model": "Room Kit"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B3-004",
+  "poDate": "2023-07-01",
+  "receiptNumber": "RCPT-B3-004",
+  "receiptDate": "2023-07-05",
+  "purchaseDate": "2023-07-03",
+  "vendorId": "VENDOR-24",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B3-004",
+  "invoiceDate": "2023-07-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 110000,
+  "taxAmount": 19800,
+  "totalAmount": 129800,
+  "currency": "INR",
+
+  "deliveryDate": "2023-07-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Cisco Support",
+  "supportPhone": "1800555555",
+  "supportEmail": "support@cisco.com",
+
+  "warrantyTillDate": "2026-07-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-005",
+  "itemTag": "CAM-DELL-B3-005",
+  "barcode": "BARB3005",
+  "itemSubType": "Webcam",
+  "manufacturer": "Dell",
+  "model": "WB5023",
+  "modelNumber": "WB5023",
+  "partNumber": "PN-WB5023",
+  "serialNumber": "SN-B3-005",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-05-05",
+
+  "cameraType": "Webcam",
+
+  "resolution": "2K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 90,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 1.8,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 190,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Dell WB5023",
+    "itemTag": "CAM-DELL-B3-005",
+    "serialNumber": "SN-B3-005",
+    "manufacturer": "Dell",
+    "model": "WB5023"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B3-005",
+  "receiptDate": "2023-05-10",
+  "purchaseDate": "2023-05-08",
+  "vendorId": "VENDOR-25",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B3-005",
+  "invoiceDate": "2023-05-08",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 7500,
+  "taxAmount": 1350,
+  "totalAmount": 8850,
+  "currency": "INR",
+
+  "deliveryDate": "2023-05-11",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Dell Support",
+  "supportPhone": "18004252067",
+  "supportEmail": "support@dell.com",
+
+  "warrantyTillDate": "2025-05-08",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-006",
+  "itemTag": "CAM-PTZ-B3-006",
+  "barcode": "BARB3006",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Panasonic",
+  "model": "AW-UE50",
+  "modelNumber": "UE50",
+  "partNumber": "PN-UE50",
+  "serialNumber": "SN-B3-006",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-07-15",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 100,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1400,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Auditorium-01",
+  "AssignDate": "2024-01-25",
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Panasonic AW-UE50",
+    "itemTag": "CAM-PTZ-B3-006",
+    "serialNumber": "SN-B3-006",
+    "manufacturer": "Panasonic",
+    "model": "AW-UE50"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B3-006",
+  "poDate": "2022-08-01",
+  "receiptNumber": "RCPT-B3-006",
+  "receiptDate": "2022-08-05",
+  "purchaseDate": "2022-08-03",
+  "vendorId": "VENDOR-26",
+
+  "itemReceivedOn": "challan",
+  "invoiceNumber": null,
+  "invoiceDate": null,
+  "deliveryChallanNumber": "DC-B3-006",
+  "deliveryChallanDate": "2022-08-02",
+
+  "purchaseCost": 99000,
+  "taxAmount": 17820,
+  "totalAmount": 116820,
+  "currency": "INR",
+
+  "deliveryDate": "2022-08-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "Panasonic Care",
+  "amcPhone": "1800333333",
+  "amcEmail": "support@panasonic.com",
+  "amcStartDate": "2023-01-01",
+  "amcEndDate": "2024-12-31",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B3-007",
+  "itemTag": "CAM-CISCO-B3-007",
+  "barcode": "BARB3007",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Room Kit Mini",
+  "modelNumber": "RKM",
+  "partNumber": "PN-RKM",
+  "serialNumber": "SN-B3-007",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-08-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 105,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1150,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a85b680a2e0b7064e54",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Cisco Room Kit Mini",
+    "itemTag": "CAM-CISCO-B3-007",
+    "serialNumber": "SN-B3-007",
+    "manufacturer": "Cisco",
+    "model": "Room Kit Mini"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B3-007",
+  "receiptDate": "2023-08-05",
+  "purchaseDate": "2023-08-03",
+  "vendorId": "VENDOR-27",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B3-007",
+  "invoiceDate": "2023-08-03",
+
+  "purchaseCost": 78000,
+  "taxAmount": 14040,
+  "totalAmount": 92040,
+  "currency": "INR",
+
+  "deliveryDate": "2023-08-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "inMonth": 0,
+  "warrantyProvider": "Manufacturer",
+
+  "warrantyTillDate": "2026-08-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+
+
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-001",
+  "itemTag": "CAM-LOGI-B4-001",
+  "barcode": "BARB4001",
+  "itemSubType": "Webcam",
+  "manufacturer": "Logitech",
+  "model": "Brio 4K",
+  "modelNumber": "BRIO-4K",
+  "partNumber": "PN-BRIO",
+  "serialNumber": "SN-B4-001",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-01-15",
+
+  "cameraType": "Webcam",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 90,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 210,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-31",
+  "AssignDate": "2024-01-10",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Logitech Brio 4K",
+    "itemTag": "CAM-LOGI-B4-001",
+    "serialNumber": "SN-B4-001",
+    "manufacturer": "Logitech",
+    "model": "Brio 4K"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B4-001",
+  "poDate": "2023-02-01",
+  "receiptNumber": "RCPT-B4-001",
+  "receiptDate": "2023-02-05",
+  "purchaseDate": "2023-02-03",
+  "vendorId": "VENDOR-31",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-001",
+  "invoiceDate": "2023-02-03",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 12000,
+  "taxAmount": 2160,
+  "totalAmount": 14160,
+  "currency": "INR",
+
+  "deliveryDate": "2023-02-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Logitech Support",
+  "supportPhone": "1800123456",
+  "supportEmail": "support@logi.com",
+
+  "warrantyTillDate": "2026-02-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-002",
+  "itemTag": "CAM-SONY-B4-002",
+  "barcode": "BARB4002",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X400",
+  "modelNumber": "SRGX400",
+  "partNumber": "PN-SRGX400",
+  "serialNumber": "SN-B4-002",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-09-20",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 100,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1350,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Auditorium-02",
+  "AssignDate": "2024-02-15",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Sony SRG-X400",
+    "itemTag": "CAM-SONY-B4-002",
+    "serialNumber": "SN-B4-002",
+    "manufacturer": "Sony",
+    "model": "SRG-X400"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B4-002",
+  "receiptDate": "2022-09-25",
+  "purchaseDate": "2022-09-22",
+  "vendorId": "VENDOR-32",
+
+  "itemReceivedOn": "challan",
+  "deliveryChallanNumber": "DC-B4-002",
+  "deliveryChallanDate": "2022-09-23",
+
+  "purchaseCost": 98000,
+  "taxAmount": 17640,
+  "totalAmount": 115640,
+  "currency": "INR",
+
+  "deliveryDate": "2022-09-26",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "warrantyStartDate": "2022-09-22",
+  "warrantyEndDate": "2025-09-22",
+  "warrantyProvider": "Vendor",
+  "supportVendor": "Sony India",
+  "supportPhone": "1800222222",
+  "supportEmail": "support@sony.in",
+
+  "warrantyTillDate": "2025-09-22",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-003",
+  "itemTag": "CAM-HP-B4-003",
+  "barcode": "BARB4003",
+  "itemSubType": "Webcam",
+  "manufacturer": "HP",
+  "model": "W500",
+  "modelNumber": "HP-W500",
+  "partNumber": "PN-W500",
+  "serialNumber": "SN-B4-003",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-03-10",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 80,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.3,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 165,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "HP W500 Webcam",
+    "itemTag": "CAM-HP-B4-003",
+    "serialNumber": "SN-B4-003",
+    "manufacturer": "HP",
+    "model": "W500"
+  },
+
+  "purchaseType": "Direct",
+  "poNumber": null,
+  "poDate": null,
+  "receiptNumber": "RCPT-B4-003",
+  "receiptDate": "2023-03-15",
+  "purchaseDate": "2023-03-12",
+  "vendorId": "VENDOR-33",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-003",
+  "invoiceDate": "2023-03-12",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 3200,
+  "taxAmount": 576,
+  "totalAmount": 3776,
+  "currency": "INR",
+
+  "deliveryDate": "2023-03-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyMode": null,
+  "inYear": null,
+  "inMonth": null,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": null,
+  "supportVendor": null,
+  "supportPhone": null,
+  "supportEmail": null,
+
+  "warrantyTillDate": null,
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "HP Care",
+  "amcPhone": "1800111111",
+  "amcEmail": "hp@support.com",
+  "amcStartDate": "2024-01-01",
+  "amcEndDate": "2025-01-01",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-004",
+  "itemTag": "CAM-DELL-B4-004",
+  "barcode": "BARB4004",
+  "itemSubType": "Webcam",
+  "manufacturer": "Dell",
+  "model": "WB7022",
+  "modelNumber": "WB7022",
+  "partNumber": "PN-WB7022",
+  "serialNumber": "SN-B4-004",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-05-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 90,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 1.8,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 210,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-32",
+  "AssignDate": "2024-02-05",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Dell WB7022",
+    "itemTag": "CAM-DELL-B4-004",
+    "serialNumber": "SN-B4-004",
+    "manufacturer": "Dell",
+    "model": "WB7022"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B4-004",
+  "poDate": "2023-05-10",
+  "receiptNumber": "RCPT-B4-004",
+  "receiptDate": "2023-05-15",
+  "purchaseDate": "2023-05-12",
+  "vendorId": "VENDOR-34",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-004",
+  "invoiceDate": "2023-05-12",
+  "deliveryChallanNumber": null,
+  "deliveryChallanDate": null,
+
+  "purchaseCost": 14000,
+  "taxAmount": 2520,
+  "totalAmount": 16520,
+  "currency": "INR",
+
+  "deliveryDate": "2023-05-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "inMonth": 0,
+  "warrantyStartDate": null,
+  "warrantyEndDate": null,
+  "warrantyProvider": "Manufacturer",
+  "supportVendor": "Dell Support",
+  "supportPhone": "18004252067",
+  "supportEmail": "support@dell.com",
+
+  "warrantyTillDate": "2026-05-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No",
+  "amcVendor": null,
+  "amcPhone": null,
+  "amcEmail": null,
+  "amcStartDate": null,
+  "amcEndDate": null,
+  "amcStatus": null
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-005",
+  "itemTag": "CAM-SONY-B4-005",
+  "barcode": "BARB4005",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X120",
+  "modelNumber": "SRGX120",
+  "partNumber": "PN-SRG120",
+  "serialNumber": "SN-B4-005",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-11-15",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 95,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "cableLength": null,
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1280,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Hall-02",
+  "AssignDate": "2024-01-18",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Sony SRG-X120",
+    "itemTag": "CAM-SONY-B4-005",
+    "serialNumber": "SN-B4-005",
+    "manufacturer": "Sony",
+    "model": "SRG-X120"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B4-005",
+  "receiptDate": "2022-11-20",
+  "purchaseDate": "2022-11-18",
+  "vendorId": "VENDOR-35",
+
+  "itemReceivedOn": "challan",
+  "deliveryChallanNumber": "DC-B4-005",
+  "deliveryChallanDate": "2022-11-19",
+
+  "purchaseCost": 87000,
+  "taxAmount": 15660,
+  "totalAmount": 102660,
+  "currency": "INR",
+
+  "deliveryDate": "2022-11-21",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "warrantyStartDate": "2022-11-18",
+  "warrantyEndDate": "2025-11-18",
+  "warrantyProvider": "Vendor",
+  "supportVendor": "Sony India",
+  "supportPhone": "1800222222",
+  "supportEmail": "support@sony.in",
+
+  "warrantyTillDate": "2025-11-18",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-006",
+  "itemTag": "CAM-POLY-B4-006",
+  "barcode": "BARB4006",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Poly",
+  "model": "Studio X50",
+  "modelNumber": "X50",
+  "partNumber": "PN-X50",
+  "serialNumber": "SN-B4-006",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-07-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 120,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1250,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+  "itemUser": null,
+  "AssignDate": null,
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "inactiveAt": null,
+  "inactiveBy": null,
+  "inactiveReason": null,
+  "isDeleted": false,
+  "deletedAt": null,
+  "deletedBy": null,
+  "deletedReason": null,
+  "updatedBy": null,
+
+  "summary": {
+    "itemName": "Poly Studio X50",
+    "itemTag": "CAM-POLY-B4-006",
+    "serialNumber": "SN-B4-006",
+    "manufacturer": "Poly",
+    "model": "Studio X50"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B4-006",
+  "poDate": "2023-07-10",
+  "receiptNumber": "RCPT-B4-006",
+  "receiptDate": "2023-07-15",
+  "purchaseDate": "2023-07-12",
+  "vendorId": "VENDOR-36",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-006",
+  "invoiceDate": "2023-07-12",
+
+  "purchaseCost": 88000,
+  "taxAmount": 15840,
+  "totalAmount": 103840,
+  "currency": "INR",
+
+  "deliveryDate": "2023-07-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+  "warrantyProvider": "Manufacturer",
+
+  "warrantyTillDate": "2026-07-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-007",
+  "itemTag": "CAM-DELL-B4-007",
+  "barcode": "BARB4007",
+  "itemSubType": "Webcam",
+  "manufacturer": "Dell",
+  "model": "WB3023",
+  "modelNumber": "WB3023",
+  "partNumber": "PN-WB3023",
+  "serialNumber": "SN-B4-007",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-08-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "2K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 88,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB",
+  "cableLength": 1.5,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 180,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-33",
+  "AssignDate": "2024-02-25",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Dell WB3023",
+    "itemTag": "CAM-DELL-B4-007",
+    "serialNumber": "SN-B4-007",
+    "manufacturer": "Dell",
+    "model": "WB3023"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B4-007",
+  "receiptDate": "2023-08-05",
+  "purchaseDate": "2023-08-03",
+  "vendorId": "VENDOR-37",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-007",
+  "invoiceDate": "2023-08-03",
+
+  "purchaseCost": 6000,
+  "taxAmount": 1080,
+  "totalAmount": 7080,
+  "currency": "INR",
+
+  "deliveryDate": "2023-08-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+
+  "warrantyTillDate": "2025-08-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B4-008",
+  "itemTag": "CAM-CISCO-B4-008",
+  "barcode": "BARB4008",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Webex Room Kit",
+  "modelNumber": "WRK",
+  "partNumber": "PN-WRK",
+  "serialNumber": "SN-B4-008",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-09-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 110,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Black",
+  "weight": 1400,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e57",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Cisco Webex Room Kit",
+    "itemTag": "CAM-CISCO-B4-008",
+    "serialNumber": "SN-B4-008",
+    "manufacturer": "Cisco",
+    "model": "Webex Room Kit"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B4-008",
+  "poDate": "2023-09-10",
+  "receiptNumber": "RCPT-B4-008",
+  "receiptDate": "2023-09-15",
+  "purchaseDate": "2023-09-12",
+  "vendorId": "VENDOR-38",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B4-008",
+  "invoiceDate": "2023-09-12",
+
+  "purchaseCost": 130000,
+  "taxAmount": 23400,
+  "totalAmount": 153400,
+  "currency": "INR",
+
+  "deliveryDate": "2023-09-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+
+  "warrantyTillDate": "2026-09-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+
+
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-001",
+  "itemTag": "CAM-LOGI-B5-001",
+  "barcode": "BARB5001",
+  "itemSubType": "Webcam",
+  "manufacturer": "Logitech",
+  "model": "C270",
+  "modelNumber": "C270-HD",
+  "partNumber": "PN-C270",
+  "serialNumber": "SN-B5-001",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-01-05",
+
+  "cameraType": "Webcam",
+
+  "resolution": "720p",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 70,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 150,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Teacher-41",
+  "AssignDate": "2024-01-05",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Logitech C270",
+    "itemTag": "CAM-LOGI-B5-001",
+    "serialNumber": "SN-B5-001",
+    "manufacturer": "Logitech",
+    "model": "C270"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-001",
+  "receiptDate": "2023-01-10",
+  "purchaseDate": "2023-01-08",
+  "vendorId": "VENDOR-41",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-001",
+  "invoiceDate": "2023-01-08",
+
+  "purchaseCost": 1500,
+  "taxAmount": 270,
+  "totalAmount": 1770,
+  "currency": "INR",
+
+  "deliveryDate": "2023-01-11",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+
+  "warrantyTillDate": "2025-01-08",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-002",
+  "itemTag": "CAM-DELL-B5-002",
+  "barcode": "BARB5002",
+  "itemSubType": "Webcam",
+  "manufacturer": "Dell",
+  "model": "WB3023",
+  "modelNumber": "WB3023",
+  "partNumber": "PN-WB3023",
+  "serialNumber": "SN-B5-002",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-02-10",
+
+  "cameraType": "Webcam",
+
+  "resolution": "2K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 88,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Dual Mic",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "cableLength": 1.6,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 180,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Dell WB3023",
+    "itemTag": "CAM-DELL-B5-002",
+    "serialNumber": "SN-B5-002",
+    "manufacturer": "Dell",
+    "model": "WB3023"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B5-002",
+  "poDate": "2023-02-15",
+  "receiptNumber": "RCPT-B5-002",
+  "receiptDate": "2023-02-20",
+  "purchaseDate": "2023-02-18",
+  "vendorId": "VENDOR-42",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-002",
+  "invoiceDate": "2023-02-18",
+
+  "purchaseCost": 6000,
+  "taxAmount": 1080,
+  "totalAmount": 7080,
+  "currency": "INR",
+
+  "deliveryDate": "2023-02-21",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 2,
+
+  "warrantyTillDate": "2025-02-18",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-003",
+  "itemTag": "CAM-SONY-B5-003",
+  "barcode": "BARB5003",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X120",
+  "modelNumber": "SRGX120",
+  "partNumber": "PN-SRG120",
+  "serialNumber": "SN-B5-003",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-12-01",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 95,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1300,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Hall-03",
+  "AssignDate": "2024-01-20",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Sony SRG-X120",
+    "itemTag": "CAM-SONY-B5-003",
+    "serialNumber": "SN-B5-003",
+    "manufacturer": "Sony",
+    "model": "SRG-X120"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-003",
+  "receiptDate": "2022-12-05",
+  "purchaseDate": "2022-12-03",
+  "vendorId": "VENDOR-43",
+
+  "itemReceivedOn": "challan",
+  "deliveryChallanNumber": "DC-B5-003",
+  "deliveryChallanDate": "2022-12-04",
+
+  "purchaseCost": 86000,
+  "taxAmount": 15480,
+  "totalAmount": 101480,
+  "currency": "INR",
+
+  "deliveryDate": "2022-12-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "warrantyStartDate": "2022-12-03",
+  "warrantyEndDate": "2025-12-03",
+
+  "warrantyTillDate": "2025-12-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-004",
+  "itemTag": "CAM-CISCO-B5-004",
+  "barcode": "BARB5004",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Room Kit Mini",
+  "modelNumber": "RKM",
+  "partNumber": "PN-RKM",
+  "serialNumber": "SN-B5-004",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-04-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 105,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1150,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Cisco Room Kit Mini",
+    "itemTag": "CAM-CISCO-B5-004",
+    "serialNumber": "SN-B5-004",
+    "manufacturer": "Cisco",
+    "model": "Room Kit Mini"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B5-004",
+  "poDate": "2023-04-10",
+  "receiptNumber": "RCPT-B5-004",
+  "receiptDate": "2023-04-15",
+  "purchaseDate": "2023-04-12",
+  "vendorId": "VENDOR-44",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-004",
+  "invoiceDate": "2023-04-12",
+
+  "purchaseCost": 78000,
+  "taxAmount": 14040,
+  "totalAmount": 92040,
+  "currency": "INR",
+
+  "deliveryDate": "2023-04-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+
+  "warrantyTillDate": "2026-04-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-005",
+  "itemTag": "CAM-POLY-B5-005",
+  "barcode": "BARB5005",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Poly",
+  "model": "Studio X30",
+  "modelNumber": "X30",
+  "partNumber": "PN-X30",
+  "serialNumber": "SN-B5-005",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-05-05",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 110,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Black",
+  "weight": 1200,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Meeting-01",
+  "AssignDate": "2024-02-10",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Poly Studio X30",
+    "itemTag": "CAM-POLY-B5-005",
+    "serialNumber": "SN-B5-005",
+    "manufacturer": "Poly",
+    "model": "Studio X30"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-005",
+  "receiptDate": "2023-05-10",
+  "purchaseDate": "2023-05-08",
+  "vendorId": "VENDOR-45",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-005",
+  "invoiceDate": "2023-05-08",
+
+  "purchaseCost": 65000,
+  "taxAmount": 11700,
+  "totalAmount": 76700,
+  "currency": "INR",
+
+  "deliveryDate": "2023-05-11",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+
+  "warrantyTillDate": "2026-05-08",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-006",
+  "itemTag": "CAM-HP-B5-006",
+  "barcode": "BARB5006",
+  "itemSubType": "Webcam",
+  "manufacturer": "HP",
+  "model": "W200",
+  "modelNumber": "HP-W200",
+  "partNumber": "PN-W200",
+  "serialNumber": "SN-B5-006",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-06-01",
+
+  "cameraType": "Webcam",
+
+  "resolution": "1080p",
+  "frameRate": 30,
+  "sensorType": "CCD",
+  "fieldOfView": 75,
+  "autoFocus": "No",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Single Mic",
+  "noiseReduction": "No",
+
+  "connectionType": "USB",
+  "cableLength": 1.2,
+  "plugAndPlay": "Yes",
+
+  "mountType": "Monitor Clip",
+  "color": "Black",
+  "weight": 160,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "HP W200 Webcam",
+    "itemTag": "CAM-HP-B5-006",
+    "serialNumber": "SN-B5-006",
+    "manufacturer": "HP",
+    "model": "W200"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-006",
+  "receiptDate": "2023-06-05",
+  "purchaseDate": "2023-06-03",
+  "vendorId": "VENDOR-46",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-006",
+  "invoiceDate": "2023-06-03",
+
+  "purchaseCost": 2800,
+  "taxAmount": 504,
+  "totalAmount": 3304,
+  "currency": "INR",
+
+  "deliveryDate": "2023-06-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "No",
+  "warrantyStatus": "Expired",
+
+  "amcAvailable": "Yes",
+  "amcVendor": "HP Care",
+  "amcPhone": "1800111111",
+  "amcEmail": "hp@support.com",
+  "amcStartDate": "2024-01-01",
+  "amcEndDate": "2025-01-01",
+  "amcStatus": "Active"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-007",
+  "itemTag": "CAM-SONY-B5-007",
+  "barcode": "BARB5007",
+  "itemSubType": "PTZ Camera",
+  "manufacturer": "Sony",
+  "model": "SRG-X400",
+  "modelNumber": "SRGX400",
+  "partNumber": "PN-SRGX400",
+  "serialNumber": "SN-B5-007",
+  "ownershipType": "Leased",
+  "manufacturingDate": "2022-08-01",
+
+  "cameraType": "PTZ Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 100,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "No",
+  "microphoneType": null,
+  "noiseReduction": "No",
+
+  "connectionType": "Wireless",
+  "plugAndPlay": "No",
+
+  "mountType": "Ceiling Mount",
+  "color": "White",
+  "weight": 1350,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Auditorium-03",
+  "AssignDate": "2024-02-01",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Sony SRG-X400",
+    "itemTag": "CAM-SONY-B5-007",
+    "serialNumber": "SN-B5-007",
+    "manufacturer": "Sony",
+    "model": "SRG-X400"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-007",
+  "receiptDate": "2022-08-05",
+  "purchaseDate": "2022-08-03",
+  "vendorId": "VENDOR-47",
+
+  "itemReceivedOn": "challan",
+  "deliveryChallanNumber": "DC-B5-007",
+  "deliveryChallanDate": "2022-08-04",
+
+  "purchaseCost": 97000,
+  "taxAmount": 17460,
+  "totalAmount": 114460,
+  "currency": "INR",
+
+  "deliveryDate": "2022-08-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "End Date",
+  "warrantyStartDate": "2022-08-03",
+  "warrantyEndDate": "2025-08-03",
+
+  "warrantyTillDate": "2025-08-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-008",
+  "itemTag": "CAM-CISCO-B5-008",
+  "barcode": "BARB5008",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Cisco",
+  "model": "Webex Room Kit",
+  "modelNumber": "WRK",
+  "partNumber": "PN-WRK",
+  "serialNumber": "SN-B5-008",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-09-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 60,
+  "sensorType": "CMOS",
+  "fieldOfView": 110,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Black",
+  "weight": 1400,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inStore",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Cisco Webex Room Kit",
+    "itemTag": "CAM-CISCO-B5-008",
+    "serialNumber": "SN-B5-008",
+    "manufacturer": "Cisco",
+    "model": "Webex Room Kit"
+  },
+
+  "purchaseType": "PO",
+  "poNumber": "PO-B5-008",
+  "poDate": "2023-09-10",
+  "receiptNumber": "RCPT-B5-008",
+  "receiptDate": "2023-09-15",
+  "purchaseDate": "2023-09-12",
+  "vendorId": "VENDOR-48",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-008",
+  "invoiceDate": "2023-09-12",
+
+  "purchaseCost": 130000,
+  "taxAmount": 23400,
+  "totalAmount": 153400,
+  "currency": "INR",
+
+  "deliveryDate": "2023-09-16",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+
+  "warrantyTillDate": "2026-09-12",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+},
+{
+  "itemCategory": "69c3af1d43b8a010e0da3a7a",
+  "itemType": "camera",
+  "itemTypeId": "69c3c264f3df17bd889b549a",
+
+  "itemId": "CAM-B5-009",
+  "itemTag": "CAM-POLY-B5-009",
+  "barcode": "BARB5009",
+  "itemSubType": "Conference Camera",
+  "manufacturer": "Poly",
+  "model": "Studio X50",
+  "modelNumber": "X50",
+  "partNumber": "PN-X50",
+  "serialNumber": "SN-B5-009",
+  "ownershipType": "Owned",
+  "manufacturingDate": "2023-10-01",
+
+  "cameraType": "Conference Camera",
+
+  "resolution": "4K",
+  "frameRate": 30,
+  "sensorType": "CMOS",
+  "fieldOfView": 120,
+  "autoFocus": "Yes",
+
+  "builtInMicrophone": "Yes",
+  "microphoneType": "Array Microphone",
+  "noiseReduction": "Yes",
+
+  "connectionType": "USB-C",
+  "plugAndPlay": "Yes",
+
+  "mountType": "Wall Mount",
+  "color": "Grey",
+  "weight": 1250,
+
+  "itemStatus": "active",
+  "itemIsCurrently": "inUsed",
+  "itemUser": "Meeting-02",
+  "AssignDate": "2024-02-28",
+
+  "organizationId": null,
+  "branchId": "69935a86b680a2e0b7064e5a",
+
+  "isActive": true,
+  "isDeleted": false,
+
+  "summary": {
+    "itemName": "Poly Studio X50",
+    "itemTag": "CAM-POLY-B5-009",
+    "serialNumber": "SN-B5-009",
+    "manufacturer": "Poly",
+    "model": "Studio X50"
+  },
+
+  "purchaseType": "Direct",
+  "receiptNumber": "RCPT-B5-009",
+  "receiptDate": "2023-10-05",
+  "purchaseDate": "2023-10-03",
+  "vendorId": "VENDOR-49",
+
+  "itemReceivedOn": "invoice",
+  "invoiceNumber": "INV-B5-009",
+  "invoiceDate": "2023-10-03",
+
+  "purchaseCost": 90000,
+  "taxAmount": 16200,
+  "totalAmount": 106200,
+  "currency": "INR",
+
+  "deliveryDate": "2023-10-06",
+  "receivedBy": "Admin",
+
+  "warrantyAvailable": "Yes",
+  "warrantyMode": "Duration",
+  "inYear": 3,
+
+  "warrantyTillDate": "2026-10-03",
+  "warrantyStatus": "Under Warranty",
+
+  "amcAvailable": "No"
+}
+
+
+]
+

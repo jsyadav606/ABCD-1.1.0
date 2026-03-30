@@ -40,14 +40,7 @@ const create = async (req) => {
     // Camera Type
     cameraType: body.cameraType || null,
 
-    // Location & Other Information
-    location: body.location || null,
-    locationType: body.locationType || null,
-    building: body.building || null,
-    floor: body.floor || null,
-    room: body.room || null,
-    rackNumber: body.rackNumber || null,
-    rackUnit: body.rackUnit || null,
+    
 
     // Camera Specifications
     resolution: body.resolution || null,

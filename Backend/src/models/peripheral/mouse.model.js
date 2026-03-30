@@ -82,7 +82,7 @@ const mouseSchema = new mongoose.Schema(
       model: { type: String, trim: true, default: null },
     }
   },
-  { timestamps: true, collection: "asset_peripheral_mouse" }
+  { timestamps: true, collection: "asset_peripheral" }
 );
 
 mouseSchema.pre("save", function (next) {

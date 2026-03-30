@@ -82,7 +82,7 @@ const keyboardSchema = new mongoose.Schema(
       model: { type: String, trim: true, default: null },
     }
   },
-  { timestamps: true, collection: "asset_peripheral_keyboard" }
+  { timestamps: true, collection: "asset_peripheral" }
 );
 
 keyboardSchema.pre("save", function (next) {

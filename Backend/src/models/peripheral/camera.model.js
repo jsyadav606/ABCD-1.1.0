@@ -37,14 +37,7 @@ const cameraSchema = new mongoose.Schema(
     // Camera Type (e.g., "USB Webcam", "Security Camera", "Video Conference Camera")
     cameraType: { type: String, trim: true, default: null },
 
-    // Location & Other Information
-    location: { type: String, trim: true, default: null },
-    locationType: { type: String, trim: true, default: null },
-    building: { type: String, trim: true, default: null },
-    floor: { type: String, trim: true, default: null },
-    room: { type: String, trim: true, default: null },
-    rackNumber: { type: String, trim: true, default: null },
-    rackUnit: { type: Number, default: null },
+
 
     // Camera Specifications
     resolution: { type: String, trim: true, default: null }, // e.g., "1080p", "4K", "2MP"

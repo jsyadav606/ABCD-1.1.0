@@ -85,7 +85,7 @@ const headphoneSchema = new mongoose.Schema(
       model: { type: String, trim: true, default: null },
     }
   },
-  { timestamps: true, collection: "asset_peripheral_headphone" }
+  { timestamps: true, collection: "asset_peripheral" }
 );
 
 headphoneSchema.pre("save", function (next) {
