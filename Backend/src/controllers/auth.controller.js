@@ -403,49 +403,113 @@ export const validateTokenController = asyncHandler(async (req, res) => {
 // =====================================================
 export const profileController = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
+  console.log(`[PROFILE] Fetching profile for user: ${userId}`);
+  
   if (!userId) {
-    throw new apiError(401, "Unauthorized");
+    throw new apiError(401, "Unauthorized - No user ID in token");
   }
 
-  const userDoc = await User.findById(userId).select("-password").populate("roleId");
-  if (!userDoc) {
-    throw new apiError(404, "User not found");
-  }
+  try {
+    // Fetch user document
+    let userDoc;
+    try {
+      userDoc = await User.findById(userId).select("-password");
+      if (!userDoc) {
+        console.error(`[PROFILE] User not found: ${userId}`);
+        throw new apiError(404, "User not found");
+      }
+    } catch (findErr) {
+      if (findErr.kind === 'ObjectId') {
+        throw new apiError(400, "Invalid user ID format");
+      }
+      console.error(`[PROFILE] Error finding user:`, findErr.message);
+      throw findErr;
+    }
 
-  // Fetch user login information for total login count
-  const userLoginDoc = await UserLogin.findOne({ user: userId }).select("totalLoginCount");
+    // Populate roleId if present
+    let roleData = null;
+    if (userDoc.roleId) {
+      try {
+        userDoc = await User.findById(userId)
+          .select("-password")
+          .populate("roleId")
+          .lean();
+        roleData = userDoc?.roleId;
+      } catch (populateErr) {
+        console.warn(`[PROFILE] Warning: Failed to populate roleId for ${userId}:`, populateErr.message);
+        // Continue anyway, role data will be null
+      }
+    }
 
-  const minimalUser = {
-    _id: userDoc._id,
-    userId: userDoc.userId,
-    name: userDoc.name,
-    email: userDoc.email,
-    role: userDoc.roleId?.name || null,
-    roleId: userDoc.roleId?._id || userDoc.roleId || null,
-    branchId: userDoc.branchId || [],
-    organizationId: userDoc.organizationId || null,
-    totalLoginCount: userLoginDoc?.totalLoginCount || 0,
-  };
+    // Fetch user login information for total login count
+    let userLoginDoc = null;
+    try {
+      userLoginDoc = await UserLogin.findOne({ user: userId }).select("totalLoginCount");
+    } catch (loginErr) {
+      console.warn(`[PROFILE] Warning: Failed to fetch UserLogin for ${userId}:`, loginErr.message);
+    }
 
-  let permissions = [];
-  if (Array.isArray(userDoc.permissions)) {
-    permissions = [...userDoc.permissions];
-  }
-  if (userDoc.roleId && Array.isArray(userDoc.roleId.permissionKeys)) {
-    permissions = [...permissions, ...userDoc.roleId.permissionKeys];
-  }
-  if (minimalUser.role === "super_admin" && !permissions.includes("*")) {
-    permissions.push("*");
-  }
-  permissions = Array.from(new Set(permissions));
+    // Safe extraction of role information
+    const roleId = roleData?._id || userDoc.roleId?._id || userDoc.roleId || null;
+    const roleName = roleData?.name || userDoc.roleId?.name || null;
 
-  return res
-    .status(200)
-    .json(
-      new apiResponse(
-        200,
-        { user: minimalUser, permissions },
-        "Profile retrieved successfully"
-      )
-    );
+    const minimalUser = {
+      _id: userDoc._id,
+      userId: userDoc.userId,
+      name: userDoc.name,
+      email: userDoc.email,
+      role: roleName,
+      roleId: roleId,
+      branchId: Array.isArray(userDoc.branchId) 
+        ? userDoc.branchId.map(b => (b && b._id) ? b._id : b).filter(Boolean)
+        : [],
+      organizationId: userDoc.organizationId || null,
+      totalLoginCount: userLoginDoc?.totalLoginCount || 0,
+    };
+
+    // Build permissions array safely
+    let permissions = [];
+    
+    // Add user-specific permissions
+    if (Array.isArray(userDoc.permissions) && userDoc.permissions.length > 0) {
+      permissions = [...userDoc.permissions];
+    }
+    
+    // Add role-based permissions
+    if (roleData && Array.isArray(roleData.permissionKeys) && roleData.permissionKeys.length > 0) {
+      permissions = [...permissions, ...roleData.permissionKeys];
+    }
+    
+    // Super admin gets wildcard permission
+    if (roleName === "super_admin" && !permissions.includes("*")) {
+      permissions.push("*");
+    }
+    
+    // Remove duplicates and sort
+    permissions = Array.from(new Set(permissions)).sort();
+
+    console.log(`[PROFILE] Successfully fetched profile for ${userId} with ${permissions.length} permissions`);
+
+    return res
+      .status(200)
+      .json(
+        new apiResponse(
+          200,
+          { user: minimalUser, permissions },
+          "Profile retrieved successfully"
+        )
+      );
+  } catch (error) {
+    if (error.statusCode) {
+      // Custom apiError - rethrow to asyncHandler
+      throw error;
+    }
+    console.error(`[PROFILE] Unexpected error fetching profile for userId ${userId}:`, {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
+    throw new apiError(500, `Failed to retrieve profile: ${error.message}`);
+  }
 });

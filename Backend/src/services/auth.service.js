@@ -74,8 +74,11 @@ export const authService = {
       }
 
       if (!userLogin) {
+        console.log(`[LOGIN] ❌ User not found: ${loginIdStr}`);
         throw new apiError(401, "Invalid login credentials");
       }
+      
+      console.log(`[LOGIN] ✅ User found: ${loginIdStr}, checking password...`);
 
       // Check if account is permanently locked
       if (userLogin.isPermanentlyLocked) {
@@ -94,7 +97,17 @@ export const authService = {
       }
 
       // Verify password (convert to string in case it's sent as number)
-      const isPasswordValid = await userLogin.comparePassword(String(password));
+      const passwordStr = String(password);
+      const isPasswordValid = await userLogin.comparePassword(passwordStr);
+      
+      console.log(`[LOGIN] Password verification for ${loginIdStr}:`, {
+        passwordProvided: passwordStr.substring(0, 3) + '***',
+        userFound: true,
+        passwordMatch: isPasswordValid,
+        failedAttempts: userLogin.failedLoginAttempts,
+        storageStatus: userLogin.password ? 'hash_stored' : 'no_hash'
+      });
+      
       if (!isPasswordValid) {
         // Increment failed attempts
         userLogin.failedLoginAttempts = (userLogin.failedLoginAttempts || 0) + 1;
@@ -106,6 +119,7 @@ export const authService = {
         }
 
         await userLogin.save();
+        console.error(`[LOGIN] Password mismatch for ${loginIdStr}. Attempts: ${userLogin.failedLoginAttempts}`);
         throw new apiError(401, "Invalid login credentials");
       }
 

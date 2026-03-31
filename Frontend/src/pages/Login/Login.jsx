@@ -97,6 +97,13 @@ const Login = () => {
 
     if (result.success) {
       navigate('/dashboard')
+    } else {
+      // Ensure error is visible if login failed
+      console.error('[LOGIN-PAGE] Login failed:', result.error)
+      // Force re-render of error display
+      if (!error && result.error) {
+        setValidationError(result.error)
+      }
     }
 
     setLoading(false)

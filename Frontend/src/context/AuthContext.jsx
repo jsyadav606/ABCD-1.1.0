@@ -95,8 +95,7 @@ export const AuthProvider = ({ children }) => {
 
           // Refresh profile and permissions from server so role rights changes reflect on refresh
           try {
-            const prof = await authAPI.getProfile()
-            const data = prof.data?.data
+            const data = await fetchProfileWithRetry(2)
             if (data?.user) {
               localStorage.setItem('user', JSON.stringify({
                 id: data.user._id || data.user.id,
@@ -104,7 +103,9 @@ export const AuthProvider = ({ children }) => {
                 name: data.user.name,
                 email: data.user.email,
                 role: data.user.role,
-                roleId: data.user.roleId
+                roleId: data.user.roleId,
+                organizationId: data.user.organizationId || null,
+                branchIds: Array.isArray(data.user.branchId) ? data.user.branchId.map(b => typeof b === 'object' ? String(b._id || b) : String(b)) : []
               }))
               setUser({
                 id: data.user._id || data.user.id,
@@ -112,7 +113,9 @@ export const AuthProvider = ({ children }) => {
                 name: data.user.name,
                 email: data.user.email,
                 role: data.user.role,
-                roleId: data.user.roleId
+                roleId: data.user.roleId,
+                organizationId: data.user.organizationId || null,
+                branchIds: Array.isArray(data.user.branchId) ? data.user.branchId.map(b => typeof b === 'object' ? String(b._id || b) : String(b)) : []
               })
             }
             if (Array.isArray(data?.permissions)) {
@@ -120,8 +123,9 @@ export const AuthProvider = ({ children }) => {
             } else if ((data?.user?.role || parsed?.role) === 'super_admin') {
               localStorage.setItem('permissions', JSON.stringify(['*']))
             }
-          } catch {
+          } catch (err) {
             // Ignore profile errors; keep current session
+            console.warn('[AUTH] Profile refresh during auth check failed, keeping session:', err?.message)
           }
         } catch (err) {
           console.error('Failed to parse stored user:', err)
@@ -169,6 +173,66 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  // Validate that token exists and is not expired (basic check)
+  const hasValidToken = useCallback(() => {
+    const token = localStorage.getItem('accessToken')
+    if (!token || token === 'undefined' || token === 'null') {
+      console.warn('[AUTH] No valid access token found')
+      return false
+    }
+    // Basic check: token should be a non-empty JWT string
+    const isJSONValid = token.split('.').length === 3
+    if (!isJSONValid) {
+      console.warn('[AUTH] Invalid token format')
+      return false
+    }
+    return true
+  }, [])
+
+  // Safely fetch profile with validation and error handling
+  const fetchProfileWithRetry = useCallback(async (maxRetries = 2) => {
+    if (!hasValidToken()) {
+      console.warn('[AUTH] Skipping profile fetch - no valid token')
+      return null
+    }
+    
+    let lastError = null
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[AUTH] Fetching profile (attempt ${attempt}/${maxRetries})`)
+        const response = await authAPI.getProfile()
+        console.log('[AUTH] Profile fetch successful')
+        return response.data?.data
+      } catch (err) {
+        lastError = err
+        const status = err.response?.status
+        const message = err.response?.data?.message || err.message
+        
+        console.error(`[AUTH] Profile fetch failed (attempt ${attempt}/${maxRetries}):`, {
+          status,
+          message,
+          attempt
+        })
+        
+        // Don't retry on 401/403/404 (auth/permission/not-found errors)
+        if ([401, 403, 404].includes(status)) {
+          console.error('[AUTH] Auth error - not retrying')
+          break
+        }
+        
+        // For 500 errors, wait before retry with exponential backoff
+        if (attempt < maxRetries && status === 500) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000)
+          console.log(`[AUTH] Retrying after ${delay}ms`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+        }
+      }
+    }
+    
+    console.error('[AUTH] Profile fetch failed after all retries')
+    return null
+  }, [hasValidToken])
+
   const login = useCallback(async (loginId, password) => {
     try {
       setLoading(true)
@@ -209,15 +273,15 @@ export const AuthProvider = ({ children }) => {
       updateActivity() // Update activity timestamp
       
       try {
-        const prof = await authAPI.getProfile()
-        const perms = prof.data?.data?.permissions
+        const data = await fetchProfileWithRetry(2)
+        const perms = data?.permissions
         if (Array.isArray(perms)) {
           localStorage.setItem('permissions', JSON.stringify(perms))
         } else if (minimalUser?.role === 'super_admin') {
           localStorage.setItem('permissions', JSON.stringify(['*']))
         }
       } catch (e) {
-        String(e)
+        console.warn('[AUTH] Profile fetch after login failed:', e?.message)
         if (minimalUser?.role === 'super_admin') {
           localStorage.setItem('permissions', JSON.stringify(['*']))
         }
@@ -230,13 +294,15 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Login failed'
-      setError(message)
+      const finalMessage = message && String(message).trim() ? message : 'Invalid login credentials'
+      console.error('[AUTH] Login error:', { status: err.response?.status, message: finalMessage })
+      setError(finalMessage)
       setIsAuthenticated(false)
-      return { success: false, error: message }
+      return { success: false, error: finalMessage }
     } finally {
       setLoading(false)
     }
-  }, [deviceId])
+  }, [deviceId, fetchProfileWithRetry])
 
   const reauth = useCallback(async (password) => {
     try {
@@ -275,15 +341,15 @@ export const AuthProvider = ({ children }) => {
       updateActivity() // Update activity timestamp
       
       try {
-        const prof = await authAPI.getProfile()
-        const perms = prof.data?.data?.permissions
+        const data = await fetchProfileWithRetry(2)
+        const perms = data?.permissions
         if (Array.isArray(perms)) {
           localStorage.setItem('permissions', JSON.stringify(perms))
         } else if (minimalUser?.role === 'super_admin') {
           localStorage.setItem('permissions', JSON.stringify(['*']))
         }
       } catch (e) {
-        String(e)
+        console.warn('[AUTH] Profile fetch after reauth failed:', e?.message)
         if (minimalUser?.role === 'super_admin') {
           localStorage.setItem('permissions', JSON.stringify(['*']))
         }
@@ -296,12 +362,14 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Re-authentication failed'
-      setError(message)
-      return { success: false, error: message }
+      const finalMessage = message && String(message).trim() ? message : 'Authentication failed'
+      console.error('[AUTH] Reauth error:', { status: err.response?.status, message: finalMessage })
+      setError(finalMessage)
+      return { success: false, error: finalMessage }
     } finally {
       setLoading(false)
     }
-  }, [deviceId, updateActivity])
+  }, [deviceId, updateActivity, fetchProfileWithRetry])
 
   const register = useCallback(async (userData) => {
     try {

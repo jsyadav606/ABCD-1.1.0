@@ -3,20 +3,50 @@ export const BRANCH_SCOPE_EVENT = "branch-scope-changed";
 
 export const getSelectedBranch = () => {
   try {
-    return localStorage.getItem(BRANCH_SCOPE_KEY) || "";
+    const stored = localStorage.getItem(BRANCH_SCOPE_KEY);
+    if (stored) {
+      // Check if it's JSON or old string format
+      if (stored.startsWith('{')) {
+        const parsed = JSON.parse(stored);
+        return parsed.id || "";
+      } else {
+        // Old format, return as is
+        return stored;
+      }
+    }
+    return "";
   } catch {
     return "";
   }
 };
 
-export const setSelectedBranch = (branchId) => {
+export const getSelectedBranchName = () => {
+  try {
+    const stored = localStorage.getItem(BRANCH_SCOPE_KEY);
+    if (stored) {
+      if (stored.startsWith('{')) {
+        const parsed = JSON.parse(stored);
+        return parsed.name || "";
+      } else {
+        // Old format, no name stored
+        return "";
+      }
+    }
+    return "";
+  } catch {
+    return "";
+  }
+};
+
+export const setSelectedBranch = (branchId, branchName = "") => {
   try {
     if (branchId) {
-      localStorage.setItem(BRANCH_SCOPE_KEY, branchId);
+      const data = { id: branchId, name: branchName };
+      localStorage.setItem(BRANCH_SCOPE_KEY, JSON.stringify(data));
     } else {
       localStorage.removeItem(BRANCH_SCOPE_KEY);
     }
-    const ev = new CustomEvent(BRANCH_SCOPE_EVENT, { detail: { branchId } });
+    const ev = new CustomEvent(BRANCH_SCOPE_EVENT, { detail: { branchId, branchName } });
     window.dispatchEvent(ev);
   } catch {
     // ignore
@@ -24,7 +54,7 @@ export const setSelectedBranch = (branchId) => {
 };
 
 export const onBranchChange = (handler) => {
-  const wrapped = (e) => handler(e.detail?.branchId || "");
+  const wrapped = (e) => handler(e.detail?.branchId || "", e.detail?.branchName || "");
   window.addEventListener(BRANCH_SCOPE_EVENT, wrapped);
   return () => window.removeEventListener(BRANCH_SCOPE_EVENT, wrapped);
 };

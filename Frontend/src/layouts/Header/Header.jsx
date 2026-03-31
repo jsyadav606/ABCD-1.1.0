@@ -1,10 +1,46 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { fetchBranchesForDropdown } from "../../services/userApi";
+import { getSelectedBranch, getSelectedBranchName, onBranchChange } from "../../utils/scope";
 import "./Header.css";
 
 const Header = ({ onToggleSidebar }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const headerRef = useRef(null);
+  const { user } = useAuth();
+  const [branches, setBranches] = useState([]);
+  const [selectedBranch, setSelectedBranchState] = useState(getSelectedBranch());
+  const [selectedBranchName, setSelectedBranchNameState] = useState(getSelectedBranchName());
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      if (user?.organizationId) {
+        try {
+          const branchList = await fetchBranchesForDropdown(user.organizationId);
+          setBranches(branchList);
+        } catch (error) {
+          console.error('Failed to fetch branches:', error);
+        }
+      }
+    };
+    fetchBranches();
+  }, [user?.organizationId]);
+
+  useEffect(() => {
+    const unsubscribe = onBranchChange((branchId, branchName) => {
+      setSelectedBranchState(branchId);
+      setSelectedBranchNameState(branchName);
+    });
+    return unsubscribe;
+  }, []);
+
+  const getLogoText = () => {
+    if (selectedBranch === "__ALL__") {
+      return "A";
+    }
+    return selectedBranchName || "A";
+  };
 
   const handleSearchToggle = () => {
     setIsSearchOpen(!isSearchOpen);
@@ -56,7 +92,7 @@ const Header = ({ onToggleSidebar }) => {
 
         <div className="logo">
           {/* <Link to="/">ABCD</Link> */}
-          <Link to="/">A</Link>
+          <Link to="/">{getLogoText()}</Link>
         </div>
       </div>
 

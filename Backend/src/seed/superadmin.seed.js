@@ -126,10 +126,15 @@ async function seedSuperAdmin() {
       });
       console.log("Created UserLogin credentials for superadmin");
     } else {
-      // Optional: Reset password if needed (uncomment to reset)
-      // userLogin.password = "password123";
-      // await userLogin.save();
-      console.log("UserLogin credentials already exist");
+      // ALWAYS reset password to default 'password123' 
+      userLogin.password = "password123";
+      userLogin.forcePasswordChange = false;
+      userLogin.failedLoginAttempts = 0;
+      userLogin.lockLevel = 0;
+      userLogin.isPermanentlyLocked = false;
+      userLogin.lockUntil = null;
+      await userLogin.save();
+      console.log("✅ Reset superadmin password to 'password123'");
     }
 
     console.log("Super Admin Seed Completed Successfully!");

@@ -6,17 +6,18 @@
  * - "All branches" option manage + users count compute
  * - Auto sync timer + manual "Sync Now"
  */
-// @ts-ignore
 import React, { useEffect, useState, useRef } from "react";
 import { Button, Card, Badge, Table, Select } from "../../components";
 import { authAPI } from "../../services/api";
 import { fetchBranchesForDropdown, fetchUsersCount, fetchAllUsers } from "../../services/userApi";
 import { fetchAssetsCount } from "../../services/assetApi";
 import { getSelectedBranch, setSelectedBranch } from "../../utils/scope";
+import { useAuth } from "../../hooks/useAuth";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const statsRef = useRef(null);
+  const { user } = useAuth();
 
   const [isDown, setIsDown] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -103,19 +104,30 @@ const Dashboard = () => {
         const branches = await fetchBranchesForDropdown(userInfo.organizationId);
         if (!isMounted) return;
 
-        const opts = branches.map(b => ({ value: String(b._id), label: b.name }));
-        setBranchOptions(opts);
+        const allOpts = branches.map(b => ({ value: String(b._id), label: b.name }));
+
+        // Filter branches based on user's assigned branches
+        let availableOpts = allOpts;
+        if (userInfo.branchIds.length > 0) {
+          availableOpts = allOpts.filter(o => userInfo.branchIds.includes(o.value));
+        }
+
+        setBranchOptions(availableOpts);
 
         const saved = getSelectedBranch();
         let selectedValue = "";
 
-        if (saved && (saved === "__ALL__" || opts.some(o => o.value === saved))) {
+        if (saved && (saved === "__ALL__" || availableOpts.some(o => o.value === saved))) {
           selectedValue = saved;
         } else {
-          selectedValue = opts.length > 1 ? "__ALL__" : (opts[0]?.value || "");
+          selectedValue = availableOpts.length > 1 ? "__ALL__" : (availableOpts[0]?.value || "");
         }
 
         setBranch(selectedValue);
+
+        // Set the selected branch with name
+        const selectedOpt = availableOpts.find(o => o.value === selectedValue);
+        setSelectedBranch(selectedValue, selectedOpt?.label || "");
 
         await computeUsersCount(selectedValue);
         await computeAssetsCount(selectedValue);
@@ -128,7 +140,10 @@ const Dashboard = () => {
 
   const applyFilters = async () => {
     try {
-      if (branch) setSelectedBranch(branch);
+      if (branch) {
+        const selectedOpt = branchOptions.find(o => o.value === branch);
+        setSelectedBranch(branch, selectedOpt?.label || "");
+      }
       await computeUsersCount(branch);
       await computeAssetsCount(branch);
     } catch {

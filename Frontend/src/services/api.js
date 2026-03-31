@@ -19,6 +19,7 @@
  */
 
 import axios from 'axios'
+import apiLogger from '../utils/apiLogger'
 
 // Dev: always use relative path to leverage Vite proxy (avoids HTTPS->HTTP mixed-content + CORS).
 // Prod: allow VITE_API_URL override (separate backend domain) else fall back to relative.
@@ -38,6 +39,10 @@ const API = axios.create({
 // Track if we're currently refreshing token to prevent multiple refresh attempts
 let isRefreshing = false
 let failedQueue = []
+
+// Retry configuration
+const MAX_RETRIES = 2
+const RETRY_DELAY_MS = 1000
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach(prom => {
@@ -88,6 +93,10 @@ API.interceptors.request.use(
         config.headers['x-csrf-token'] = csrf
       }
     }
+    
+    // Log the request
+    apiLogger.logRequest(method, config.url)
+    
     return config
   },
   error => {
@@ -103,16 +112,24 @@ export const clearAuthHeaders = () => {
   delete API.defaults.headers.common.Authorization
 }
 
-// Response interceptor - Handle token refresh and common errors
+// Response interceptor - Handle token refresh, retries, and common errors
 API.interceptors.response.use(
-  response => response,
+  response => {
+    // Log successful response
+    const method = response.config?.method || 'get'
+    const url = response.config?.url
+    apiLogger.logResponse(method, url, response.status, response.data)
+    return response
+  },
   async error => {
     const originalRequest = error.config
+    const method = originalRequest?.method || 'get'
+    const url = originalRequest?.url
 
     // Handle 401 - Try to refresh token if not already refreshing
     // But skip refresh logic for login/register endpoints - let them fail normally
-    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
-                          originalRequest.url?.includes('/auth/register')
+    const isAuthEndpoint = url?.includes('/auth/login') || 
+                          url?.includes('/auth/register')
     
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
@@ -123,7 +140,10 @@ API.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`
             return API(originalRequest)
           })
-          .catch(err => Promise.reject(err))
+          .catch(err => {
+            apiLogger.logError(method, url, err.response?.status, err)
+            return Promise.reject(err)
+          })
       }
 
       originalRequest._retry = true
@@ -154,8 +174,31 @@ API.interceptors.response.use(
         localStorage.removeItem('user')
         sessionStorage.removeItem('deviceId')
         processQueue(err, null)
+        apiLogger.logError('POST', '/auth/refresh', err.response?.status, err)
         window.location.href = '/login'
         return Promise.reject(err)
+      }
+    }
+
+    // Handle 500 - Server errors with exponential backoff retry
+    if (error.response?.status === 500 && !originalRequest._retryCount) {
+      originalRequest._retryCount = 0
+    }
+
+    if (error.response?.status === 500 && originalRequest._retryCount < MAX_RETRIES) {
+      originalRequest._retryCount += 1
+      const delay = Math.min(RETRY_DELAY_MS * Math.pow(2, originalRequest._retryCount - 1), 5000)
+      
+      apiLogger.logError(method, url, 500, new Error(`Server error - Retry ${originalRequest._retryCount}/${MAX_RETRIES}`))
+      
+      await new Promise(resolve => setTimeout(resolve, delay))
+      
+      // Retry the request
+      try {
+        return API(originalRequest)
+      } catch (retryErr) {
+        apiLogger.logError(method, url, retryErr.response?.status, retryErr)
+        return Promise.reject(retryErr)
       }
     }
 
@@ -163,6 +206,7 @@ API.interceptors.response.use(
     if (error.response?.status === 429) {
       const message = error.response?.data?.message || 'Too many login attempts. Account temporarily locked.'
       error.message = message
+      apiLogger.logError(method, url, 429, error)
     }
 
     // Handle 403 - Forbidden
@@ -170,7 +214,20 @@ API.interceptors.response.use(
       // Do NOT log out on 403. This just means the user lacks permission for a specific resource.
       // The component (e.g., ProtectedRoute) will handle this by showing a 404/403 page.
       console.warn("Access Denied (403) - You do not have permission for this action.");
+      apiLogger.logError(method, url, 403, error)
       return Promise.reject(error);
+    }
+
+    // Enhanced error messaging for user feedback
+    if (error.response?.status && error.response.status >= 400) {
+      // Use backend message if available, else generic message
+      const backendMessage = error.response?.data?.message
+      if (!error.message || error.message === 'Network Error') {
+        error.message = backendMessage || `Error: ${error.response.status}`
+      }
+      apiLogger.logError(method, url, error.response.status, error)
+    } else {
+      apiLogger.logError(method, url, 'unknown', error)
     }
 
     return Promise.reject(error)
