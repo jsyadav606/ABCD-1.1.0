@@ -10,11 +10,17 @@ header {
   padding: 0 1rem;
   background: #0c3c78;
   color: #fbbf24;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 999;
   gap: 1rem;
   flex-wrap: wrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* ============================================
