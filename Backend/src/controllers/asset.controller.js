@@ -35,17 +35,17 @@ const getHandler = (AssetType) => {
 };
 
 export const createAsset = asyncHandler(async (req, res) => {
-  const { AssetType, AssetCategory } = req.body;
-  if (!AssetType || !String(AssetType).trim()) {
+  const { AssetType: assetTypeName, AssetCategory: assetCategoryId } = req.body;
+  if (!assetTypeName || !String(assetTypeName).trim()) {
     throw new apiError(400, "AssetType is required");
   }
-  if (!AssetCategory || !String(AssetCategory).trim()) {
+  if (!assetCategoryId || !String(assetCategoryId).trim()) {
     throw new apiError(400, "AssetCategory is required");
   }
 
   // Validate AssetCategory exists
   const category = await AssetCategory.findOne({
-    _id: AssetCategory,
+    _id: assetCategoryId,
     isDeleted: false,
     isActive: true,
   });
@@ -57,13 +57,13 @@ export const createAsset = asyncHandler(async (req, res) => {
   // Create or update AssetType
   await AssetType.findOneAndUpdate(
     {
-      name: { $regex: `^${AssetType.trim()}$`, $options: "i" },
-      category: AssetCategory,
+      name: { $regex: `^${assetTypeName.trim()}$`, $options: "i" },
+      category: assetCategoryId,
       isDeleted: false,
     },
     {
-      name: AssetType.trim(),
-      category: AssetCategory,
+      name: assetTypeName.trim(),
+      category: assetCategoryId,
       isActive: true,
     },
     {
@@ -73,7 +73,14 @@ export const createAsset = asyncHandler(async (req, res) => {
     }
   );
 
-  const handler = getHandler(AssetType);
+  const handler = getHandler(assetTypeName);
+  // Keep the original request body names for downstream handler code if needed
+  req.body.AssetType = assetTypeName;
+  req.body.assetType = assetTypeName;
+  req.body.AssetCategory = assetCategoryId;
+  req.body.assetCategory = assetCategoryId;
+  req.body.AssetTypeId = req.body.AssetTypeId || null;
+
   const { doc, message } = await handler.create(req);
   return res.status(201).json(new apiResponse(201, doc, message || "Asset created successfully"));
 });

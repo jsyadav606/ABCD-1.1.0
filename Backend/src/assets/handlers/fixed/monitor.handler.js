@@ -18,8 +18,9 @@ const create = async (req) => {
   // Build Fixed Asset Payload (no purchase/warranty fields)
   const fixedPayload = {
     ...body,
-    AssetCategory,
-    AssetType,
+    assetCategory: AssetCategory,
+    assetType: AssetType,
+    assetTypeId: body.AssetTypeId || null,
     branchId,
     screenSizeInches: toNumberOrNull(body.screenSizeInches),
     refreshRateHz: toNumberOrNull(body.refreshRateHz),

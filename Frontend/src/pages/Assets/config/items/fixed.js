@@ -18,7 +18,7 @@ export const fixedConfigs = {
       //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),
@@ -695,7 +695,7 @@ export const fixedConfigs = {
       //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),

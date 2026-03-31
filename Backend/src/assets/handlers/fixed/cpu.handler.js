@@ -80,8 +80,9 @@ const create = async (req) => {
   // Build Fixed Asset Payload (no purchase/warranty fields)
   const fixedPayload = {
     ...body,
-    AssetCategory,
-    AssetType,
+    assetCategory: AssetCategory,
+    assetType: AssetType,
+    assetTypeId: body.AssetTypeId || null,
     branchId,
     memory,
     storage,
