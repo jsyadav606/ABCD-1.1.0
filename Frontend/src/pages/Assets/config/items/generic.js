@@ -8,16 +8,16 @@ export const genericConfig = {
     {
       sectionTitle: "Basic Information",
       fields: [
-        { name: "itemId", label: "Asset ID", placeholder: "Enter Asset ID", type: "text", readOnly: false, required: true,},
-        { name: "itemTag", label: "Item Tag", placeholder: "Enter Item Tag", type: "text", required: true, maxLength: 80 },
+        { name: "assetId", label: "Asset ID", placeholder: "Enter Asset ID", type: "text", readOnly: false, required: true,},
+        { name: "assetTag", label: "Asset Tag", placeholder: "Enter Asset Tag", type: "text", required: true, maxLength: 80 },
         { name: "barcode", label: "Barcode / QR Code", placeholder: "Enter Barcode / QR Code", type: "text", maxLength: 120 },
 
-        { name: "itemName", label: "Item Name", placeholder: "Enter Item Name", type: "text", required: true, maxLength: 120 },
-        { name: "itemDescription", label: "Description", placeholder: "Enter Description", type: "textarea", maxLength: 500 },
+        { name: "assetName", label: "Asset Name", placeholder: "Enter Asset Name", type: "text", required: true, maxLength: 120 },
+        { name: "assetDescription", label: "Description", placeholder: "Enter Description", type: "textarea", maxLength: 500 },
 
-        { name: "itemCategory", label: "Category", placeholder: "Select Category", type: "select", options: common.assetCategories },
-        { name: "itemType", label: "Item Type", placeholder: "Select Item Type", type: "select", options: common.assetTypes },
-        { name: "itemSubType", label: "Sub Type", placeholder: "Enter Sub Type", type: "text", maxLength: 80 },
+        { name: "assetCategory", label: "Category", placeholder: "Select Category", type: "select", options: common.assetCategories },
+        { name: "assetType", label: "Asset Type", placeholder: "Select Asset Type", type: "select", options: common.assetTypes },
+        { name: "assetSubType", label: "Sub Type", placeholder: "Enter Sub Type", type: "text", maxLength: 80 },
 
         { name: "manufacturer", label: "Manufacturer", placeholder: "Enter Manufacturer", type: "text", maxLength: 100 },
         { name: "brand", label: "Brand", placeholder: "Enter Brand", type: "text", maxLength: 100 },
@@ -26,7 +26,7 @@ export const genericConfig = {
         { name: "partNumber", label: "Part Number", placeholder: "Enter Part Number", type: "text", maxLength: 100 },
         { name: "serialNumber", label: "Serial Number", placeholder: "Enter Serial Number", type: "text", maxLength: 120 },
 
-        { name: "itemCondition", label: "Condition", placeholder: "Select Condition", type: "select", options: common.assetCondition },
+        { name: "assetCondition", label: "Condition", placeholder: "Select Condition", type: "select", options: common.assetCondition },
         { name: "ownershipType", label: "Ownership Type", placeholder: "Select Ownership Type", type: "select", options: [{name:"Owned", value:"Owned"}, {name:"Leased", value:"Leased"}, {name:"Rented", value:"Rented"}] },
 
         { name: "manufacturingDate", label: "Manufacturing Date", placeholder: "Select Manufacturing Date", type: "date" },
@@ -49,11 +49,11 @@ export const genericConfig = {
         { name: "vendorId", label: "Vendor", placeholder: "Select Vendor", type: "select", options: common.vendors },
         
         
-        { name: "itemReceivedOn", label: "Item Received On", placeholder: "Select Item Received On", type: "radio", options: [{ name: "Invoice", value: "invoice" }, { name: "Challan", value: "Challan" }] },
-        { name: "invoiceNumber", label: "Invoice Number", placeholder: "Enter Invoice Number", type: "text", maxLength: 80, showIf: { itemReceivedOn: "invoice" } },
-        { name: "invoiceDate", label: "Invoice Date", placeholder: "Select Invoice Date", type: "date", showIf: { itemReceivedOn: "invoice" } },
-        { name: "deliveryChallanNumber", label: "Delivery Challan Number", placeholder: "Enter Delivery Challan Number", type: "text", showIf: { itemReceivedOn: "Challan" } },
-        { name: "deliveryChallanDate", label: "Challan Date", placeholder: "Select Challan Date", type: "date", showIf: { itemReceivedOn: "Challan" } },
+        { name: "assetReceivedOn", label: "Asset Received On", placeholder: "Select Asset Received On", type: "radio", options: [{ name: "Invoice", value: "invoice" }, { name: "Challan", value: "Challan" }] },
+        { name: "invoiceNumber", label: "Invoice Number", placeholder: "Enter Invoice Number", type: "text", maxLength: 80, showIf: { assetReceivedOn: "invoice" } },
+        { name: "invoiceDate", label: "Invoice Date", placeholder: "Select Invoice Date", type: "date", showIf: { assetReceivedOn: "invoice" } },
+        { name: "deliveryChallanNumber", label: "Delivery Challan Number", placeholder: "Enter Delivery Challan Number", type: "text", showIf: { assetReceivedOn: "Challan" } },
+        { name: "deliveryChallanDate", label: "Challan Date", placeholder: "Select Challan Date", type: "date", showIf: { assetReceivedOn: "Challan" } },
         
         { name: "purchaseDate", label: "Purchase Date", placeholder: "Select Purchase Date", type: "date", },
         { name: "purchaseCost", label: "Purchase Cost", placeholder: "Enter Purchase Cost", type: "number", min: 0, max: 50000000 },
@@ -97,15 +97,15 @@ export const genericConfig = {
       ],
     },
 
-    //! Item State
+    //! Asset State
     {
-      sectionTitle: "Item State",
+      sectionTitle: "Asset State",
       fields: [
-        { name: "itemStatus", label: "Item Status", placeholder: "Select Item Status", type: "select", options: [{name:"Active", value:"active"}, {name:"Inactive", value:"inactive"}], defaultValue: "active" },
-        { name: "itemIsCurrently", label: "Item is Currently", placeholder: "Select Item is Currently", type: "select", options: [{name:"In Store", value:"inStore"}, {name:"In Use", value:"inUse" }], defaultValue: "inStore" },
+        { name: "assetStatus", label: "Asset Status", placeholder: "Select Asset Status", type: "select", options: [{name:"Active", value:"active"}, {name:"Inactive", value:"inactive"}], defaultValue: "active" },
+        { name: "assetIsCurrently", label: "Asset is Currently", placeholder: "Select Asset is Currently", type: "select", options: [{name:"In Store", value:"inStore"}, {name:"In Use", value:"inUse" }], defaultValue: "inStore" },
 
-        { name: "itemUser", label: "Item User", placeholder: "Select Item User", type: "select", options: common.user, showIf: { itemIsCurrently: "inUse" }},
-         { name: "AssignDate", label: "Assignment Date", placeholder: "Select Assignment Date", type: "date", showIf: { itemIsCurrently: "inUse" }},
+        { name: "assetUser", label: "Asset User", placeholder: "Select Asset User", type: "select", options: common.user, showIf: { assetIsCurrently: "inUse" }},
+        { name: "assignDate", label: "Assignment Date", placeholder: "Select Assignment Date", type: "date", showIf: { assetIsCurrently: "inUse" }},
         // { name: "endOfLifeDate", label: "End Of Life Date", type: "date" },
       ],
   
@@ -222,3 +222,4 @@ export const genericConfig = {
 
   ],
 };
+

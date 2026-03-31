@@ -64,8 +64,8 @@ const AssetPage = () => {
         setError(null);
         const data = await fetchAllAssets();
         // Remove duplicates based on _id
-        const uniqueData = data.filter((item, index, self) => 
-          self.findIndex(a => a._id === item._id) === index
+        const uniqueData = data.filter((asset, index, self) => 
+          self.findIndex(a => a._id === asset._id) === index
         );
         setAssets(uniqueData);
         // Debug: log sample monitor rows so we can verify available fields
@@ -353,7 +353,7 @@ const AssetPage = () => {
     return counts;
   }, [activeVisibleAssets, assetCategories, getCategoryName]);
 
-  const goAddItem = () => {
+  const goAddAsset = () => {
     navigate("/assets/add");
   };
 
@@ -459,7 +459,7 @@ const AssetPage = () => {
 
   const columns = [
     { 
-      header: "Item ID", 
+      header: "Asset ID", 
       key: "assetId", 
       sortable: true,
       render: (row, search) => (
@@ -526,8 +526,8 @@ const AssetPage = () => {
       </div> */}
         <div className="asset-header">
           <h1>Assets</h1>
-          <Button variant="primary" aria-label="Add Item" onClick={goAddItem}>
-            Add Item
+          <Button variant="primary" aria-label="Add Asset" onClick={goAddAsset}>
+            Add Asset
           </Button>
         </div>
 
@@ -606,7 +606,7 @@ const AssetPage = () => {
             <div className="empty-state">
               <div className="empty-icon">[BOX]</div>
               <div className="empty-text">
-                {appliedFilterCategory === "ALL" ? "No items. Click Add Item to create one." : `No ${capitalizeText(appliedFilterCategory)} items here.`}
+                {appliedFilterCategory === "ALL" ? "No assets. Click Add Asset to create one." : `No ${capitalizeText(appliedFilterCategory)} assets here.`}
               </div>
             </div>
           </>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Model: Camera Peripheral
  * Description: Camera-specific fields for peripheral assets. 
  * Collections: asset_peripheral_camera
@@ -9,21 +9,21 @@ import mongoose from "mongoose";
 const cameraSchema = new mongoose.Schema(
   {
     // Mandatory first fields
-    AssetCategory: {
+    assetCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AssetCategory",
       required: true
     },
-    AssetType: { type: String, required: true, trim: true },
-    AssetTypeId: {
+    assetType: { type: String, required: true, trim: true },
+    assetTypeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AssetType",
+      ref: "assetType",
       default: null
     },
 
     // Basic Information
-    AssetId: { type: String, trim: true, default: null },
-    AssetTag: { type: String, trim: true, default: null },
+    assetId: { type: String, trim: true, default: null },
+    assetTag: { type: String, trim: true, default: null },
     barcode: { type: String, trim: true, default: null },
     assetSubType: { type: String, trim: true, default: null },
     manufacturer: { type: String, trim: true, default: null },
@@ -62,10 +62,10 @@ const cameraSchema = new mongoose.Schema(
     weight: { type: Number, default: null }, // grams
 
     // Item State
-    AssetStatus: { type: String, trim: true, default: "active" },
+    assetStatus: { type: String, trim: true, default: "active" },
     assetIsCurrently: { type: String, trim: true, default: "inStore" },
-    AssetUser: { type: String, trim: true, default: null },
-    AssignDate: { type: Date, default: null },
+    assetUser: { type: String, trim: true, default: null },
+    assignDate: { type: Date, default: null },
 
     // Infrastructure fields
     organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null },
@@ -84,8 +84,8 @@ const cameraSchema = new mongoose.Schema(
 
     // Summary field for quick listing
     summary: {
-      AssetName: { type: String, trim: true, default: null },
-      AssetTag: { type: String, trim: true, default: null },
+      assetName: { type: String, trim: true, default: null },
+      assetTag: { type: String, trim: true, default: null },
       serialNumber: { type: String, trim: true, default: null },
       manufacturer: { type: String, trim: true, default: null },
       model: { type: String, trim: true, default: null },
@@ -95,15 +95,15 @@ const cameraSchema = new mongoose.Schema(
 );
 
 // Indices for performance
-cameraSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, AssetType: 1, isDeleted: 1, createdAt: -1 });
-cameraSchema.index({ AssetId: 1 }, { sparse: true });
+cameraSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, assetType: 1, isDeleted: 1, createdAt: -1 });
+cameraSchema.index({ assetId: 1 }, { sparse: true });
 cameraSchema.index({ serialNumber: 1 }, { sparse: true });
 
 // Pre-save hook to populate summary
 cameraSchema.pre("save", function () {
   this.summary = {
-    AssetName: this.AssetId || "Camera",
-    AssetTag: this.AssetTag || this.AssetId || "N/A",
+    assetName: this.assetId || "Camera",
+    assetTag: this.assetTag || this.assetId || "N/A",
     barcode: this.barcode || "N/A",
     serialNumber: this.serialNumber || "N/A",
     manufacturer: this.manufacturer || "N/A",

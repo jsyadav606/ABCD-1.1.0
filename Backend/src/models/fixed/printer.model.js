@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Model: Printer Asset
  * Description: Printer specific fields + summary for fast list views. Collection: asset_fixed
  */
@@ -6,15 +6,15 @@ import mongoose from "mongoose";
 
 const printerSchema = new mongoose.Schema(
   {
-    AssetCategory: {
+    assetCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AssetCategory",
       required: true
     },
-    AssetType: { type: String, required: true, trim: true },
-    AssetTypeId: {
+    assetType: { type: String, required: true, trim: true },
+    assetTypeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AssetType",
+      ref: "assetType",
       default: null
     },
 
@@ -22,8 +22,8 @@ const printerSchema = new mongoose.Schema(
     AssetId: { type: String, trim: true, default: null },
     AssetTag: { type: String, trim: true, default: null },
     barcode: { type: String, trim: true, default: null },
-    AssetName: { type: String, trim: true, default: null },
-    AssetDescription: { type: String, trim: true, default: null },
+    assetName: { type: String, trim: true, default: null },
+    assetDescription: { type: String, trim: true, default: null },
     assetSubType: { type: String, trim: true, default: null },
 
     manufacturer: { type: String, trim: true, default: null },
@@ -33,7 +33,7 @@ const printerSchema = new mongoose.Schema(
     partNumber: { type: String, trim: true, default: null },
     serialNumber: { type: String, trim: true, default: null },
 
-    AssetCondition: { type: String, trim: true, default: null },
+    assetCondition: { type: String, trim: true, default: null },
     ownershipType: { type: String, trim: true, default: null },
     manufacturingDate: { type: Date, default: null },
 
@@ -116,7 +116,7 @@ const printerSchema = new mongoose.Schema(
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
     summary: {
-      AssetName: { type: String, trim: true, default: null },
+      assetName: { type: String, trim: true, default: null },
       AssetTag: { type: String, trim: true, default: null },
       serialNumber: { type: String, trim: true, default: null },
       manufacturer: { type: String, trim: true, default: null },
@@ -126,13 +126,13 @@ const printerSchema = new mongoose.Schema(
   { timestamps: true, collection: "asset_fixed" }
 );
 
-printerSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, AssetType: 1, isDeleted: 1, createdAt: -1 });
+printerSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, assetType: 1, isDeleted: 1, createdAt: -1 });
 printerSchema.index({ AssetId: 1 }, { sparse: true });
 printerSchema.index({ serialNumber: 1 }, { sparse: true });
 
 printerSchema.pre("save", function () {
   this.summary = {
-    AssetName: this.AssetId || "Printer",
+    assetName: this.AssetId || "Printer",
     AssetTag: this.AssetTag || this.AssetId || "N/A",
     serialNumber: this.serialNumber || "N/A",
     manufacturer: this.manufacturer || "N/A",

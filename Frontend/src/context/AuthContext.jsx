@@ -199,9 +199,9 @@ export const AuthProvider = ({ children }) => {
     let lastError = null
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`[AUTH] Fetching profile (attempt ${attempt}/${maxRetries})`)
+        
         const response = await authAPI.getProfile()
-        console.log('[AUTH] Profile fetch successful')
+      
         return response.data?.data
       } catch (err) {
         lastError = err

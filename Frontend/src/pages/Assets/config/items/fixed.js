@@ -165,8 +165,8 @@ export const fixedConfigs = {
         //  addFields:[{},{},{},]
       }),
 
-      //! Item State
-      fromGeneric("Item State",{
+      //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -185,7 +185,7 @@ export const fixedConfigs = {
        //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),
@@ -244,8 +244,8 @@ export const fixedConfigs = {
         //  addFields:[{},{},{},]
       }),
 
-      //! Item State
-      fromGeneric("Item State",{
+      //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -261,7 +261,7 @@ export const fixedConfigs = {
       //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),
@@ -300,9 +300,9 @@ export const fixedConfigs = {
         ],
       },
 
-      //! Item Lifecycle Status
+      //! Asset Lifecycle Status
       {
-        sectionTitle: "Item Lifecycle Status",
+        sectionTitle: "Asset Lifecycle Status",
         fields: [
           { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
 
@@ -450,8 +450,8 @@ export const fixedConfigs = {
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
       }),
-      //! Item State
-      fromGeneric("Item State",{
+      //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -466,7 +466,7 @@ export const fixedConfigs = {
       //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),
@@ -679,8 +679,8 @@ export const fixedConfigs = {
         //  addFields:[{},{},{},]
       }),
 
-       //! Item State
-      fromGeneric("Item State",{
+       //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -771,9 +771,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Financial Details",
+        sectionTitle: "Asset Financial Details",
         fields: [
-          { name: "itemTag", placeholder: "e.g. IP001", label: "Item Tag", type: "text", required: true, maxLength: 80 },
+          { name: "assetTag", placeholder: "e.g. IP001", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
           { name: "serialNumber", placeholder: "e.g. SN1234567890", label: "Serial Number", type: "text", required: true, maxLength: 120 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "barcode", placeholder: "e.g. 123456789012", label: "Barcode / QR Code", type: "text", maxLength: 120 },
@@ -787,7 +787,7 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Location & Assignment",
+        sectionTitle: "Asset Location & Assignment",
         fields: [
           { name: "branch", label: "Branch", type: "select", options: common.branches },
           { name: "building", placeholder: "e.g. Main Building", label: "Building", type: "text", maxLength: 100 },
@@ -798,7 +798,7 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Lifecycle Status",
+        sectionTitle: "Asset Lifecycle Status",
         fields: [
           { name: "lifecycleStatus", label: "Lifecycle Status", type: "select", options: common.lifecycleStatus },
           { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
@@ -813,10 +813,10 @@ export const fixedConfigs = {
   tablet: {
     sections: [
       {
-        sectionTitle: "Item Basic Information",
+        sectionTitle: "Asset Basic Information",
         fields: [
-          { name: "itemName", placeholder: "e.g. iPad Pro", label: "Item Name", type: "text", required: true, maxLength: 120 },
-          { name: "itemCategory", label: "Item Category", type: "select", options: common.itemCategories, required: true },
+          { name: "assetName", placeholder: "e.g. iPad Pro", label: "Asset Name", type: "text", required: true, maxLength: 120 },
+          { name: "assetCategory", label: "Asset Category", type: "select", options: common.itemCategories, required: true },
           { name: "manufacturer", placeholder: "e.g. Apple", label: "Manufacturer", type: "text", required: true, maxLength: 100 },
           { name: "model", placeholder: "e.g. iPad Pro 12.9", label: "Model", type: "text", required: true, maxLength: 100 },
           { name: "deviceType", label: "Device Type", type: "select", options: common.deviceTypes },
@@ -824,7 +824,7 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Operating System",
+        sectionTitle: "Asset Operating System",
         fields: [
           { name: "osName", placeholder: "e.g. iOS", label: "OS Name", type: "text", maxLength: 80 },
           { name: "osVersion", placeholder: "e.g. 15.0", label: "OS Version", type: "text", maxLength: 40 },
@@ -894,9 +894,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Financial Details",
+        sectionTitle: "Asset Financial Details",
         fields: [
-          { name: "itemTag", placeholder: "e.g. TAB001", label: "Item Tag", type: "text", required: true, maxLength: 80 },
+          { name: "assetTag", placeholder: "e.g. TAB001", label: "Asset Tag", type: "text", required: true, maxLength: 80 },
           { name: "serialNumber", placeholder: "e.g. F1234567890", label: "Serial Number", type: "text", required: true, maxLength: 120 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "barcode", placeholder: "e.g. 123456789012", label: "Barcode / QR Code", type: "text", maxLength: 120 },
@@ -910,7 +910,7 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Location & Assignment",     
+        sectionTitle: "Asset Location & Assignment",     
         fields: [
           { name: "branch", label: "Branch", type: "select", options: common.branches },
           { name: "building", placeholder: "e.g. Admin Building", label: "Building", type: "text", maxLength: 100 },
@@ -921,9 +921,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Lifecycle Status",  
+        sectionTitle: "Asset Lifecycle Status",  
         fields: [
-          { name: "itemLifecycleStatus", label: "Item Lifecycle Status", type: "select", options: common.lifecycleStatus },
+          { name: "assetLifecycleStatus", label: "Asset Lifecycle Status", type: "select", options: common.lifecycleStatus },
           { name: "operationalStatus", label: "Operational Status", type: "select", options: common.operationalStatus },
           { name: "lastAuditDate", label: "Last Physical Audit Date", type: "date" },
           { name: "condition", label: "Physical Condition", type: "select", options: common.conditionStatus },
@@ -936,11 +936,11 @@ export const fixedConfigs = {
   projector: {
     sections: [
       {
-        sectionTitle: "Item Basic Information",
+        sectionTitle: "Asset Basic Information",
         fields: [
-          { name: "itemName", label: "Item Name", type: "text", required: true, maxLength: 80 },
+          { name: "assetName", label: "Asset Name", type: "text", required: true, maxLength: 80 },
           { name: "model", label: "Model", type: "text", maxLength: 80 },
-          { name: "itemManufacturer", label: "Item Manufacturer", type: "text", required: true, maxLength: 80 },
+          { name: "assetManufacturer", label: "Asset Manufacturer", type: "text", required: true, maxLength: 80 },
           { name: "deviceTag", label: "Device Tag", type: "text", maxLength: 50 },
           {
             name: "projectorType",
@@ -1019,10 +1019,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1032,9 +1032,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "assignedTo", label: "Assigned To", type: "text", maxLength: 120 },
           { name: "stateComments", label: "Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1131,10 +1131,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1144,9 +1144,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "state", label: "State", type: "select", options: common.status },
           { name: "stateComments", label: "State Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1260,10 +1260,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1273,9 +1273,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "state", label: "State", type: "select", options: common.status },
           { name: "stateComments", label: "State Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1360,10 +1360,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1373,9 +1373,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "state", label: "State", type: "select", options: common.status },
           { name: "stateComments", label: "State Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1477,10 +1477,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1490,9 +1490,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "state", label: "State", type: "select", options: common.status },
           { name: "stateComments", label: "State Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1558,10 +1558,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1571,9 +1571,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "state", label: "State", type: "select", options: common.status },
           { name: "stateComments", label: "State Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1688,10 +1688,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1701,9 +1701,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "condition", label: "Condition", type: "select", options: common.conditionStatus },
           { name: "stateComments", label: "Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1818,10 +1818,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1831,9 +1831,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "condition", label: "Condition", type: "select", options: common.conditionStatus },
           { name: "stateComments", label: "Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1968,10 +1968,10 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Details",
+        sectionTitle: "Asset Details",
         fields: [
-          { name: "itemSerial", label: "Serial Number", type: "text", maxLength: 80 },
-          { name: "itemTag", label: "Item Tag", type: "text", required: true, maxLength: 60 },
+          { name: "assetSerial", label: "Serial Number", type: "text", maxLength: 80 },
+          { name: "assetTag", label: "Asset Tag", type: "text", required: true, maxLength: 60 },
           { name: "barcode", label: "Barcode / QR Code", type: "text", maxLength: 80 },
           { name: "vendor", label: "Vendor", type: "select", options: common.vendors },
           { name: "purchaseCost", label: "Purchase Cost", type: "number", min: 0, max: 10000000 },
@@ -1982,9 +1982,9 @@ export const fixedConfigs = {
         ],
       },
       {
-        sectionTitle: "Item Status",
+        sectionTitle: "Asset Status",
         fields: [
-          { name: "itemStatus", label: "Item Status", type: "select", options: common.status },
+          { name: "assetStatus", label: "Asset Status", type: "select", options: common.status },
           { name: "condition", label: "Condition", type: "select", options: common.conditionStatus },
           { name: "stateComments", label: "Comments", type: "textarea", maxLength: 400 },
         ],
@@ -1992,4 +1992,5 @@ export const fixedConfigs = {
     ],
   },
 };
+
 

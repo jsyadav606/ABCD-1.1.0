@@ -6,16 +6,16 @@ export const exportToCSV = (data, fileName = 'export.csv') => {
 
   // Get all unique keys from all objects
   const keys = Array.from(
-    new Set(data.flatMap(item => Object.keys(item)))
+    new Set(data.flatMap(asset => Object.keys(asset)))
   ).filter(key => !key.startsWith('_'))
 
   // Create CSV header
   const header = keys.join(',')
 
   // Create CSV rows
-  const rows = data.map(item =>
+  const rows = data.map(asset =>
     keys.map(key => {
-      const value = item[key]
+      const value = asset[key]
       // Handle strings with commas
       if (typeof value === 'string' && value.includes(',')) {
         return `"${value}"`

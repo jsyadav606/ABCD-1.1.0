@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Model: CPU Asset
  * Description: CPU specific fields + summary for fast list views. Collections: asset_cpu
  */
@@ -7,21 +7,21 @@ import mongoose from "mongoose";
 const assetSchema = new mongoose.Schema(
   {
     // Mandatory first fields
-    AssetCategory: {
+    assetCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AssetCategory",
       required: true
     },
-    AssetType: { type: String, required: true, trim: true },
-    AssetTypeId: {
+    assetType: { type: String, required: true, trim: true },
+    assetTypeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AssetType",
+      ref: "assetType",
       default: null
     },
 
     // Basic Information (matching frontend fields after omit)
-    AssetId: { type: String, trim: true, default: null },
-    AssetTag: { type: String, trim: true, default: null },
+    assetId: { type: String, trim: true, default: null },
+    assetTag: { type: String, trim: true, default: null },
     barcode: { type: String, trim: true, default: null },
     assetSubType: { type: String, trim: true, default: null },
     manufacturer: { type: String, trim: true, default: null },
@@ -111,10 +111,10 @@ const assetSchema = new mongoose.Schema(
     gpuInterfaceSpeed: { type: String, trim: true, default: null },
 
     // Item State
-    AssetStatus: { type: String, trim: true, default: "active" },
+    assetStatus: { type: String, trim: true, default: "active" },
     assetIsCurrently: { type: String, trim: true, default: "inStore" },
-    AssetUser: { type: String, trim: true, default: null },
-    AssignDate: { type: Date, default: null },
+    assetUser: { type: String, trim: true, default: null },
+    assignDate: { type: Date, default: null },
 
     // Network (Table in frontend)
     network: {
@@ -164,8 +164,8 @@ const assetSchema = new mongoose.Schema(
 
     // Summary field for quick listing (Industrial standard to avoid deep object lookup)
     summary: {
-      AssetName: { type: String, trim: true, default: null },
-      AssetTag: { type: String, trim: true, default: null },
+      assetName: { type: String, trim: true, default: null },
+      assetTag: { type: String, trim: true, default: null },
       serialNumber: { type: String, trim: true, default: null },
       manufacturer: { type: String, trim: true, default: null },
       model: { type: String, trim: true, default: null },
@@ -175,16 +175,16 @@ const assetSchema = new mongoose.Schema(
 );
 
 // Indices for performance
-assetSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, AssetType: 1, isDeleted: 1, createdAt: -1 });
-assetSchema.index({ AssetId: 1 }, { sparse: true });
+assetSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, assetType: 1, isDeleted: 1, createdAt: -1 });
+assetSchema.index({ assetId: 1 }, { sparse: true });
 assetSchema.index({ serialNumber: 1 }, { sparse: true });
 
 // Pre-save hook to populate summary if needed
 assetSchema.pre("save", function () {
   // Map identifying fields to summary for compatibility with list views
   this.summary = {
-    AssetName: this.AssetId || "CPU",
-    AssetTag: this.AssetTag || this.AssetId || "N/A",
+    assetName: this.assetId || "CPU",
+    assetTag: this.assetTag || this.assetId || "N/A",
     barcode: this.barcode || "N/A",
     serialNumber: this.serialNumber || "N/A",
     manufacturer: this.manufacturer || "N/A",

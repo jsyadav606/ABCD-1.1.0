@@ -29,7 +29,7 @@ const Setup = lazy(() => import("./pages/Setup/Setup"));
 // @ts-ignore
 const AssetPage = lazy(() => import("./pages/Assets/asset"));
 // @ts-ignore
-const AddItemPage = lazy(() => import("./pages/Assets/AddItem"));
+const AddAssetPage = lazy(() => import("./pages/Assets/addasset"));
 // @ts-ignore
 const AssetDetails = lazy(() => import("./pages/Assets/AssetDetails"));
 
@@ -134,7 +134,7 @@ function App() {
 // @ts-ignore
               ProtectedRoute>
                 <MainLayout>
-                  <AddItemPage />
+                  <AddAssetPage />
                 </MainLayout>
               </ProtectedRoute>
             }
@@ -146,7 +146,7 @@ function App() {
 // @ts-ignore
               ProtectedRoute>
                 <MainLayout>
-                  <AddItemPage />
+                  <AddAssetPage />
                 </MainLayout>
               </ProtectedRoute>
             }

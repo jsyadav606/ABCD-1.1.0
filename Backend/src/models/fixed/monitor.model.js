@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Model: Monitor Asset
  * Description: Monitor specific fields + summary for fast list views. Collection: asset_monitor
  */
@@ -6,23 +6,23 @@ import mongoose from "mongoose";
 
 const monitorSchema = new mongoose.Schema(
   {
-    AssetCategory: {
+    assetCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AssetCategory",
       required: true
     },
-    AssetType: { type: String, required: true, trim: true },
-    AssetTypeId: {
+    assetType: { type: String, required: true, trim: true },
+    assetTypeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AssetType",
+      ref: "assetType",
       default: null
     },
 
     AssetId: { type: String, trim: true, default: null },
     AssetTag: { type: String, trim: true, default: null },
     barcode: { type: String, trim: true, default: null },
-    AssetName: { type: String, trim: true, default: null },
-    AssetDescription: { type: String, trim: true, default: null },
+    assetName: { type: String, trim: true, default: null },
+    assetDescription: { type: String, trim: true, default: null },
     assetSubType: { type: String, trim: true, default: null },
 
     manufacturer: { type: String, trim: true, default: null },
@@ -32,7 +32,7 @@ const monitorSchema = new mongoose.Schema(
     partNumber: { type: String, trim: true, default: null },
     serialNumber: { type: String, trim: true, default: null },
 
-    AssetCondition: { type: String, trim: true, default: null },
+    assetCondition: { type: String, trim: true, default: null },
     ownershipType: { type: String, trim: true, default: null },
     manufacturingDate: { type: Date, default: null },
 
@@ -76,7 +76,7 @@ const monitorSchema = new mongoose.Schema(
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
     summary: {
-      AssetName: { type: String, trim: true, default: null },
+      assetName: { type: String, trim: true, default: null },
       AssetTag: { type: String, trim: true, default: null },
       serialNumber: { type: String, trim: true, default: null },
       manufacturer: { type: String, trim: true, default: null },
@@ -86,13 +86,13 @@ const monitorSchema = new mongoose.Schema(
   { timestamps: true, collection: "asset_fixed" }
 );
 
-monitorSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, AssetType: 1, isDeleted: 1, createdAt: -1 });
+monitorSchema.index({ organizationId: 1, branchId: 1, AssetCategory: 1, assetType: 1, isDeleted: 1, createdAt: -1 });
 monitorSchema.index({ AssetId: 1 }, { sparse: true });
 monitorSchema.index({ serialNumber: 1 }, { sparse: true });
 
 monitorSchema.pre("save", function () {
   this.summary = {
-    AssetName: this.AssetId || "Monitor",
+    assetName: this.AssetId || "Monitor",
     AssetTag: this.AssetTag || this.AssetId || "N/A",
     serialNumber: this.serialNumber || "N/A",
     manufacturer: this.manufacturer || "N/A",

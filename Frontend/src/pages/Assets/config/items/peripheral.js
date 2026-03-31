@@ -13,7 +13,7 @@ export const peripheralConfigs = {
        //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         addFields: [
           {
@@ -112,8 +112,8 @@ export const peripheralConfigs = {
         //  addFields:[{},{},{},]
       }),
 
-      //! Item State
-      fromGeneric("Item State",{
+      //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -241,7 +241,7 @@ export const peripheralConfigs = {
        //! Basic Information
       fromGeneric("Basic Information", {
         // Example: hide description field coming from generic
-        omitFields: ["itemDescription", "barcode","itemName","itemTag","itemCategory","itemType","brand","itemCondition",],
+        omitFields: ["assetDescription", "barcode","assetName","assetTag","assetCategory","assetType","brand","assetCondition",],
         // overrideFields: [{},{},{}  ],
         // addFields: [{},{},{}],
       }),
@@ -283,8 +283,8 @@ export const peripheralConfigs = {
         //  addFields:[{},{},{},]
       }),
 
-      //! Item State
-      fromGeneric("Item State",{
+      //! Asset State
+      fromGeneric("Asset State",{
         //  omitFields: ["","",""],
         //  overrideFields: [{},{},{},],
         //  addFields:[{},{},{},]
@@ -292,4 +292,5 @@ export const peripheralConfigs = {
     ],
   },
 };
+
 

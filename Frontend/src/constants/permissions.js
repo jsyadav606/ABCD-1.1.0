@@ -16,10 +16,10 @@ export const PERMISSION_MODULES = [
       },
       {
         key: "items",
-        label: "Asset Items",
+        label: "Assets",
         actions: [
-          { key: "view", label: "View Items" },
-          { key: "create", label: "Create Items" },
+          { key: "view", label: "View Assets" },
+          { key: "create", label: "Create Assets" },
         ],
       },
     ],

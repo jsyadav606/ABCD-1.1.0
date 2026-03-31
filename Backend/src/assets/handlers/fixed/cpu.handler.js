@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CPU Asset Handler
  * Description: CPU-specific create/list/get logics. Frontend AddItem.jsx ke payload ko normalize karke
  * memory/storage/network summaries banata hai taa ki queries fast aur UI mapping simple rahe.
@@ -99,7 +99,7 @@ const create = async (req) => {
   // Purchase & Warranty field names to extract
   const purchaseFields = [
     "purchaseType", "poNumber", "poDate", "receiptNumber", "receiptDate", "purchaseDate",
-    "vendorId", "AssetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
+    "vendorId", "assetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
     "deliveryChallanDate", "purchaseCost", "taxAmount", "totalAmount", "currency",
     "deliveryDate", "receivedBy"
   ];

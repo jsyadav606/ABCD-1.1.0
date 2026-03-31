@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Select from '../../components/Select/Select.jsx';
 import './AddAsset.css';
@@ -245,10 +245,10 @@ const AddAsset = () => {
 
   const handleItemSelect = (e) => {
     const selectedId = e.target.value;
-    const selectedItemObj = assetTypes.find(item => item._id === selectedId);
+    const selectedAssetObj = assetTypes.find(item => item._id === selectedId);
     
-    if (selectedItemObj) {
-      const normalizedName = normalizeTypeKey(selectedItemObj.name || selectedItemObj._id);
+    if (selectedAssetObj) {
+      const normalizedName = normalizeTypeKey(selectedAssetObj.name || selectedAssetObj._id);
       setSelectedAsset(normalizedName); // normalized name for config lookup
       setSelectedAssetId(selectedId); // ObjectId for data persistence
     }
@@ -406,7 +406,7 @@ const AddAsset = () => {
             />
             <Select
               name="item"
-              value={selectedassetId}
+              value={selectedAssetId}
               onChange={handleItemSelect}
               options={itemOptions}
               placeholder={selectedCategory ? 'Select an item': 'Select a category first'}
@@ -432,7 +432,7 @@ const AddAsset = () => {
               userSelectedBranch={userSelectedBranch}
             />
           </div>
-        ) : selectedItem ? (
+        ) : selectedAsset ? (
           <div className="form-empty-notice">No form configuration found for selected item.</div>
         ) : null}
       </div>
@@ -441,3 +441,4 @@ const AddAsset = () => {
 };
 
 export default AddAsset;
+

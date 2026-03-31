@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Mouse Asset Handler (Peripheral)
  * Description: Mouse-specific create/list/getById logics.
  * Uses Mouse model (asset_peripheral_mouse collection).
@@ -65,7 +65,7 @@ const create = async (req) => {
   // Purchase field names to extract
   const purchaseFields = [
     "purchaseType", "poNumber", "poDate", "receiptNumber", "receiptDate", "purchaseDate",
-    "vendorId", "AssetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
+    "vendorId", "assetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
     "deliveryChallanDate", "purchaseCost", "taxAmount", "totalAmount", "currency",
     "deliveryDate", "receivedBy"
   ];

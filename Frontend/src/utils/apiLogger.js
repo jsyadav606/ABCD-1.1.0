@@ -48,7 +48,7 @@ class APILogger {
 
     this.logs.push(log)
     this.saveLogs()
-    console.log(`[API] ${method.toUpperCase()} ${url.replace(/^.*\/api/, '/api')}`, status && `→ ${status}`)
+   
   }
 
   // Log a response
@@ -69,7 +69,7 @@ class APILogger {
     this.saveLogs()
 
     const emoji = status >= 200 && status < 300 ? '✅' : '❌'
-    console.log(`[API] ${emoji} ${method.toUpperCase()} ${url.replace(/^.*\/api/, '/api')} → ${status}`, data || '')
+    
   }
 
   // Log an error

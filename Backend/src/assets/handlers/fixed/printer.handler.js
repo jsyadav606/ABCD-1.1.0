@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Printer Asset Handler
  * Description: Printer create/list/get logics. Simple fields normalize + numeric sanitization.
  * Creates 3 documents: Fixed Asset (asset_fixed), Purchase (asset_purchases), Warranty (asset_warranties)
@@ -38,7 +38,7 @@ const create = async (req) => {
   // Purchase & Warranty field names to extract
   const purchaseFields = [
     "purchaseType", "poNumber", "poDate", "receiptNumber", "receiptDate", "purchaseDate",
-    "vendorId", "AssetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
+    "vendorId", "assetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
     "deliveryChallanDate", "purchaseCost", "taxAmount", "totalAmount", "currency",
     "deliveryDate", "receivedBy"
   ];

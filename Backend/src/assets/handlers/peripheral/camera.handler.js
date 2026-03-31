@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Camera Peripheral Handler
  * Description: Camera-specific create/list/getById logics. 
  * Handles all camera fields from frontend and creates Fixed Asset, Purchase, and Warranty documents.
@@ -77,7 +77,7 @@ const create = async (req) => {
   // Purchase field names to extract
   const purchaseFields = [
     "purchaseType", "poNumber", "poDate", "receiptNumber", "receiptDate", "purchaseDate",
-    "vendorId", "AssetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
+    "vendorId", "assetReceivedOn", "invoiceNumber", "invoiceDate", "deliveryChallanNumber",
     "deliveryChallanDate", "purchaseCost", "taxAmount", "totalAmount", "currency",
     "deliveryDate", "receivedBy"
   ];
