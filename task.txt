@@ -15,6 +15,9 @@ DELETE /api/v1/itemtypes/:id                → Delete item type
 
 
 
+Masonry
+
+
 
 Camera type - Conference Camera, PTZ Camera, Webcam
 Connection Type - USB, USB-C, Wireless

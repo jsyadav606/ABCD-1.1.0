@@ -11,9 +11,11 @@ import { PageLoader } from "../../components/Loader/Loader.jsx";
 import { ErrorNotification } from "../../components/ErrorBoundary/ErrorNotification.jsx";
 import Button from "../../components/Button/Button.jsx";
 import Badge from "../../components/Badge/Badge.jsx";
+import AssetSpecifications from "./components/AssetSpecifications.jsx";
 import { fetchAssetDetailsById } from "../../services/assetApi.js";
+import { toCapitalizedCase } from "../../utils/string.jsx";
 
-const AssetDetails = () => {
+  const AssetDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [asset, setAsset] = useState(null);
@@ -68,16 +70,54 @@ const AssetDetails = () => {
   };
 
   const getWarrantyStatus = (warranty) => {
-    if (!warranty || warranty.warrantyAvailable === "No") return "NO WARRANTY";
-    if (warranty.warrantyStatus === "Under Warranty") return "ACTIVE";
-    if (warranty.warrantyStatus === "Expired") return "EXPIRED";
-    return "UNKNOWN";
+    if (!warranty) return "NO WARRANTY";
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Priority 1: Check if under AMC
+    if (warranty.amcAvailable === "Yes" || warranty.amcAvailable === "yes") {
+      if (warranty.amcEndDate) {
+        const amcEndDate = new Date(warranty.amcEndDate);
+        amcEndDate.setHours(0, 0, 0, 0);
+        if (amcEndDate >= today) {
+          return "Under AMC";
+        }
+      }
+    }
+    
+    // Priority 2: Check if under warranty
+    if (warranty.warrantyAvailable === "Yes" || warranty.warrantyAvailable === "yes") {
+      if (warranty.warrantyEndDate) {
+        const warrantyEndDate = new Date(warranty.warrantyEndDate);
+        warrantyEndDate.setHours(0, 0, 0, 0);
+        if (warrantyEndDate >= today) {
+          return "Under Warranty";
+        } else {
+          return "Warranty Expired";
+        }
+      }
+      // If no end date but warranty is available, assume it's under warranty
+      return "Under Warranty";
+    }
+    
+    // If warranty was available but now expired
+    if (warranty.warrantyAvailable === "No" && warranty.warrantyEndDate) {
+      const warrantyEndDate = new Date(warranty.warrantyEndDate);
+      warrantyEndDate.setHours(0, 0, 0, 0);
+      if (warrantyEndDate < today) {
+        return "Warranty Expired";
+      }
+    }
+    
+    return "NO WARRANTY";
   };
 
   const getWarrantyColor = (warranty) => {
     const status = getWarrantyStatus(warranty);
-    if (status === "ACTIVE") return "success";
-    if (status === "EXPIRED") return "danger";
+    if (status === "Under AMC") return "info";
+    if (status === "Under Warranty") return "success";
+    if (status === "Warranty Expired") return "danger";
     return "secondary";
   };
 
@@ -88,13 +128,14 @@ const AssetDetails = () => {
   const purchase = asset.purchase || {};
   const warranty = asset.warranty || {};
 
-  const storage = asset.storage || {};
-  const memory = asset.memory || {};
-  const totalRam = memory.totalCapacityGB || (memory.modules?.reduce((sum, m) => sum + (m.ramCapacityGB || 0), 0) || 0);
-  const totalStorage = storage.totalCapacityGB || (storage.devices?.reduce((sum, d) => sum +  (d.driveCapacityGB || 0), 0) || 0);
-
   return (
     <div className="asset-details-container">
+    {/* Back Button */}
+      <div className="back-button-container">
+        <Button className="back-button" variant="secondary" onClick={() => navigate("/assets")}>
+          <span className="material-icons">arrow_back</span> Back to Assets
+        </Button>
+      </div>
       {/* ===== HEADER SECTION ===== */}
       <div className="asset-details-header">
         <div className="header-left">
@@ -112,10 +153,21 @@ const AssetDetails = () => {
               </Badge>
             </div>
             <p className="header-subtitle">
-              {asset.assetType} | {asset.manufacturer || "Unknown"} | {asset.model || "N/A"}
+              <span title="Asset Type">
+                {["cpu"].includes(asset.assetType?.toLowerCase()) ? "CPU"  : toCapitalizedCase(String(asset.assetType)) || "Unknown Type"}
+              </span>              
+
+              {" | "}
+              <span title="Manufacturer">
+                {toCapitalizedCase(String(asset.manufacturer)) || "Unknown Manufacturer"}
+              </span>
+              {" | "}
+              <span title="Model">
+                { toCapitalizedCase(String(asset.model)) || "N/A"}
+              </span>
             </p>
             <p className="header-meta">
-              Serial: <strong>{asset.serialNumber || "N/A"}</strong> | 
+              Serial: <strong>{asset.serialNumber?.toUpperCase() || "N/A"}</strong> | 
               Added: <strong>{formatDate(asset.createdAt)}</strong>
             </p>
           </div>
@@ -150,13 +202,13 @@ const AssetDetails = () => {
           className={`tab ${activeTab === "overview" ? "active" : ""}`}
           onClick={() => setActiveTab("overview")}
         >
-          <span className="material-icons">description</span> Overview
+          <span className="material-icons">description</span> Specifications
         </button>
         <button
-          className={`tab ${activeTab === "specifications" ? "active" : ""}`}
-          onClick={() => setActiveTab("specifications")}
+          className={`tab ${activeTab === "assignment" ? "active" : ""}`}
+          onClick={() => setActiveTab("assignment")}
         >
-          <span className="material-icons">settings</span> Specifications
+          <span className="material-icons">person</span> Assignment
         </button>
         <button
           className={`tab ${activeTab === "warranty" ? "active" : ""}`}
@@ -184,223 +236,97 @@ const AssetDetails = () => {
         {activeTab === "overview" && (
           <div className="tab-content overview-tab">
             <div className="info-grid">
-              <div className="info-section">
-                <h3>Asset Information</h3>
-                <div className="info-items">
-                  <div className="info-item">
-                    <label>Asset ID</label>
-                    <p>{asset.assetId || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Item Type</label>
-                    <p>{asset.assetType || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Category</label>
-                    <p>{typeof asset.assetcategory === "string" ? asset.assetcategory : asset.assetcategory?.name || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Status</label>
-                    <p>
-                      <Badge variant={getStatusColor(asset.isActive)}>
-                        {getStatusBadge(asset.isActive)}
-                      </Badge>
-                    </p>
-                  </div>
-                  <div className="info-item">
-                    <label>Location/Branch</label>
-                    <p>{typeof asset.branchId === "string" ? asset.branchId : asset.branchId?.branchName || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Created Date</label>
-                    <p>{formatDate(asset.createdAt)}</p>
-                  </div>
-                </div>
-              </div>
+              {/* //! Specifications Details */}
+              <AssetSpecifications asset={asset} />
 
-              <div className="info-section">
-                <h3>Product Details</h3>
-                <div className="info-items">
-                  <div className="info-item">
-                    <label>Manufacturer</label>
-                    <p>{asset.manufacturer || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Model</label>
-                    <p>{asset.model || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Serial Number</label>
-                    <p className="serial-number">{asset.serialNumber || "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Asset Tag</label>
-                    <p className="asset-tag">{asset.assetTag || asset.assetId || "N/A"}</p>
-                  </div>
-                  {asset.osName && (
-                    <div className="info-item">
-                      <label>Operating System</label>
-                      <p>{asset.osName}</p>
-                    </div>
-                  )}
-                  {asset.processorModel && (
-                    <div className="info-item">
-                      <label>Processor</label>
-                      <p>{asset.processorModel}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="info-section">
-                <h3>Assignment</h3>
-                <div className="info-items">
-                  <div className="info-item">
-                    <label>Assigned To</label>
-                    <p>{asset.assignedToUser?.name || asset.assignedTo || "Unassigned"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Assignment Date</label>
-                    <p>{asset.assignmentDate ? formatDate(asset.assignmentDate) : "N/A"}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Department</label>
-                    <p>{asset.department || "N/A"}</p>
-                  </div>
-                </div>
-              </div>
+               
             </div>
           </div>
         )}
 
-        {/* ===== SPECIFICATIONS TAB ===== */}
-        {activeTab === "specifications" && (
-          <div className="tab-content specifications-tab">
+        {/* ===== ASSIGNMENT TAB ===== */}
+        {activeTab === "assignment" && (
+          <div className="tab-content assignment-tab">
             <div className="info-grid">
-              {/* RAM Section */}
-              {(totalRam > 0 || memory.modules?.length > 0) && (
-                <div className="info-section">
-                  <h3>Memory (RAM)</h3>
-                  <div className="info-items">
-                    <div className="info-item">
-                      <label>Total Capacity</label>
-                      <p>{totalRam} GB</p>
-                    </div>
-                    {memory.modules?.length > 0 && (
-                      <div className="info-item">
-                        <label>Modules</label>
-                        <ul className="spec-list">
-                          {memory.modules.map((module, idx) => (
-                            <li key={idx}>
-                              {module.ramCapacityGB}GB - {module.ramType || "N/A"}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Storage Section */}
-              {(totalStorage > 0 || storage.devices?.length > 0) && (
-                <div className="info-section">
-                  <h3>Storage</h3>
-                  <div className="info-items">
-                    <div className="info-item">
-                      <label>Total Capacity</label>
-                      <p>{totalStorage} GB</p>
-                    </div>
-                    {storage.devices?.length > 0 && (
-                      <div className="info-item">
-                        <label>Drives</label>
-                        <ul className="spec-list">
-                          {storage.devices.map((device, idx) => (
-                            <li key={idx}>
-                              {device.driveCapacityGB}GB {device.driveType || "HDD"} - {device.interfaceType || "SATA"}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Monitor Specifications */}
-              {asset.assetType === "MONITOR" && (
-                <div className="info-section">
-                  <h3>Display Specifications</h3>
-                  <div className="info-items">
-                    {asset.screenSizeInches && (
-                      <div className="info-item">
-                        <label>Screen Size</label>
-                        <p>{asset.screenSizeInches}"</p>
-                      </div>
-                    )}
-                    {asset.resolution && (
-                      <div className="info-item">
-                        <label>Resolution</label>
-                        <p>{asset.resolution}</p>
-                      </div>
-                    )}
-                    {(asset.panelType || asset.panel_type) && (
-                      <div className="info-item">
-                        <label>Panel Type</label>
-                        <p>{asset.panelType || asset.panel_type}</p>
-                      </div>
-                    )}
-                    {(asset.refreshRateHz || asset.refresh_rate_hz) && (
-                      <div className="info-item">
-                        <label>Refresh Rate</label>
-                        <p>{asset.refreshRateHz || asset.refresh_rate_hz} Hz</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* GPU Section */}
-              {asset.gpu && (
-                <div className="info-section">
-                  <h3>Graphics</h3>
-                  <div className="info-items">
-                    <div className="info-item">
-                      <label>GPU Model</label>
-                      <p>{asset.gpu}</p>
-                    </div>
-                    {asset.gpuMemoryGB && (
-                      <div className="info-item">
-                        <label>GPU Memory</label>
-                        <p>{asset.gpuMemoryGB} GB</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* General Specs */}
+              {/* Current Assignment */}
               <div className="info-section">
-                <h3>General Information</h3>
+                <h3>Current Assignment</h3>
                 <div className="info-items">
-                  {asset.color && (
-                    <div className="info-item">
-                      <label>Color</label>
-                      <p>{asset.color}</p>
+                  <div className="info-item">
+                    <label>Assigned To</label>
+                    <p>{asset.assignedToUser?.name || asset.assignedTo || "Not Assigned"}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Employee ID</label>
+                    <p>{asset.assignedToUser?.employeeId || asset.employeeId || "N/A"}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Department</label>
+                    <p>{asset.assignedToUser?.department || asset.department || "N/A"}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Assignment Date</label>
+                    <p>{asset.assignmentDate ? formatDate(asset.assignmentDate) : "Not Assigned"}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Location</label>
+                    <p>{asset.location || asset.branchId?.branchName || "N/A"}</p>
+                  </div>
+                  <div className="info-item">
+                    <label>Status</label>
+                    <p>
+                      <Badge variant={asset.assignedTo ? "success" : "secondary"}>
+                        {asset.assignedTo ? "Assigned" : "Available"}
+                      </Badge>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assignment History */}
+              <div className="info-section">
+                <h3>Assignment History</h3>
+                <div className="assignment-history">
+                  {asset.assignmentHistory && asset.assignmentHistory.length > 0 ? (
+                    <div className="history-list">
+                      {asset.assignmentHistory.map((assignment, index) => (
+                        <div key={index} className="history-item">
+                          <div className="history-header">
+                            <span className="history-user">{assignment.assignedTo || "Unknown"}</span>
+                            <span className="history-date">{formatDate(assignment.assignmentDate)}</span>
+                          </div>
+                          <div className="history-details">
+                            <span>Department: {assignment.department || "N/A"}</span>
+                            <span>Location: {assignment.location || "N/A"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <span className="material-icons">history</span>
+                      <p>No assignment history available</p>
                     </div>
                   )}
-                  {asset.weight && (
-                    <div className="info-item">
-                      <label>Weight</label>
-                      <p>{asset.weight}</p>
-                    </div>
-                  )}
-                  {asset.notes && (
-                    <div className="info-item">
-                      <label>Notes</label>
-                      <p>{asset.notes}</p>
-                    </div>
-                  )}
+                </div>
+              </div>
+
+              {/* Assignment Actions */}
+              <div className="info-section">
+                <h3>Assignment Actions</h3>
+                <div className="action-buttons">
+                  <Button variant="primary" size="small">
+                    <span className="material-icons" style={{fontSize: '16px', marginRight: '4px'}}>person_add</span>
+                    Assign Asset
+                  </Button>
+                  <Button variant="secondary" size="small">
+                    <span className="material-icons" style={{fontSize: '16px', marginRight: '4px'}}>swap_horiz</span>
+                    Transfer Asset
+                  </Button>
+                  <Button variant="danger" size="small">
+                    <span className="material-icons" style={{fontSize: '16px', marginRight: '4px'}}>person_remove</span>
+                    Unassign Asset
+                  </Button>
                 </div>
               </div>
             </div>
@@ -709,12 +635,7 @@ const AssetDetails = () => {
         )}
       </div>
 
-      {/* Back Button */}
-      <div className="asset-details-footer">
-        <Button variant="secondary" onClick={() => navigate("/assets")}>
-          <span className="material-icons">arrow_back</span> Back to Assets
-        </Button>
-      </div>
+      
     </div>
   );
 };

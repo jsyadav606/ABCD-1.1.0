@@ -1,0 +1,439 @@
+/* AssetSpecifications.css - Professional & Clean Design */
+
+.asset-specifications {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.specifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.specifications-header h3 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+.asset-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.asset-type-badge .material-icons {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.specifications-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin: 0 0 24px;
+  width: 100%;
+  max-width: 100%;
+  grid-auto-rows: minmax(100px, auto);
+  grid-auto-flow: dense;
+}
+
+@media (max-width: 1024px) {
+  .specifications-content {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .specifications-content {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.spec-section {
+  display: block;
+  width: 100%;
+  margin: 0;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  align-self: start;
+}
+
+@media (min-width: 1500px) {
+  .specifications-content {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .specifications-content {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .specifications-content {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .specifications-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) {
+  .specifications-content {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .specifications-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Base Spec Section Styling */
+.spec-section {
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 20px;
+  background: #ffffff;
+  position: relative;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.spec-section:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Section Title */
+.spec-section h4 {
+  margin: 0 0 18px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Different accent colors for different section types - based on position */
+.spec-section:nth-child(1) {
+  border-left-color: #6366f1; /* Processor - Indigo */
+}
+
+.spec-section:nth-child(1) h4 {
+  color: #4f46e5;
+}
+
+.spec-section:nth-child(2) {
+  border-left-color: #8b5cf6; /* Memory - Violet */
+}
+
+.spec-section:nth-child(2) h4 {
+  color: #7c3aed;
+}
+
+.spec-section:nth-child(3) {
+  border-left-color: #06b6d4; /* Storage - Cyan */
+}
+
+.spec-section:nth-child(3) h4 {
+  color: #0891b2;
+}
+
+.spec-section:nth-child(4) {
+  border-left-color: #f59e0b; /* Display - Amber */
+}
+
+.spec-section:nth-child(4) h4 {
+  color: #d97706;
+}
+
+.spec-section:nth-child(5) {
+  border-left-color: #ec4899; /* Graphics - Pink */
+}
+
+.spec-section:nth-child(5) h4 {
+  color: #db2777;
+}
+
+.spec-section:nth-child(6) {
+  border-left-color: #3b82f6; /* OS - Blue */
+}
+
+.spec-section:nth-child(6) h4 {
+  color: #1d4ed8;
+}
+
+.spec-section:nth-child(7) {
+  border-left-color: #10b981; /* Security/Hardware - Emerald */
+}
+
+.spec-section:nth-child(7) h4 {
+  color: #059669;
+}
+
+.spec-section:nth-child(n+8) {
+  border-left-color: #64748b; /* Others - Slate */
+}
+
+.spec-section:nth-child(n+8) h4 {
+  color: #475569;
+}
+
+/* Grid for spec items - Responsive masonry-like layout */
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.spec-item:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.spec-item.full-width {
+  grid-column: 1 / -1;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.spec-item label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.spec-item span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+  word-break: break-word;
+}
+
+/* Module and Drive Lists */
+.module-list,
+.drive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.module-item,
+.drive-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.module-item:hover,
+.drive-item:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.module-spec,
+.drive-spec {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.module-manufacturer,
+.drive-manufacturer {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.drive-interface {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* No Specifications State */
+.no-specs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #94a3b8;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  gap: 12px;
+}
+
+.no-specs .material-icons {
+  font-size: 44px;
+  opacity: 0.4;
+}
+
+.no-specs p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.no-specs small {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* Empty State */
+.specifications-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.specifications-empty .empty-state {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.specifications-empty .empty-state .material-icons {
+  font-size: 60px;
+  margin-bottom: 12px;
+  opacity: 0.25;
+}
+
+.specifications-empty .empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.specifications-empty .empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .spec-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .specifications-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .spec-section {
+    padding: 16px;
+  }
+
+  .spec-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .spec-item {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .asset-specifications {
+    padding: 0;
+  }
+
+  .specifications-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .asset-type-badge {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .spec-section {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .spec-section h4 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  .spec-grid {
+    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .spec-item {
+    padding: 8px;
+  }
+
+  .spec-item label {
+    font-size: 0.7rem;
+  }
+
+  .spec-item span {
+    font-size: 0.85rem;
+  }
+}

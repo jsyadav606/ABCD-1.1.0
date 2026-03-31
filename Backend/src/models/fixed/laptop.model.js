@@ -21,7 +21,7 @@ const laptopSchema = new mongoose.Schema(
     // Basic Information
     AssetId: { type: String, trim: true, default: null },
     AssetTag: { type: String, trim: true, default: null },
-    barcode: { type: String, trim: true, default: null },
+    // barcode: { type: String, trim: true, default: null },
     assetSubType: { type: String, trim: true, default: null },
     manufacturer: { type: String, trim: true, default: null },
     model: { type: String, trim: true, default: null },
