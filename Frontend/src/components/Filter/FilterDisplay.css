@@ -3,18 +3,22 @@
 
 .filter-display-row {
   background: linear-gradient(135deg, rgba(226, 232, 240, 0.9) 0%, rgba(203, 213, 225, 0.8) 100%);
-  padding: 10px 16px;
+  padding: 5px 16px;
   border-radius: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 12px;
-  /* flex-wrap: wrap; */
-  overflow-x: auto;
+  /*flex-wrap: wrap;
+  */overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
   border: 1.5px solid #cbd5e1;
   backdrop-filter: blur(4px);
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
 }
 
 

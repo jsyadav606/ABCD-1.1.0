@@ -19,6 +19,16 @@ Masonry
 
 
 
+just btana h ki kya hum assetdetails pahe ke spectification tab me jo section h unhe individual edit kar skte h. yani age mne cpu ki deatl pahe open ki h or m uske kekval processor ya sirf ram section ko edit krna chahta hu to kya kar skta hu. or mujhe same vhi section chahiye jo input form ya addasset page per show hote h same vse hi layout me or save krne ke baad fir se ase hi aa jaye jse details page per show ho rhe h abhi.
+
+sirf conferm kro ki asa ho skta h ya nhi. abhi koi change nhi krna h.
+
+
+
+
+
+
+
 Camera type - Conference Camera, PTZ Camera, Webcam
 Connection Type - USB, USB-C, Wireless
 Item is Currently - In Store, In used
