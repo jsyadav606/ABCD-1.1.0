@@ -42,7 +42,7 @@
 
 .table__container {
 	overflow-x: auto;
-	max-height: 60vh;
+	max-height: 57vh;
 }
 
 /* ================= TABLE ================= */
@@ -151,6 +151,7 @@
 .highlight {
 	background-color: #fde68a;
 	border-radius: 4px;
+	color: #000;
 	/* padding: 0 2px; */
 }
 

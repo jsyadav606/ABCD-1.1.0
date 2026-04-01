@@ -102,7 +102,7 @@ const AssetSpecifications = ({ asset }) => {
 
     return (
       <div key={section.title} className="spec-section">
-        <h4>{section.title}</h4>
+        <h3>{section.title}</h3>
         <div className="spec-grid">
           {section.fields.map((field) => renderFieldItem(field))}
         </div>
@@ -141,7 +141,7 @@ const AssetSpecifications = ({ asset }) => {
 
   return (
     <div className="asset-specifications">
-      <div className="specifications-header">
+      {/* <div className="specifications-header">
         <h3>Specifications</h3>
         <div className="asset-type-badge">
           <span className="material-icons">
@@ -149,7 +149,7 @@ const AssetSpecifications = ({ asset }) => {
           </span>
           {assetType || "Unknown"}
         </div>
-      </div>
+      </div> */}
       <div className="specifications-content">
         {renderSpecifications()}
       </div>

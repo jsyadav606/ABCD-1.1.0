@@ -29,19 +29,58 @@
   background-color: #f8fafc;
   padding: 0;
   margin: 0;
+      padding: 5px 20px;
 }
 
 
 .back-button-container {
   /* position: fixed; */
   display: inline-block;
- padding: 10px 32px;
+ /* padding: 10px 0px; */
   /* z-index: 100; */
+}
+
+.back-button-container .material-icons {
+  font-size: 17px;
+  color: var(--primary-color);
+  transition: color 0.2s ease;
+}
+.back-button-container .material-icons:hover {
+  color: var(--primary-dark);
+}
+
+.back-button-container span {
+  margin-left: 4px;
+  font-size: 14px;
+  color: var(--primary-color);
+  transition: color 0.2s ease;
+}
+
+.back-button-container span:hover {
+  color: var(--primary-dark);
+}
+
+.back-button-container .btn-md {
+  padding: 0.225rem 1rem;
+}
+
+.back-button{
+  padding: 5px 5px0 !important;
+      /* border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; */
 }
 
 /* ===== HEADER SECTION ===== */
 .asset-details-header {
   display: flex;
+  padding: 9px 0px;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
@@ -140,7 +179,7 @@
 .asset-details-tabs {
   display: flex;
   gap: 0;
-  padding: 0 32px;
+  /* padding: 0 32px; */
   background-color: white;
   border-bottom: 1px solid var(--border-color);
   overflow-x: auto;
@@ -199,7 +238,7 @@
 /* ===== CONTENT AREA ===== */
 .asset-details-content {
   flex: 1;
-  padding: 24px 32px;
+  padding: 16px 0px;
   overflow-y: auto;
 }
 
@@ -329,19 +368,29 @@
 }
 
 .info-item label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
 }
 
 .info-item p {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-primary);
-  font-weight: 500;
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 600;
   word-break: break-word;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.info-item:hover p {
+  background: #f1f5f9;
+  border-color: #a8b4c2;
 }
 
 .spec-list {

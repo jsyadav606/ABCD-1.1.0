@@ -132,7 +132,7 @@ import { toCapitalizedCase } from "../../utils/string.jsx";
     <div className="asset-details-container">
     {/* Back Button */}
       <div className="back-button-container">
-        <Button className="back-button" variant="secondary" onClick={() => navigate("/assets")}>
+        <Button className="back-button" variant="secondary"  onClick={() => navigate("/assets")}>
           <span className="material-icons">arrow_back</span> Back to Assets
         </Button>
       </div>
