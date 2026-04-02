@@ -729,6 +729,9 @@
   }
 
   .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
     gap: 12px;
   }
 
@@ -818,6 +821,101 @@
 
   .timeline-content p {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .asset-details-container {
+    padding: 8px 8px;
+    min-height: 100vh;
+  }
+
+  .asset-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .asset-icon {
+    font-size: 24px;
+  }
+
+  .header-title h1 {
+    font-size: 16px;
+  }
+
+  .header-subtitle,
+  .header-meta {
+    font-size: 11px;
+  }
+
+  .header-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .header-actions > button {
+    width: 100%;
+    font-size: 11px;
+    padding: 6px 8px !important;
+  }
+
+  .asset-details-tabs {
+    padding: 0 8px;
+  }
+
+  .tab {
+    min-width: 90px;
+    padding: 10px 6px;
+    font-size: 11px;
+  }
+
+  .asset-details-content {
+    padding: 10px 0;
+  }
+
+  .info-section {
+    padding: 10px;
+  }
+
+  .timeline::before {
+    left: 18px;
+  }
+
+  .timeline-marker {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .timeline-event {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .timeline-content {
+    padding: 10px;
+  }
+
+  .empty-state {
+    padding: 28px 14px;
   }
 }
 

@@ -102,7 +102,7 @@ const AssetSpecifications = ({ asset }) => {
 
     return (
       <div key={section.title} className="spec-section">
-        <h3>{section.title}</h3>
+        <h4>{section.title}</h4>
         <div className="spec-grid">
           {section.fields.map((field) => renderFieldItem(field))}
         </div>

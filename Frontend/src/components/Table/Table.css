@@ -74,6 +74,10 @@
 	box-shadow: 0 2px 0 #ddd;
 }
 
+.table__data td {
+	font-size: 14px;
+}
+
 /* ================= ROWS ================= */
 
 /* Alternating row background colors */
@@ -88,6 +92,10 @@
 /* Hover effect - overrides alternating colors */
 .table__data tbody tr.table__row:hover {
 	background: #a2bdd8 !important;
+	color: #fff !important;
+}
+
+.table__data tbody tr.table__row:hover Button {
 	color: #fff !important;
 }
 
@@ -115,6 +123,8 @@
 .table__row--inactive:hover {
 	background-color: #f3f4f6;
 }
+
+
 
 /* ================= ACTION BUTTONS ================= */
 
